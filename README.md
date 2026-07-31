@@ -1,0 +1,116 @@
+# Composer Atlas
+
+A personal classical-music exploration tool: **194 composers spanning ~950 years** of music history (Petrus Abaelardus, 1079 → present), rendered as an interactive D3.js timeline with a Leaflet map panel for each composer's geographic journey.
+
+## Run it locally
+
+The app is a static site that needs to be served over HTTP (because it loads `composers.json` via `fetch` and uses ES modules).
+
+**Easiest (Windows):** double-click `start.cmd`. It launches a static server and opens the browser to <http://atlas.localhost:8080>.
+
+**Manual** — from this directory:
+
+```powershell
+npx serve -l 8080           # Node (any OS)
+python3 -m http.server 8080 # Python 3 (if installed)
+```
+
+Then open <http://atlas.localhost:8080> or <http://localhost:8080>. Press `Ctrl+C` in the terminal to stop the server.
+
+> Modern browsers auto-route any `*.localhost` hostname to 127.0.0.1, so `atlas.localhost` works with no hosts-file edit.
+
+## Notion / offline single-file version
+
+For an environment that can't serve a folder (a Notion HTML block, an email attachment, a USB drive), run:
+
+```powershell
+node build.cjs
+```
+
+This produces `composer-atlas.html` (~1.4 MB) with **everything inlined** — CSS, all JS modules, `composers.json`, D3, and Leaflet. Just drop it anywhere and open. The build fetches D3 and Leaflet from their CDNs at build time so no internet is needed at runtime either.
+
+## Files
+
+- `index.html` — page shell.
+- `styles.css` — dark theme, panel transitions, Leaflet overrides, the Clair-de-lune sheet-paper background baked in as a filtered SVG data URI.
+- `timeline.js` — D3 timeline: sticky-top axis, vertical bar list, horizontal-scroll at zoom > 1, six zoom levels, world-event markers, dashed relationship lines, era filter.
+- `map.js` — Leaflet map with CartoDB dark-matter tiles; birth/lived/death markers with toggleable layers; journey polyline.
+- `panel.js` — composer detail card: portrait, dual-row Life & Works timeline with popover, key works with Listen link, connection cards with notes, world-context aside.
+- `portraits.js` — initials fallback + lazy Wikipedia thumbnail fetch + per-title cache; higher-resolution swap for the lightbox.
+- `app.js` — glue: loads JSON, mirrors relationships, wires selection, zoom, lightbox, keyboard, tooltip, panel state machine, hash-based era filter.
+- `composers.json` — the data file (194 composers).
+- `build.cjs` — single-file bundler for the Notion / offline HTML.
+- `start.cmd` — Windows launcher (opens browser, runs `npx serve`).
+
+## Interaction
+
+### Timeline
+- **Click a composer bar** to open the side panel (peek mode, ~40% width from the right).
+- **Zoom** with the `−` / `+` buttons top-right, the `+` / `−` keys, or `Ctrl/⌘ + scroll wheel`. Six levels (1× → 6×). At higher zooms the timeline scrolls horizontally.
+- **Filter by era** — click any chip in the top-bar legend (Medieval, Renaissance, Baroque, Classical, Romantic, Modern, Contemporary). The URL updates to `#era=Romantic` so views are shareable and survive reload. Click **All** to clear.
+- **World-event markers** — French Revolution, Napoleonic Wars, 1848, WWI, WWII appear as faint vertical bands on the axis.
+- **Relationship lines** — selecting a composer draws soft dashed lines to the composers they knew personally.
+
+### Panel
+- **Peek** (default) — 40%-width overlay from the right, map above details.
+- **Expand** — click the `⤢` icon (top-left of panel, next to the close arrow) to switch to full-page mode: map fills the left 50 %, details fill the right 50 % with the world-context bullets promoted to a card next to the composer's name. Click `⤡` to collapse back.
+- **Close** — click the `»` arrow top-left of the panel or press `Esc`. `Esc` closes the lightbox first if it's open.
+- **Portrait** — click the portrait to enlarge it in a lightbox with a link out to Wikipedia.
+- **Life & Works timeline** — dual-row track sharing one x-axis. Filled dots = life events; open rings = key works. Hover any dot for the year, kind, title, and (for works) the era-context blurb.
+- **▶ Listen** — every key work has a Listen pill that opens a YouTube search for `{composer} {work}`. Override per work by adding `mediaUrl` in `composers.json`.
+- **Connection cards** — each shows the connected composer's name, lifespan, and a note explaining the relationship; click to jump to them. Cross-era navigation works even while the timeline is filtered.
+
+### Keyboard
+- `Esc` — close lightbox, then panel.
+- `+` / `-` — zoom the timeline.
+- `Ctrl/⌘ + scroll wheel` (over the timeline) — zoom.
+
+## Editing data
+
+All composer data lives in `composers.json`. Adding or editing entries doesn't require touching the UI code — the timeline sorts by `born`, the map auto-fits to the listed locations, and relationships are mirrored at load time so each link only needs to be listed on one side.
+
+A composer entry looks like:
+
+```json
+{
+  "id": "bach",
+  "name": "Johann Sebastian Bach",
+  "born": 1685,
+  "died": 1750,
+  "era": "Baroque",
+  "portrait": "",
+  "wiki": "Johann Sebastian Bach",
+  "birthPlace": { "city": "Eisenach", "country": "Germany", "lat": 50.9743, "lng": 10.3233 },
+  "locations": [
+    { "city": "Eisenach", "type": "birth", "years": "1685",       "lat": 50.9743, "lng": 10.3233 },
+    { "city": "Leipzig",  "type": "lived", "years": "1723–1750",  "lat": 51.3397, "lng": 12.3731 },
+    { "city": "Leipzig",  "type": "death", "years": "1750",       "lat": 51.3397, "lng": 12.3731 }
+  ],
+  "relationships": [
+    { "id": "handel",  "note": "Born the same year, 80 miles apart; never met" },
+    { "id": "vivaldi", "note": "Bach transcribed several of Vivaldi's concertos" }
+  ],
+  "lifeEvents": [
+    { "year": 1685, "event": "Born in Eisenach" }
+  ],
+  "keyWorks": [
+    { "title": "Brandenburg Concertos", "year": "1721", "context": "...", "mediaUrl": "https://www.youtube.com/watch?v=..." }
+  ],
+  "worldContext": ["..."]
+}
+```
+
+Notes on individual fields:
+
+- **`born`** and **`died`** are integers. `died` may be `null` for living composers (the bar extends to the current year, and the header count reflects a rolling span).
+- **`era`** must be one of: `Medieval`, `Renaissance`, `Baroque`, `Classical`, `Romantic`, `Modern`, `Contemporary`. It drives the bar colour and the legend chip that filters to that composer. Adding a new era means editing three files: `--era-*` in `styles.css`, `ERA_COLORS` in `timeline.js`, and `ERA_ORDER` in `app.js` (for legend order).
+- **`portrait`** is left blank by default — the app lazily fetches a thumbnail from Wikipedia's REST API using the `wiki` field. To override with a curated image, set `portrait` to a direct URL (Wikimedia Commons' `Special:FilePath` redirect works well); that takes precedence. While the fetch is in flight or if it fails, the portrait shows the composer's initials on their era colour.
+- **`wiki`** is the Wikipedia page title (with spaces, not underscores — the app URL-encodes it). Include parenthetical disambiguators when needed, e.g. `"John Powell (film composer)"`.
+- **`locations[].type`** is `birth`, `lived`, or `death`. Each drives a different marker colour (green / blue / red) and can be toggled independently in the map controls.
+- **`keyWorks[].year`** can be a single year (`"1721"`), a range (`"1722–1742"`), or a prefixed estimate (`"c.1680"`). The Life & Works timeline extracts the first four-digit number for positioning and shows the original string in the popover.
+- **`keyWorks[].mediaUrl`** is optional. When absent, the ▶ Listen pill falls back to a YouTube search of `{composer name} {work title}`.
+- **`relationships[]`** should list a note that describes the connection from either side (the mirroring copies the same note to the other composer). Relationships to composers not in the data file are silently ignored.
+
+## Adding composers programmatically
+
+Batches of new composers are typically added by writing a small one-off `_add_something.cjs` seed script that reads `composers.json`, pushes new entries into the array, calls a `pairs` block for relationships, and writes the file back. The `build.cjs` bundler then repackages the single-file HTML.

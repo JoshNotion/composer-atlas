@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "composer-atlas",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "serve", "-l", "8080", "C:/Users/User/code/composer-atlas"],
+      "port": 8080
+    }
+  ]
+}
