@@ -2034,10 +2034,6 @@
         "note": "Brahms-style German Romanticism reached its peak during his career"
       },
       {
-        "id": "amy-beach",
-        "note": "Late-Romantic chamber masterpiece in the wake of Brahms and Franck"
-      },
-      {
         "id": "richard-strauss",
         "note": "He spanned from Brahms's Vienna to postwar Allied occupation"
       },
@@ -2052,6 +2048,10 @@
       {
         "id": "dohnanyi",
         "note": "His conservative style stayed rooted in Brahms while Bartók and Kodály revolutionized around him"
+      },
+      {
+        "id": "amy-beach",
+        "note": "Late-Romantic chamber masterpiece in the wake of Brahms and Franck"
       }
     ],
     "lifeEvents": [
@@ -4703,10 +4703,6 @@
       {
         "id": "schoenberg",
         "note": "Born in Baltimore to a Lithuanian-Jewish record-shop owner and a librarian mother; discovers Bartók and Schoenberg among his father's unsold LPs and takes them home to study"
-      },
-      {
-        "id": "amy-beach",
-        "note": "Premieres Einstein on the Beach with Robert Wilson at the Met"
       },
       {
         "id": "milhaud",
@@ -7612,10 +7608,6 @@
     ],
     "relationships": [
       {
-        "id": "harris",
-        "note": "Marries surgeon Henry Harris Aubrey Beach, who restricts her concert career to one public appearance per year"
-      },
-      {
         "id": "brahms",
         "note": "Late-Romantic chamber masterpiece in the wake of Brahms and Franck"
       },
@@ -7626,14 +7618,6 @@
       {
         "id": "macdowell",
         "note": "The Second New England School (Beach, MacDowell, Chadwick) sought a distinct American Romanticism"
-      },
-      {
-        "id": "glass",
-        "note": "Premieres Einstein on the Beach with Robert Wilson at the Met"
-      },
-      {
-        "id": "bloch",
-        "note": "Dies at Agate Beach, Oregon on 15 July 1959 aged 78 of cancer; his last work is a Suite modale for flute and strings written for the flautist Elaine Shaffer"
       }
     ],
     "lifeEvents": [
@@ -24215,16 +24199,16 @@
         "note": "Cyclic sonata written for Ysaÿe's wedding; one of the great chamber works"
       },
       {
-        "id": "amy-beach",
-        "note": "Late-Romantic chamber masterpiece in the wake of Brahms and Franck"
-      },
-      {
         "id": "dindy",
         "note": "Begins studies with César Franck, whose most devoted pupil he becomes"
       },
       {
         "id": "widor",
         "note": "Succeeds Franck as professor of organ at the Paris Conservatoire"
+      },
+      {
+        "id": "amy-beach",
+        "note": "Late-Romantic chamber masterpiece in the wake of Brahms and Franck"
       }
     ],
     "lifeEvents": [
@@ -26616,10 +26600,6 @@
       {
         "id": "ysaye",
         "note": "Born in Geneva to a Jewish father from the Swiss village of Lengnau who traded in Swiss clocks and Alpine tourism souvenirs; sent to Brussels at 14 to study with Ysaÿe"
-      },
-      {
-        "id": "amy-beach",
-        "note": "Dies at Agate Beach, Oregon on 15 July 1959 aged 78 of cancer; his last work is a Suite modale for flute and strings written for the flautist Elaine Shaffer"
       }
     ],
     "lifeEvents": [
@@ -27890,12 +27870,7 @@
         "lng": -118.4912
       }
     ],
-    "relationships": [
-      {
-        "id": "amy-beach",
-        "note": "Marries surgeon Henry Harris Aubrey Beach, who restricts her concert career to one public appearance per year"
-      }
-    ],
+    "relationships": [],
     "lifeEvents": [
       {
         "year": 1898,
