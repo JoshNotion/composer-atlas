@@ -385,6 +385,10 @@
         "note": "Crossed paths in Venice in 1709 during Handel’s Italian travels; both were celebrated opera composers."
       },
       {
+        "id": "haydn",
+        "note": "Dies impoverished in Vienna and is buried in a hospital pauper's grave; the young Haydn sings in the funeral cortège"
+      },
+      {
         "id": "piazzolla",
         "note": "Suite of four tangos that quote and refract Vivaldi's seasons"
       },
@@ -395,10 +399,6 @@
       {
         "id": "meredith",
         "note": "Response to Vivaldi's Four Seasons for string quartet and electronics"
-      },
-      {
-        "id": "haydn",
-        "note": "Dies impoverished in Vienna and is buried in a hospital pauper's grave; the young Haydn sings in the funeral cortège"
       }
     ],
     "lifeEvents": [
@@ -977,6 +977,18 @@
         "note": "The eight-year-old Mozart visited London in 1764 and formed a deep bond with 'the London Bach'; Mozart mourned him warmly when he died in 1782."
       },
       {
+        "id": "hummel",
+        "note": "Born in Pressburg (modern Bratislava) to a conductor father; the family moves to Vienna when Hummel is eight and the child moves in with Mozart as his pupil, staying for two years"
+      },
+      {
+        "id": "weber",
+        "note": "Born in Eutin, Holstein, cousin of Mozart's wife Constanze; his father's traveling theatre company means Weber changes cities every few months throughout his childhood"
+      },
+      {
+        "id": "guarnieri",
+        "note": "Born in the Brazilian coffee-town of Tietê to an Italian-immigrant barber and choirmaster who names his son 'Mozart Camargo Guarnieri' — the composer suppresses the first name after adulthood"
+      },
+      {
         "id": "allegri",
         "note": "Setting of Psalm 51 whose embellished tradition was kept secret in the Sistine Chapel; legendarily transcribed from memory by the 14-year-old Mozart"
       },
@@ -997,20 +1009,8 @@
         "note": "Dies in Vienna on 7 May 1825 aged 74 after two years in a mental hospital, where the ailing composer had allegedly confessed on his sickbed to poisoning Mozart — a claim he explicitly denied when lucid"
       },
       {
-        "id": "hummel",
-        "note": "Born in Pressburg (modern Bratislava) to a conductor father; the family moves to Vienna when Hummel is eight and the child moves in with Mozart as his pupil, staying for two years"
-      },
-      {
-        "id": "weber",
-        "note": "Born in Eutin, Holstein, cousin of Mozart's wife Constanze; his father's traveling theatre company means Weber changes cities every few months throughout his childhood"
-      },
-      {
         "id": "korngold",
         "note": "He was Vienna's greatest child prodigy since Mozart"
-      },
-      {
-        "id": "guarnieri",
-        "note": "Born in the Brazilian coffee-town of Tietê to an Italian-immigrant barber and choirmaster who names his son 'Mozart Camargo Guarnieri' — the composer suppresses the first name after adulthood"
       }
     ],
     "lifeEvents": [
@@ -1520,6 +1520,14 @@
         "note": "Chopin counted Bellini's bel canto melodic line as a primary influence on his own piano writing."
       },
       {
+        "id": "field",
+        "note": "Refined a genre invented by John Field into music of unique poetic depth"
+      },
+      {
+        "id": "berlioz",
+        "note": "Paris in the 1830s was the cultural capital where Liszt, Berlioz, and Heine all lived"
+      },
+      {
         "id": "farrenc",
         "note": "Paris was the centre of European piano culture under Chopin, Liszt, and Kalkbrenner"
       },
@@ -1534,14 +1542,6 @@
       {
         "id": "hummel",
         "note": "Concerto bridging Mozart and Chopin; Chopin studied it closely"
-      },
-      {
-        "id": "field",
-        "note": "Refined a genre invented by John Field into music of unique poetic depth"
-      },
-      {
-        "id": "berlioz",
-        "note": "Paris in the 1830s was the cultural capital where Liszt, Berlioz, and Heine all lived"
       }
     ],
     "lifeEvents": [
@@ -2022,6 +2022,14 @@
         "note": "Hailed the 20-year-old Brahms in his 1853 essay 'Neue Bahnen' ('New Paths') as a 'young eagle' and the next great composer — the championing changed Brahms's life."
       },
       {
+        "id": "beethoven",
+        "note": "Dies of liver cancer in Vienna on 3 April 1897 aged 63, less than a year after Clara Schumann; buried in a state ceremony in the Zentralfriedhof between Beethoven, Schubert, and Johann Strauss II"
+      },
+      {
+        "id": "schubert",
+        "note": "Dies of liver cancer in Vienna on 3 April 1897 aged 63, less than a year after Clara Schumann; buried in a state ceremony in the Zentralfriedhof between Beethoven, Schubert, and Johann Strauss II"
+      },
+      {
         "id": "bruch",
         "note": "Brahms-style German Romanticism reached its peak during his career"
       },
@@ -2044,14 +2052,6 @@
       {
         "id": "dohnanyi",
         "note": "His conservative style stayed rooted in Brahms while Bartók and Kodály revolutionized around him"
-      },
-      {
-        "id": "beethoven",
-        "note": "Dies of liver cancer in Vienna on 3 April 1897 aged 63, less than a year after Clara Schumann; buried in a state ceremony in the Zentralfriedhof between Beethoven, Schubert, and Johann Strauss II"
-      },
-      {
-        "id": "schubert",
-        "note": "Dies of liver cancer in Vienna on 3 April 1897 aged 63, less than a year after Clara Schumann; buried in a state ceremony in the Zentralfriedhof between Beethoven, Schubert, and Johann Strauss II"
       }
     ],
     "lifeEvents": [
@@ -2170,16 +2170,16 @@
         "note": "Saint-Saëns taught Fauré at the École Niedermeyer and remained his mentor and closest older friend for six decades."
       },
       {
-        "id": "gounod",
-        "note": "Dies of a stroke at Saint-Cloud outside Paris on 18 October 1893 aged 75 while playing at his piano; a state funeral is held at the Madeleine with Fauré at the organ and Saint-Saëns leading the orchestra"
-      },
-      {
         "id": "stravinsky",
         "note": "His career spans from Berlioz's old age to Stravinsky's Rite of Spring"
       },
       {
         "id": "berlioz",
         "note": "His career spans from Berlioz's old age to Stravinsky's Rite of Spring"
+      },
+      {
+        "id": "gounod",
+        "note": "Dies of a stroke at Saint-Cloud outside Paris on 18 October 1893 aged 75 while playing at his piano; a state funeral is held at the Madeleine with Fauré at the organ and Saint-Saëns leading the orchestra"
       }
     ],
     "lifeEvents": [
@@ -2289,12 +2289,12 @@
         "note": "Close Paris friends; defended each other’s music in print and shared a love of two-piano playing."
       },
       {
-        "id": "lalo",
-        "note": "Spanish idioms were fashionable in Paris after Bizet's Carmen"
-      },
-      {
         "id": "wagner",
         "note": "Wagner's music dramas were beginning to influence French composers"
+      },
+      {
+        "id": "lalo",
+        "note": "Spanish idioms were fashionable in Paris after Bizet's Carmen"
       }
     ],
     "lifeEvents": [
@@ -2415,6 +2415,10 @@
         "note": "Tchaikovsky was the young Rachmaninov's mentor; his sudden death in 1893 devastated the 20-year-old composer, who wrote a trio in his memory."
       },
       {
+        "id": "mahler",
+        "note": "Meets Grieg, Brahms, and Mahler on a European tour"
+      },
+      {
         "id": "delibes",
         "note": "Ballet score that reshaped what dance music could express; Tchaikovsky studied it closely"
       },
@@ -2433,10 +2437,6 @@
       {
         "id": "glinka",
         "note": "Orchestral fantasy on Russian folk tunes; Tchaikovsky said 'all Russian symphonic music is contained in Kamarinskaya, as the oak is in the acorn'"
-      },
-      {
-        "id": "mahler",
-        "note": "Meets Grieg, Brahms, and Mahler on a European tour"
       }
     ],
     "lifeEvents": [
@@ -2826,6 +2826,10 @@
         "note": "Complicated relationship: d'Indy conducted early Debussy works and championed him, but Debussy's aesthetic evolved sharply away from d'Indy's Wagnerian dogma."
       },
       {
+        "id": "boulez",
+        "note": "Pierre Boulez called this the awakening of modern music"
+      },
+      {
         "id": "takemitsu",
         "note": "Born in Tokyo but taken to Japanese-occupied Manchuria as a small child while his father worked there; hears Debussy for the first time on Occupation-radio broadcasts as a self-educating teenager and is transformed"
       },
@@ -2840,10 +2844,6 @@
       {
         "id": "dutilleux",
         "note": "Two-orchestra symphony blending Debussy-Ravel color with dodecaphonic technique"
-      },
-      {
-        "id": "boulez",
-        "note": "Pierre Boulez called this the awakening of modern music"
       }
     ],
     "lifeEvents": [
@@ -3205,16 +3205,16 @@
         "note": "Tchaikovsky was the young Rachmaninov's mentor; his sudden death in 1893 devastated the 20-year-old composer, who wrote a trio in his memory."
       },
       {
-        "id": "paganini",
-        "note": "The textbook of violin virtuosity; the 24th caprice has inspired variation cycles by Brahms, Liszt, Rachmaninov, and Lutosławski"
-      },
-      {
         "id": "stravinsky",
         "note": "He maintained Romantic harmony into the era of Stravinsky and Schoenberg"
       },
       {
         "id": "schoenberg",
         "note": "He maintained Romantic harmony into the era of Stravinsky and Schoenberg"
+      },
+      {
+        "id": "paganini",
+        "note": "The textbook of violin virtuosity; the 24th caprice has inspired variation cycles by Brahms, Liszt, Rachmaninov, and Lutosławski"
       }
     ],
     "lifeEvents": [
@@ -4097,6 +4097,10 @@
       {
         "id": "albeniz",
         "note": "Spanish nationalists (Falla, Albéniz) had established a distinctive idiom for him to inherit"
+      },
+      {
+        "id": "de-falla",
+        "note": "Spanish nationalists (Falla, Albéniz) had established a distinctive idiom for him to inherit"
       }
     ],
     "lifeEvents": [
@@ -4206,12 +4210,12 @@
     ],
     "relationships": [
       {
-        "id": "ginastera",
-        "note": "His pupils include Astor Piazzolla"
-      },
-      {
         "id": "vivaldi",
         "note": "Suite of four tangos that quote and refract Vivaldi's seasons"
+      },
+      {
+        "id": "ginastera",
+        "note": "His pupils include Astor Piazzolla"
       }
     ],
     "lifeEvents": [
@@ -4332,6 +4336,10 @@
         "note": "British contemporaries; Walton's more rhetorical wing counterbalanced Britten's more restrained one for four decades."
       },
       {
+        "id": "purcell",
+        "note": "Variations and fugue on a theme of Purcell, written for a children's film"
+      },
+      {
         "id": "max-davies",
         "note": "The Manchester School of the 1950s reshaped British compositional identity between Britten and Birtwistle"
       },
@@ -4342,10 +4350,6 @@
       {
         "id": "ades",
         "note": "He was among the most acclaimed young British composers since Britten"
-      },
-      {
-        "id": "purcell",
-        "note": "Variations and fugue on a theme of Purcell, written for a children's film"
       }
     ],
     "lifeEvents": [
@@ -4685,22 +4689,6 @@
         "note": "American post-minimalist peers; contemporaries who reached mainstream opera houses in the 1980s."
       },
       {
-        "id": "tchaikovsky",
-        "note": "Dies in Saint Petersburg on 6 November 1893 aged 53, officially of cholera after drinking a glass of unboiled water despite an epidemic; whether it was accidental exposure, unconscious suicide, or an enforced 'court of honour' verdict for indiscreet homosexuality remains fiercely debated to this day"
-      },
-      {
-        "id": "ten-holt",
-        "note": "American minimalism (Reich, Glass, Riley) was emerging at the same moment as Canto Ostinato"
-      },
-      {
-        "id": "berwald",
-        "note": "Dies in Stockholm on 3 April 1868 aged 71 of pneumonia; appointed professor of composition at the Royal Academy only a year before, after decades earning his living as an orthopedist and glass-factory manager"
-      },
-      {
-        "id": "milhaud",
-        "note": "Dies at Geneva on 22 June 1974 aged 81 after decades of debilitating arthritis had confined him to a wheelchair; his California pupils at Mills College had included Dave Brubeck, Steve Reich, and Philip Glass"
-      },
-      {
         "id": "bartok",
         "note": "Born in Baltimore to a Lithuanian-Jewish record-shop owner and a librarian mother; discovers Bartók and Schoenberg among his father's unsold LPs and takes them home to study"
       },
@@ -4711,6 +4699,10 @@
       {
         "id": "amy-beach",
         "note": "Premieres Einstein on the Beach with Robert Wilson at the Met"
+      },
+      {
+        "id": "milhaud",
+        "note": "Dies at Geneva on 22 June 1974 aged 81 after decades of debilitating arthritis had confined him to a wheelchair; his California pupils at Mills College had included Dave Brubeck, Steve Reich, and Philip Glass"
       }
     ],
     "lifeEvents": [
@@ -6402,6 +6394,14 @@
         "note": "Long, complicated relationship — mutual admiration and mutual jealousy across the two great mid-century operatic modernizers."
       },
       {
+        "id": "richard-strauss",
+        "note": "Born in Munich to Franz Strauss, the principal horn of the Bavarian Court Opera and a Wagner-hater of legendary force, and Josephine Pschorr of the wealthy Munich brewing family"
+      },
+      {
+        "id": "weber",
+        "note": "Wagner explicitly acknowledged Weber as his direct musical ancestor"
+      },
+      {
         "id": "bizet",
         "note": "Wagner's music dramas were beginning to influence French composers"
       },
@@ -6412,10 +6412,6 @@
       {
         "id": "bellini",
         "note": "His long melodic lines became a primary influence on Chopin and Wagner"
-      },
-      {
-        "id": "richard-strauss",
-        "note": "Born in Munich to Franz Strauss, the principal horn of the Bavarian Court Opera and a Wagner-hater of legendary force, and Josephine Pschorr of the wealthy Munich brewing family"
       },
       {
         "id": "dukas",
@@ -6432,10 +6428,6 @@
       {
         "id": "spohr",
         "note": "Dies in Kassel on 22 October 1859 aged 75 after decades as Hofkapellmeister; his championing of Wagner's music in the 1840s had helped rescue the younger man's career"
-      },
-      {
-        "id": "weber",
-        "note": "Wagner explicitly acknowledged Weber as his direct musical ancestor"
       },
       {
         "id": "bruckner",
@@ -6976,12 +6968,12 @@
         "note": "Respighi studied with Rimsky-Korsakov in Saint Petersburg in 1900–1901; the encounter reshaped his orchestration for life."
       },
       {
-        "id": "glazunov",
-        "note": "Continuous three-section concerto in Rimsky-Korsakov's romantic-national vein"
-      },
-      {
         "id": "prokofiev",
         "note": "His teaching shaped two generations including Stravinsky, Prokofiev, and Respighi"
+      },
+      {
+        "id": "glazunov",
+        "note": "Continuous three-section concerto in Rimsky-Korsakov's romantic-national vein"
       }
     ],
     "lifeEvents": [
@@ -7397,16 +7389,16 @@
         "note": "Premiered several Saint-Saëns violin works; close colleagues in late 19th-century Paris."
       },
       {
+        "id": "chausson",
+        "note": "Tone poem for violin and orchestra that directly inspired Chausson's Poème"
+      },
+      {
         "id": "franck",
         "note": "Cyclic sonata written for Ysaÿe's wedding; one of the great chamber works"
       },
       {
         "id": "bloch",
         "note": "Born in Geneva to a Jewish father from the Swiss village of Lengnau who traded in Swiss clocks and Alpine tourism souvenirs; sent to Brussels at 14 to study with Ysaÿe"
-      },
-      {
-        "id": "chausson",
-        "note": "Tone poem for violin and orchestra that directly inspired Chausson's Poème"
       }
     ],
     "lifeEvents": [
@@ -7504,6 +7496,10 @@
       {
         "id": "albeniz",
         "note": "Catalan contemporaries and close friends; leaders of the Spanish nationalist school in the 1890s–1900s."
+      },
+      {
+        "id": "de-falla",
+        "note": "Albéniz and Falla were his contemporaries in defining a modern Spanish idiom"
       }
     ],
     "lifeEvents": [
@@ -7604,14 +7600,6 @@
     ],
     "relationships": [
       {
-        "id": "glass",
-        "note": "Premieres Einstein on the Beach with Robert Wilson at the Met"
-      },
-      {
-        "id": "bloch",
-        "note": "Dies at Agate Beach, Oregon on 15 July 1959 aged 78 of cancer; his last work is a Suite modale for flute and strings written for the flautist Elaine Shaffer"
-      },
-      {
         "id": "harris",
         "note": "Marries surgeon Henry Harris Aubrey Beach, who restricts her concert career to one public appearance per year"
       },
@@ -7626,6 +7614,14 @@
       {
         "id": "macdowell",
         "note": "The Second New England School (Beach, MacDowell, Chadwick) sought a distinct American Romanticism"
+      },
+      {
+        "id": "glass",
+        "note": "Premieres Einstein on the Beach with Robert Wilson at the Met"
+      },
+      {
+        "id": "bloch",
+        "note": "Dies at Agate Beach, Oregon on 15 July 1959 aged 78 of cancer; his last work is a Suite modale for flute and strings written for the flautist Elaine Shaffer"
       }
     ],
     "lifeEvents": [
@@ -7737,6 +7733,22 @@
         "note": "The two great Austro-German conductor-composers of their generation; long correspondence; rivals and friends in equal measure."
       },
       {
+        "id": "korngold",
+        "note": "Born in Brünn (now Brno) as the son of the influential Vienna music critic Julius Korngold; performs his cantata Gold before Mahler at age nine, prompting Mahler to declare him a genius"
+      },
+      {
+        "id": "mozart",
+        "note": "Dies in Vienna on 18 May 1911 aged 50 of bacterial endocarditis contracted in New York; conducting an imaginary orchestra on his deathbed, he is heard by his wife Alma to whisper 'Mozart' as his last word"
+      },
+      {
+        "id": "schoenberg",
+        "note": "Vienna in 1900 was the cultural crucible of Freud, Klimt, Schoenberg, and Mahler"
+      },
+      {
+        "id": "bernstein",
+        "note": "His symphonies were dismissed for decades and only entered the central repertoire after Bernstein's 1960s advocacy"
+      },
+      {
         "id": "tchaikovsky",
         "note": "Meets Grieg, Brahms, and Mahler on a European tour"
       },
@@ -7753,24 +7765,8 @@
         "note": "Born in Pressburg (now Bratislava) to a Hungarian factory director; the family moves to Vienna when Franz is seventeen so he can enter the Conservatory, and he plays cello under Mahler at the Court Opera Orchestra"
       },
       {
-        "id": "korngold",
-        "note": "Born in Brünn (now Brno) as the son of the influential Vienna music critic Julius Korngold; performs his cantata Gold before Mahler at age nine, prompting Mahler to declare him a genius"
-      },
-      {
         "id": "berio",
         "note": "Third movement layers Mahler's Second Symphony scherzo with quotations from Beckett and dozens of composers"
-      },
-      {
-        "id": "mozart",
-        "note": "Dies in Vienna on 18 May 1911 aged 50 of bacterial endocarditis contracted in New York; conducting an imaginary orchestra on his deathbed, he is heard by his wife Alma to whisper 'Mozart' as his last word"
-      },
-      {
-        "id": "schoenberg",
-        "note": "Vienna in 1900 was the cultural crucible of Freud, Klimt, Schoenberg, and Mahler"
-      },
-      {
-        "id": "bernstein",
-        "note": "His symphonies were dismissed for decades and only entered the central repertoire after Bernstein's 1960s advocacy"
       }
     ],
     "lifeEvents": [
@@ -7880,16 +7876,16 @@
     ],
     "relationships": [
       {
+        "id": "verdi",
+        "note": "Manon Lescaut establishes him as Verdi's successor"
+      },
+      {
         "id": "leoncavallo",
         "note": "Premieres La bohème, one year after Puccini's version — his fails commercially"
       },
       {
         "id": "weill",
         "note": "American opera (or Broadway musical) blending Puccini and pop"
-      },
-      {
-        "id": "verdi",
-        "note": "Manon Lescaut establishes him as Verdi's successor"
       }
     ],
     "lifeEvents": [
@@ -8006,20 +8002,20 @@
         "note": "The two great Austro-German conductor-composers of their generation; long correspondence; rivals and friends in equal measure."
       },
       {
-        "id": "varese",
-        "note": "Moves to Berlin; befriended by Busoni and Richard Strauss"
-      },
-      {
-        "id": "humperdinck",
-        "note": "Premieres Hänsel und Gretel in Weimar under Richard Strauss"
-      },
-      {
         "id": "wagner",
         "note": "Born in Munich to Franz Strauss, the principal horn of the Bavarian Court Opera and a Wagner-hater of legendary force, and Josephine Pschorr of the wealthy Munich brewing family"
       },
       {
         "id": "brahms",
         "note": "He spanned from Brahms's Vienna to postwar Allied occupation"
+      },
+      {
+        "id": "varese",
+        "note": "Moves to Berlin; befriended by Busoni and Richard Strauss"
+      },
+      {
+        "id": "humperdinck",
+        "note": "Premieres Hänsel und Gretel in Weimar under Richard Strauss"
       }
     ],
     "lifeEvents": [
@@ -8246,10 +8242,6 @@
         "note": "Paris colleagues; both taught at the Schola Cantorum and Conservatoire respectively and edited early-music editions together."
       },
       {
-        "id": "de-falla",
-        "note": "Moves to Paris and befriends Debussy, Ravel, and Dukas"
-      },
-      {
         "id": "messiaen",
         "note": "Becomes professor of composition at the Paris Conservatoire, teaching Rodrigo and Messiaen"
       },
@@ -8260,6 +8252,10 @@
       {
         "id": "wagner",
         "note": "Wagner's influence and French clarity both shape his small but distinguished output"
+      },
+      {
+        "id": "de-falla",
+        "note": "Moves to Paris and befriends Debussy, Ravel, and Dukas"
       }
     ],
     "lifeEvents": [
@@ -8597,16 +8593,16 @@
         "note": "Falla revered the older Albéniz and inherited his project of a modern Spanish idiom rooted in Andalusian material."
       },
       {
+        "id": "dukas",
+        "note": "Moves to Paris and befriends Debussy, Ravel, and Dukas"
+      },
+      {
         "id": "rodrigo",
         "note": "Spanish nationalists (Falla, Albéniz) had established a distinctive idiom for him to inherit"
       },
       {
         "id": "granados",
         "note": "Albéniz and Falla were his contemporaries in defining a modern Spanish idiom"
-      },
-      {
-        "id": "dukas",
-        "note": "Moves to Paris and befriends Debussy, Ravel, and Dukas"
       }
     ],
     "lifeEvents": [
@@ -8720,6 +8716,14 @@
         "note": "Bartók discovered Debussy in 1907; the encounter transformed his harmonic language."
       },
       {
+        "id": "dohnanyi",
+        "note": "Born in Pressburg (now Bratislava) to a mathematics professor father who had been Bartók's musical mentor; his own grandson Christoph Dohnányi becomes a leading conductor"
+      },
+      {
+        "id": "kodaly",
+        "note": "Begins collecting Hungarian, Slovak, and Romanian peasant songs with Zoltán Kodály"
+      },
+      {
         "id": "glass",
         "note": "Born in Baltimore to a Lithuanian-Jewish record-shop owner and a librarian mother; discovers Bartók and Schoenberg among his father's unsold LPs and takes them home to study"
       },
@@ -8728,16 +8732,8 @@
         "note": "He was one of the great modern conductors as well — his Mahler, Bartók, and Debussy sets remain reference recordings"
       },
       {
-        "id": "dohnanyi",
-        "note": "Born in Pressburg (now Bratislava) to a mathematics professor father who had been Bartók's musical mentor; his own grandson Christoph Dohnányi becomes a leading conductor"
-      },
-      {
         "id": "holmboe",
         "note": "Half-century cycle mapping his entire style, in the Nielsen-Bartók tradition"
-      },
-      {
-        "id": "kodaly",
-        "note": "Begins collecting Hungarian, Slovak, and Romanian peasant songs with Zoltán Kodály"
       }
     ],
     "lifeEvents": [
@@ -8959,20 +8955,20 @@
     ],
     "relationships": [
       {
-        "id": "mignone",
-        "note": "Dies in Rio de Janeiro on 19 February 1986 aged 88 after decades as one of the pillars of Brazilian classical music alongside his rival Villa-Lobos"
-      },
-      {
-        "id": "guarnieri",
-        "note": "He rivalled Villa-Lobos as the pre-eminent Brazilian composer of his generation"
-      },
-      {
         "id": "stravinsky",
         "note": "Moves to Paris with funding from Brazilian patrons; befriends Stravinsky and Varèse"
       },
       {
         "id": "varese",
         "note": "Moves to Paris with funding from Brazilian patrons; befriends Stravinsky and Varèse"
+      },
+      {
+        "id": "mignone",
+        "note": "Dies in Rio de Janeiro on 19 February 1986 aged 88 after decades as one of the pillars of Brazilian classical music alongside his rival Villa-Lobos"
+      },
+      {
+        "id": "guarnieri",
+        "note": "He rivalled Villa-Lobos as the pre-eminent Brazilian composer of his generation"
       }
     ],
     "lifeEvents": [
@@ -9393,12 +9389,12 @@
         "note": "Younger Parisian composer who absorbed Ravel's harmonic language; the two were colleagues with mutual respect."
       },
       {
-        "id": "honegger",
-        "note": "Joins Les Six with Milhaud, Poulenc, Tailleferre, Auric, and Durey"
-      },
-      {
         "id": "prokofiev",
         "note": "Dies of sudden heart failure in Paris on 30 January 1963 aged 64; his last composition, an oboe sonata dedicated to Prokofiev, is lying unfinished on his piano"
+      },
+      {
+        "id": "honegger",
+        "note": "Joins Les Six with Milhaud, Poulenc, Tailleferre, Auric, and Durey"
       }
     ],
     "lifeEvents": [
@@ -9520,6 +9516,10 @@
         "note": "Bernstein championed Shostakovich's symphonies in the West and conducted the US premiere of the Seventh Symphony with the NY Phil in 1962."
       },
       {
+        "id": "beethoven",
+        "note": "Dies of lung cancer in Moscow on 9 August 1975 aged 68; his final work is the Sonata for Viola and Piano, whose closing bars quote the opening of Beethoven's Moonlight Sonata"
+      },
+      {
         "id": "mussorgsky",
         "note": "Song cycle whose unsparing realism shaped Shostakovich a half-century later"
       },
@@ -9534,10 +9534,6 @@
       {
         "id": "schnittke",
         "note": "Post-Shostakovich Soviet composition thrived quietly under Brezhnev-era censorship"
-      },
-      {
-        "id": "beethoven",
-        "note": "Dies of lung cancer in Moscow on 9 August 1975 aged 68; his final work is the Sonata for Viola and Piano, whose closing bars quote the opening of Beethoven's Moonlight Sonata"
       }
     ],
     "lifeEvents": [
@@ -9654,26 +9650,6 @@
       {
         "id": "copland",
         "note": "American contemporaries who circulated in the same New York and Tanglewood milieu; both defined the 20th-century American classical mainstream from opposite temperaments — Copland the populist, Barber the lyricist."
-      },
-      {
-        "id": "monteverdi",
-        "note": "Born in Cremona, son of a barber-surgeon and pharmacist; publishes his first madrigal collection at 15"
-      },
-      {
-        "id": "handel",
-        "note": "Born in Halle to a barber-surgeon who forbade him music; secretly practises on a clavichord smuggled into the attic"
-      },
-      {
-        "id": "rossini",
-        "note": "Premieres The Barber of Seville in Rome — initially a flop, then a global phenomenon"
-      },
-      {
-        "id": "carter",
-        "note": "American modernism split between accessible populists (Copland, Barber) and complex serialists — Carter was the complex wing's presiding elder for decades"
-      },
-      {
-        "id": "guarnieri",
-        "note": "Born in the Brazilian coffee-town of Tietê to an Italian-immigrant barber and choirmaster who names his son 'Mozart Camargo Guarnieri' — the composer suppresses the first name after adulthood"
       }
     ],
     "lifeEvents": [
@@ -10024,16 +10000,16 @@
         "note": "Life-long friendship and creative partnership; Bernstein conducted the premiere of Copland's Third Symphony in 1946 and championed his music internationally throughout his conducting career."
       },
       {
+        "id": "beethoven",
+        "note": "Conducts Beethoven's Ninth at the fall of the Berlin Wall, replacing 'Freude' with 'Freiheit'"
+      },
+      {
         "id": "mahler",
         "note": "His symphonies were dismissed for decades and only entered the central repertoire after Bernstein's 1960s advocacy"
       },
       {
         "id": "berio",
         "note": "Premieres Sinfonia at the New York Philharmonic under Bernstein"
-      },
-      {
-        "id": "beethoven",
-        "note": "Conducts Beethoven's Ninth at the fall of the Berlin Wall, replacing 'Freude' with 'Freiheit'"
       }
     ],
     "lifeEvents": [
@@ -10614,12 +10590,12 @@
         "note": "Riley's In C (1964) was the foundational influence on Glass's and Reich's minimalism."
       },
       {
-        "id": "ten-holt",
-        "note": "American minimalism (Reich, Glass, Riley) was emerging at the same moment as Canto Ostinato"
-      },
-      {
         "id": "townshend",
         "note": "Solo album of overdubbed keyboards that influenced Pete Townshend's synthesizer use"
+      },
+      {
+        "id": "ten-holt",
+        "note": "American minimalism (Reich, Glass, Riley) was emerging at the same moment as Canto Ostinato"
       }
     ],
     "lifeEvents": [
@@ -10723,10 +10699,6 @@
       {
         "id": "john-adams",
         "note": "American post-minimalist peers; both trace back to Reich's mid-1960s tape and phase-shift experiments."
-      },
-      {
-        "id": "ten-holt",
-        "note": "American minimalism (Reich, Glass, Riley) was emerging at the same moment as Canto Ostinato"
       },
       {
         "id": "milhaud",
@@ -11519,12 +11491,12 @@
         "note": "Williams has repeatedly cited Herrmann as the composer who shaped his sense of how music can drive image, particularly through the 1958 score Vertigo."
       },
       {
-        "id": "korzeniowski",
-        "note": "Tom Ford's directorial debut, scored with strings that were often compared to Bernard Herrmann"
-      },
-      {
         "id": "zimmer",
         "note": "The auteur-composer partnership (Herrmann/Hitchcock, later Williams/Spielberg, Zimmer/Nolan) became the model for prestige filmmaking"
+      },
+      {
+        "id": "korzeniowski",
+        "note": "Tom Ford's directorial debut, scored with strings that were often compared to Bernard Herrmann"
       }
     ],
     "lifeEvents": [
@@ -11825,6 +11797,10 @@
         "note": "Williams has repeatedly cited Herrmann as the composer who shaped his sense of how music can drive image, particularly through the 1958 score Vertigo."
       },
       {
+        "id": "wagner",
+        "note": "Almost single-handedly re-taught Hollywood how to use leitmotif in the Wagner tradition"
+      },
+      {
         "id": "silvestri",
         "note": "His work is a bridge from the John Williams tradition to modern blockbuster scoring"
       },
@@ -11839,10 +11815,6 @@
       {
         "id": "powell",
         "note": "First composer outside John Williams to write a full new Star Wars score"
-      },
-      {
-        "id": "wagner",
-        "note": "Almost single-handedly re-taught Hollywood how to use leitmotif in the Wagner tradition"
       }
     ],
     "lifeEvents": [
@@ -11943,12 +11915,12 @@
     ],
     "relationships": [
       {
-        "id": "bear-mccreary",
-        "note": "Amazon Tolkien series score; had to invent musical language distinct from Howard Shore's films"
-      },
-      {
         "id": "wagner",
         "note": "The Rings project is often cited as the biggest single scoring project since Wagner's Ring cycle"
+      },
+      {
+        "id": "bear-mccreary",
+        "note": "Amazon Tolkien series score; had to invent musical language distinct from Howard Shore's films"
       }
     ],
     "lifeEvents": [
@@ -12978,12 +12950,12 @@
         "note": "The auteur-composer partnership (Herrmann/Hitchcock, later Williams/Spielberg, Zimmer/Nolan) became the model for prestige filmmaking"
       },
       {
-        "id": "elfman",
-        "note": "Superhero scoring after 1989 Batman took him as its template until Zimmer redefined it in the 2000s"
-      },
-      {
         "id": "john-williams",
         "note": "He effectively replaced the John Williams symphonic model with a hybrid orchestra-plus-electronics sound that dominates modern blockbusters"
+      },
+      {
+        "id": "elfman",
+        "note": "Superhero scoring after 1989 Batman took him as its template until Zimmer redefined it in the 2000s"
       }
     ],
     "lifeEvents": [
@@ -13091,12 +13063,12 @@
     ],
     "relationships": [
       {
-        "id": "doyle",
-        "note": "Scottish and Celtic idioms enjoyed a mainstream Hollywood moment through his and James Horner's Braveheart-era work"
-      },
-      {
         "id": "james-newton-howard",
         "note": "Choir-and-piano score for Ron Howard, using vocal soloist Charlotte Church"
+      },
+      {
+        "id": "doyle",
+        "note": "Scottish and Celtic idioms enjoyed a mainstream Hollywood moment through his and James Horner's Braveheart-era work"
       }
     ],
     "lifeEvents": [
@@ -13197,10 +13169,6 @@
     ],
     "relationships": [
       {
-        "id": "elgar",
-        "note": "Oratorio setting Cardinal Newman's poem on death and judgment"
-      },
-      {
         "id": "giacchino",
         "note": "Pixar's 21st-century voice is inseparable from his and Thomas Newman's tone"
       }
@@ -13298,6 +13266,14 @@
         "note": "Co-scored the Christopher Nolan Dark Knight trilogy (Batman Begins, The Dark Knight, The Dark Knight Rises) as a rare split-composer partnership."
       },
       {
+        "id": "schuman",
+        "note": "Born William Howard Schuman in Manhattan to a wholesale-drygoods-executive father who had been an amateur violinist; hears the Manhattan piece 'Rhapsody in Blue' at seventeen and immediately abandons his intended business career"
+      },
+      {
+        "id": "john-williams",
+        "note": "Return to the Wizarding World after John Williams; developed an entire new thematic universe"
+      },
+      {
         "id": "menken",
         "note": "Little Shop of Horrors, with lyricist Howard Ashman, opens off-Broadway"
       },
@@ -13308,14 +13284,6 @@
       {
         "id": "bear-mccreary",
         "note": "Amazon Tolkien series score; had to invent musical language distinct from Howard Shore's films"
-      },
-      {
-        "id": "schuman",
-        "note": "Born William Howard Schuman in Manhattan to a wholesale-drygoods-executive father who had been an amateur violinist; hears the Manhattan piece 'Rhapsody in Blue' at seventeen and immediately abandons his intended business career"
-      },
-      {
-        "id": "john-williams",
-        "note": "Return to the Wizarding World after John Williams; developed an entire new thematic universe"
       }
     ],
     "lifeEvents": [
@@ -14310,7 +14278,12 @@
         "lng": -118.2437
       }
     ],
-    "relationships": [],
+    "relationships": [
+      {
+        "id": "thomas-newman",
+        "note": "Pixar's 21st-century voice is inseparable from his and Thomas Newman's tone"
+      }
+    ],
     "lifeEvents": [
       {
         "year": 1967,
@@ -16759,12 +16732,12 @@
         "note": "Ciconia represents the northern arrival in Italy just as Landini's generation was passing; his Italian works absorb the Trecento madrigal tradition."
       },
       {
-        "id": "lebertoul",
-        "note": "Motets preserved in Bologna Q15 alongside works by Ciconia, Dufay, and Binchois"
-      },
-      {
         "id": "dufay",
         "note": "He was the first great composer of the Franco-Flemish tradition to work almost entirely in Italy, prefiguring Dufay's generation"
+      },
+      {
+        "id": "lebertoul",
+        "note": "Motets preserved in Bologna Q15 alongside works by Ciconia, Dufay, and Binchois"
       }
     ],
     "lifeEvents": [
@@ -18316,16 +18289,16 @@
         "note": "Fellow members of the Mighty Handful; Rimsky-Korsakov completed and orchestrated Prince Igor after Borodin's sudden death."
       },
       {
-        "id": "glinka",
-        "note": "The Mighty Handful (Balakirev, Mussorgsky, Borodin, Rimsky-Korsakov, Cui) all considered themselves his direct heirs"
-      },
-      {
         "id": "balakirev",
         "note": "Joins Balakirev's circle — the future Mighty Handful — while continuing medical research"
       },
       {
         "id": "glazunov",
         "note": "Dies suddenly of heart failure at a masked ball in Saint Petersburg on 27 February 1887 aged 53, collapsing while dancing; leaves Prince Igor unfinished after eighteen years' work, completed posthumously by Rimsky-Korsakov and Glazunov"
+      },
+      {
+        "id": "glinka",
+        "note": "The Mighty Handful (Balakirev, Mussorgsky, Borodin, Rimsky-Korsakov, Cui) all considered themselves his direct heirs"
       }
     ],
     "lifeEvents": [
@@ -18890,16 +18863,24 @@
         "note": "Webern was Schoenberg's other principal pupil; together with Berg they formed the 'Second Viennese School'."
       },
       {
+        "id": "mahler",
+        "note": "Vienna in 1900 was the cultural crucible of Freud, Klimt, Schoenberg, and Mahler"
+      },
+      {
+        "id": "goehr",
+        "note": "Born in Berlin on 10 August 1932 to Walter Goehr, a Schoenberg pupil and later BBC-orchestra conductor, and Laelia Baumgartner; the family flees to England in 1933 to escape the Nazi seizure of power"
+      },
+      {
+        "id": "malcolm-arnold",
+        "note": "Born in Vienna to a Bratislava-born Jewish shoe-shop keeper father who dies when Arnold is 15, forcing him to leave school and take a bank clerk's job to support the family"
+      },
+      {
         "id": "rachmaninov",
         "note": "He maintained Romantic harmony into the era of Stravinsky and Schoenberg"
       },
       {
         "id": "glass",
         "note": "Born in Baltimore to a Lithuanian-Jewish record-shop owner and a librarian mother; discovers Bartók and Schoenberg among his father's unsold LPs and takes them home to study"
-      },
-      {
-        "id": "mahler",
-        "note": "Vienna in 1900 was the cultural crucible of Freud, Klimt, Schoenberg, and Mahler"
       },
       {
         "id": "dukas",
@@ -18920,14 +18901,6 @@
       {
         "id": "nono",
         "note": "Marries Nuria Schoenberg, daughter of Arnold"
-      },
-      {
-        "id": "goehr",
-        "note": "Born in Berlin on 10 August 1932 to Walter Goehr, a Schoenberg pupil and later BBC-orchestra conductor, and Laelia Baumgartner; the family flees to England in 1933 to escape the Nazi seizure of power"
-      },
-      {
-        "id": "malcolm-arnold",
-        "note": "Born in Vienna to a Bratislava-born Jewish shoe-shop keeper father who dies when Arnold is 15, forcing him to leave school and take a bank clerk's job to support the family"
       }
     ],
     "lifeEvents": [
@@ -19259,18 +19232,6 @@
     ],
     "relationships": [
       {
-        "id": "villa-lobos",
-        "note": "Moves to Paris with funding from Brazilian patrons; befriends Stravinsky and Varèse"
-      },
-      {
-        "id": "dindy",
-        "note": "The Schola Cantorum trained a generation of French composers (Roussel, Satie, Varèse, Auric) as a counter to Conservatoire orthodoxy"
-      },
-      {
-        "id": "roussel",
-        "note": "He taught Satie, Martinů, and Varèse at the Schola Cantorum"
-      },
-      {
         "id": "richard-strauss",
         "note": "Moves to Berlin; befriended by Busoni and Richard Strauss"
       },
@@ -19285,6 +19246,18 @@
       {
         "id": "boulez",
         "note": "Frank Zappa, John Cage, and Boulez all identified him as a decisive personal influence"
+      },
+      {
+        "id": "villa-lobos",
+        "note": "Moves to Paris with funding from Brazilian patrons; befriends Stravinsky and Varèse"
+      },
+      {
+        "id": "dindy",
+        "note": "The Schola Cantorum trained a generation of French composers (Roussel, Satie, Varèse, Auric) as a counter to Conservatoire orthodoxy"
+      },
+      {
+        "id": "roussel",
+        "note": "He taught Satie, Martinů, and Varèse at the Schola Cantorum"
       }
     ],
     "lifeEvents": [
@@ -19741,12 +19714,12 @@
         "note": "Stockhausen studied briefly with Messiaen in 1952, one of the most direct routes by which Messiaen's rhythmic ideas reached post-war German serialism."
       },
       {
-        "id": "dukas",
-        "note": "Becomes professor of composition at the Paris Conservatoire, teaching Rodrigo and Messiaen"
-      },
-      {
         "id": "xenakis",
         "note": "Appointed to the Paris Conservatoire; teaches Boulez, Stockhausen, Xenakis"
+      },
+      {
+        "id": "dukas",
+        "note": "Becomes professor of composition at the Paris Conservatoire, teaching Rodrigo and Messiaen"
       }
     ],
     "lifeEvents": [
@@ -19992,6 +19965,18 @@
         "note": "Boulez became Takemitsu's most persistent Western advocate as a conductor and correspondent."
       },
       {
+        "id": "schoenberg",
+        "note": "His polemics — famously 'Schoenberg est mort' (1952) — set the tone of European post-war modernism"
+      },
+      {
+        "id": "mahler",
+        "note": "He was one of the great modern conductors as well — his Mahler, Bartók, and Debussy sets remain reference recordings"
+      },
+      {
+        "id": "bartok",
+        "note": "He was one of the great modern conductors as well — his Mahler, Bartók, and Debussy sets remain reference recordings"
+      },
+      {
         "id": "debussy",
         "note": "Pierre Boulez called this the awakening of modern music"
       },
@@ -20006,18 +19991,6 @@
       {
         "id": "dutilleux",
         "note": "He belonged neither to Boulez's Darmstadt circle nor to French tradition alone"
-      },
-      {
-        "id": "schoenberg",
-        "note": "His polemics — famously 'Schoenberg est mort' (1952) — set the tone of European post-war modernism"
-      },
-      {
-        "id": "mahler",
-        "note": "He was one of the great modern conductors as well — his Mahler, Bartók, and Debussy sets remain reference recordings"
-      },
-      {
-        "id": "bartok",
-        "note": "He was one of the great modern conductors as well — his Mahler, Bartók, and Debussy sets remain reference recordings"
       }
     ],
     "lifeEvents": [
@@ -20468,12 +20441,12 @@
         "note": "British contemporaries whose paths crossed repeatedly at BBC and festival commissions."
       },
       {
-        "id": "judith-weir",
-        "note": "Born in Cambridge to Scottish parents; studies with John Tavener as a teenager and later Robin Holloway"
-      },
-      {
         "id": "chopin",
         "note": "Born in London on 28 January 1944 to Presbyterian parents; father a builder, mother a pianist who taught him Chopin waltzes on the family upright as a small boy"
+      },
+      {
+        "id": "judith-weir",
+        "note": "Born in Cambridge to Scottish parents; studies with John Tavener as a teenager and later Robin Holloway"
       }
     ],
     "lifeEvents": [
@@ -20787,16 +20760,16 @@
     ],
     "relationships": [
       {
-        "id": "wallen",
-        "note": "Appointed Master of the King's Music, succeeding Judith Weir"
-      },
-      {
         "id": "tavener",
         "note": "Born in Cambridge to Scottish parents; studies with John Tavener as a teenager and later Robin Holloway"
       },
       {
         "id": "britten",
         "note": "Her style incorporates traditional Scottish and non-Western musical materials with an ease that echoes Britten's Japanese studies"
+      },
+      {
+        "id": "wallen",
+        "note": "Appointed Master of the King's Music, succeeding Judith Weir"
       }
     ],
     "lifeEvents": [
@@ -20882,7 +20855,12 @@
         "lng": -4.0533
       }
     ],
-    "relationships": [],
+    "relationships": [
+      {
+        "id": "judith-weir",
+        "note": "Appointed Master of the King's Music, succeeding Judith Weir"
+      }
+    ],
     "lifeEvents": [
       {
         "year": 1958,
@@ -20978,12 +20956,12 @@
     ],
     "relationships": [
       {
-        "id": "ades",
-        "note": "Opera on Shakespeare; libretto by Meredith Oakes"
-      },
-      {
         "id": "vivaldi",
         "note": "Response to Vivaldi's Four Seasons for string quartet and electronics"
+      },
+      {
+        "id": "ades",
+        "note": "Opera on Shakespeare; libretto by Meredith Oakes"
       }
     ],
     "lifeEvents": [
@@ -21109,12 +21087,12 @@
         "note": "Schola Cantorum colleague; d'Indy taught Albéniz counterpoint after Albéniz moved to Paris in 1893."
       },
       {
-        "id": "rodrigo",
-        "note": "Spanish nationalists (Falla, Albéniz) had established a distinctive idiom for him to inherit"
-      },
-      {
         "id": "ravel",
         "note": "His Iberia is often called the summit of Spanish piano music; its complexity anticipates Debussy and Ravel"
+      },
+      {
+        "id": "rodrigo",
+        "note": "Spanish nationalists (Falla, Albéniz) had established a distinctive idiom for him to inherit"
       }
     ],
     "lifeEvents": [
@@ -21709,12 +21687,12 @@
     ],
     "relationships": [
       {
-        "id": "rodrigo",
-        "note": "Dies in Madrid on 6 July 1999 aged 97 after decades as Spain's most internationally-performed living composer; buried alongside his Turkish-born pianist wife Victoria Kamhi in Aranjuez, the town whose royal gardens inspired his concerto"
-      },
-      {
         "id": "palestrina",
         "note": "Born in Ávila, Old Castile as one of eleven children of a prosperous merchant; travels to Rome at seventeen where he probably studies with Palestrina at the German Jesuit College"
+      },
+      {
+        "id": "rodrigo",
+        "note": "Dies in Madrid on 6 July 1999 aged 97 after decades as Spain's most internationally-performed living composer; buried alongside his Turkish-born pianist wife Victoria Kamhi in Aranjuez, the town whose royal gardens inspired his concerto"
       }
     ],
     "lifeEvents": [
@@ -22255,16 +22233,16 @@
     ],
     "relationships": [
       {
-        "id": "massenet",
-        "note": "His teaching produced Charpentier, Koechlin, Hahn, and dozens of others"
-      },
-      {
         "id": "rameau",
         "note": "Only opera; considered the finest French tragédie en musique between Lully and Rameau"
       },
       {
         "id": "lully",
         "note": "Only opera; considered the finest French tragédie en musique between Lully and Rameau"
+      },
+      {
+        "id": "massenet",
+        "note": "His teaching produced Charpentier, Koechlin, Hahn, and dozens of others"
       }
     ],
     "lifeEvents": [
@@ -22492,12 +22470,12 @@
     ],
     "relationships": [
       {
-        "id": "tartini",
-        "note": "50 variations on a Corelli gavotte — a bowing textbook still used today"
-      },
-      {
         "id": "telemann",
         "note": "His compositions were unusually few but exquisitely finished — quality over Telemann-style volume"
+      },
+      {
+        "id": "tartini",
+        "note": "50 variations on a Corelli gavotte — a bowing textbook still used today"
       }
     ],
     "lifeEvents": [
@@ -23564,10 +23542,6 @@
     ],
     "relationships": [
       {
-        "id": "farrenc",
-        "note": "Drew comparisons to Schubert and Hummel"
-      },
-      {
         "id": "mozart",
         "note": "Born in Pressburg (modern Bratislava) to a conductor father; the family moves to Vienna when Hummel is eight and the child moves in with Mozart as his pupil, staying for two years"
       },
@@ -23578,6 +23552,10 @@
       {
         "id": "beethoven",
         "note": "He was Beethoven's chief piano rival in Vienna"
+      },
+      {
+        "id": "farrenc",
+        "note": "Drew comparisons to Schubert and Hummel"
       }
     ],
     "lifeEvents": [
@@ -23734,36 +23712,12 @@
     ],
     "relationships": [
       {
-        "id": "chopin",
-        "note": "Refined a genre invented by John Field into music of unique poetic depth"
-      },
-      {
-        "id": "bartok",
-        "note": "Field recordings on wax cylinders revolutionized European ethnomusicology"
-      },
-      {
-        "id": "rautavaara",
-        "note": "'Concerto for birds and orchestra' using field recordings of Arctic birds"
-      },
-      {
-        "id": "frahm",
-        "note": "Assembled from field-recording-style captures of live concerts across many rooms"
-      },
-      {
-        "id": "powell",
-        "note": "Animation scoring became a prestige field for the first time in the 2010s partly through his work"
-      },
-      {
-        "id": "gudnadottir",
-        "note": "Scores HBO's Chernobyl using field recordings from a working Lithuanian nuclear plant"
-      },
-      {
-        "id": "janacek",
-        "note": "Begins systematic field-recording of Moravian folk melodies and speech intonations"
-      },
-      {
         "id": "liszt",
         "note": "Popular concerto of the pre-Romantic era; Liszt performed it"
+      },
+      {
+        "id": "chopin",
+        "note": "Refined a genre invented by John Field into music of unique poetic depth"
       }
     ],
     "lifeEvents": [
@@ -24229,6 +24183,14 @@
     ],
     "relationships": [
       {
+        "id": "chausson",
+        "note": "Appointed professor of organ at the Paris Conservatoire; teaches d'Indy, Chausson, Duparc"
+      },
+      {
+        "id": "ysaye",
+        "note": "Cyclic sonata written for Ysaÿe's wedding; one of the great chamber works"
+      },
+      {
         "id": "amy-beach",
         "note": "Late-Romantic chamber masterpiece in the wake of Brahms and Franck"
       },
@@ -24239,14 +24201,6 @@
       {
         "id": "widor",
         "note": "Succeeds Franck as professor of organ at the Paris Conservatoire"
-      },
-      {
-        "id": "chausson",
-        "note": "Appointed professor of organ at the Paris Conservatoire; teaches d'Indy, Chausson, Duparc"
-      },
-      {
-        "id": "ysaye",
-        "note": "Cyclic sonata written for Ysaÿe's wedding; one of the great chamber works"
       }
     ],
     "lifeEvents": [
@@ -24578,12 +24532,12 @@
     ],
     "relationships": [
       {
-        "id": "glinka",
-        "note": "The Mighty Handful (Balakirev, Mussorgsky, Borodin, Rimsky-Korsakov, Cui) all considered themselves his direct heirs"
-      },
-      {
         "id": "balakirev",
         "note": "Meets Balakirev in Saint Petersburg; joins what becomes the Mighty Handful"
+      },
+      {
+        "id": "glinka",
+        "note": "The Mighty Handful (Balakirev, Mussorgsky, Borodin, Rimsky-Korsakov, Cui) all considered themselves his direct heirs"
       }
     ],
     "lifeEvents": [
@@ -25168,20 +25122,20 @@
     ],
     "relationships": [
       {
-        "id": "ysaye",
-        "note": "Tone poem for violin and orchestra that directly inspired Chausson's Poème"
-      },
-      {
-        "id": "franck",
-        "note": "Appointed professor of organ at the Paris Conservatoire; teaches d'Indy, Chausson, Duparc"
-      },
-      {
         "id": "debussy",
         "note": "His Paris salon was a hub for Debussy, Ravel, and other young modernists"
       },
       {
         "id": "ravel",
         "note": "His Paris salon was a hub for Debussy, Ravel, and other young modernists"
+      },
+      {
+        "id": "ysaye",
+        "note": "Tone poem for violin and orchestra that directly inspired Chausson's Poème"
+      },
+      {
+        "id": "franck",
+        "note": "Appointed professor of organ at the Paris Conservatoire; teaches d'Indy, Chausson, Duparc"
       }
     ],
     "lifeEvents": [
@@ -25494,14 +25448,6 @@
     ],
     "relationships": [
       {
-        "id": "horner",
-        "note": "His sudden death mid-career left several projects incomplete, notably Wolf Totem and The 33"
-      },
-      {
-        "id": "weber",
-        "note": "German Romantic opera featuring the demonic 'Wolf's Glen' scene — a landmark of orchestral atmosphere"
-      },
-      {
         "id": "schubert",
         "note": "He carried the German Lied tradition of Schubert and Schumann into the late-Romantic era"
       }
@@ -25654,10 +25600,6 @@
     ],
     "relationships": [
       {
-        "id": "borodin",
-        "note": "Dies suddenly of heart failure at a masked ball in Saint Petersburg on 27 February 1887 aged 53, collapsing while dancing; leaves Prince Igor unfinished after eighteen years' work, completed posthumously by Rimsky-Korsakov and Glazunov"
-      },
-      {
         "id": "balakirev",
         "note": "Born in Saint Petersburg to a wealthy publisher and pianist mother; a phenomenal musical memory means his early compositions circulate in Balakirev's circle from age fourteen"
       },
@@ -25668,6 +25610,10 @@
       {
         "id": "shostakovich",
         "note": "He sheltered Shostakovich during the young man's early years"
+      },
+      {
+        "id": "borodin",
+        "note": "Dies suddenly of heart failure at a masked ball in Saint Petersburg on 27 February 1887 aged 53, collapsing while dancing; leaves Prince Igor unfinished after eighteen years' work, completed posthumously by Rimsky-Korsakov and Glazunov"
       }
     ],
     "lifeEvents": [
@@ -25903,20 +25849,20 @@
     ],
     "relationships": [
       {
-        "id": "dindy",
-        "note": "The Schola Cantorum trained a generation of French composers (Roussel, Satie, Varèse, Auric) as a counter to Conservatoire orthodoxy"
-      },
-      {
-        "id": "martinu",
-        "note": "Moves to Paris to study with Roussel"
-      },
-      {
         "id": "satie",
         "note": "He taught Satie, Martinů, and Varèse at the Schola Cantorum"
       },
       {
         "id": "varese",
         "note": "He taught Satie, Martinů, and Varèse at the Schola Cantorum"
+      },
+      {
+        "id": "dindy",
+        "note": "The Schola Cantorum trained a generation of French composers (Roussel, Satie, Varèse, Auric) as a counter to Conservatoire orthodoxy"
+      },
+      {
+        "id": "martinu",
+        "note": "Moves to Paris to study with Roussel"
       }
     ],
     "lifeEvents": [
@@ -27291,10 +27237,6 @@
     ],
     "relationships": [
       {
-        "id": "ten-holt",
-        "note": "Born in the Dutch coastal artists' colony of Bergen; studies in Paris with Milhaud and Honegger before rejecting serialism in his forties for the tonal repetition that would define his late works"
-      },
-      {
         "id": "tailleferre",
         "note": "Les Six (Auric, Durey, Honegger, Milhaud, Poulenc, Tailleferre) rejected Wagnerian seriousness in favour of clarity, wit, and everyday subjects"
       },
@@ -27305,6 +27247,10 @@
       {
         "id": "milhaud",
         "note": "Joins Les Six with Milhaud, Poulenc, Tailleferre, Auric, and Durey"
+      },
+      {
+        "id": "ten-holt",
+        "note": "Born in the Dutch coastal artists' colony of Bergen; studies in Paris with Milhaud and Honegger before rejecting serialism in his forties for the tonal repetition that would define his late works"
       }
     ],
     "lifeEvents": [
@@ -27388,16 +27334,8 @@
     ],
     "relationships": [
       {
-        "id": "ten-holt",
-        "note": "Born in the Dutch coastal artists' colony of Bergen; studies in Paris with Milhaud and Honegger before rejecting serialism in his forties for the tonal repetition that would define his late works"
-      },
-      {
         "id": "tailleferre",
         "note": "Les Six (Auric, Durey, Honegger, Milhaud, Poulenc, Tailleferre) rejected Wagnerian seriousness in favour of clarity, wit, and everyday subjects"
-      },
-      {
-        "id": "honegger",
-        "note": "Joins Les Six with Milhaud, Poulenc, Tailleferre, Auric, and Durey"
       },
       {
         "id": "glass",
@@ -27406,6 +27344,14 @@
       {
         "id": "reich",
         "note": "Dies at Geneva on 22 June 1974 aged 81 after decades of debilitating arthritis had confined him to a wheelchair; his California pupils at Mills College had included Dave Brubeck, Steve Reich, and Philip Glass"
+      },
+      {
+        "id": "ten-holt",
+        "note": "Born in the Dutch coastal artists' colony of Bergen; studies in Paris with Milhaud and Honegger before rejecting serialism in his forties for the tonal repetition that would define his late works"
+      },
+      {
+        "id": "honegger",
+        "note": "Joins Les Six with Milhaud, Poulenc, Tailleferre, Auric, and Durey"
       }
     ],
     "lifeEvents": [
@@ -27739,16 +27685,16 @@
     ],
     "relationships": [
       {
-        "id": "goldmark",
-        "note": "Dies in Vienna on 2 January 1915 aged 84 during the first winter of the World War, having lived long enough to teach both Jean Sibelius and Erich Wolfgang Korngold"
-      },
-      {
         "id": "mahler",
         "note": "Born in Brünn (now Brno) as the son of the influential Vienna music critic Julius Korngold; performs his cantata Gold before Mahler at age nine, prompting Mahler to declare him a genius"
       },
       {
         "id": "mozart",
         "note": "He was Vienna's greatest child prodigy since Mozart"
+      },
+      {
+        "id": "goldmark",
+        "note": "Dies in Vienna on 2 January 1915 aged 84 during the first winter of the World War, having lived long enough to teach both Jean Sibelius and Erich Wolfgang Korngold"
       }
     ],
     "lifeEvents": [
@@ -28316,16 +28262,16 @@
     ],
     "relationships": [
       {
-        "id": "gliere",
-        "note": "Becomes professor at the Moscow Conservatory; his pupils include Khachaturian and Prokofiev"
-      },
-      {
         "id": "prokofiev",
         "note": "Denounced along with Prokofiev and Shostakovich under the Zhdanov decree"
       },
       {
         "id": "shostakovich",
         "note": "Denounced along with Prokofiev and Shostakovich under the Zhdanov decree"
+      },
+      {
+        "id": "gliere",
+        "note": "Becomes professor at the Moscow Conservatory; his pupils include Khachaturian and Prokofiev"
       }
     ],
     "lifeEvents": [
@@ -29510,16 +29456,16 @@
     ],
     "relationships": [
       {
-        "id": "webern",
-        "note": "After WWII, the Darmstadt School (Boulez, Stockhausen, Nono) took him rather than Schoenberg as their patriarch"
-      },
-      {
         "id": "schoenberg",
         "note": "Marries Nuria Schoenberg, daughter of Arnold"
       },
       {
         "id": "malcolm-arnold",
         "note": "Marries Nuria Schoenberg, daughter of Arnold"
+      },
+      {
+        "id": "webern",
+        "note": "After WWII, the Darmstadt School (Boulez, Stockhausen, Nono) took him rather than Schoenberg as their patriarch"
       }
     ],
     "lifeEvents": [
@@ -29596,20 +29542,20 @@
     ],
     "relationships": [
       {
-        "id": "richter",
-        "note": "Studies in Florence with Luciano Berio after graduating from the Royal Academy of Music"
-      },
-      {
-        "id": "einaudi",
-        "note": "Studies with Luciano Berio in Milan"
-      },
-      {
         "id": "bernstein",
         "note": "Premieres Sinfonia at the New York Philharmonic under Bernstein"
       },
       {
         "id": "mahler",
         "note": "Third movement layers Mahler's Second Symphony scherzo with quotations from Beckett and dozens of composers"
+      },
+      {
+        "id": "richter",
+        "note": "Studies in Florence with Luciano Berio after graduating from the Royal Academy of Music"
+      },
+      {
+        "id": "einaudi",
+        "note": "Studies with Luciano Berio in Milan"
       }
     ],
     "lifeEvents": [
