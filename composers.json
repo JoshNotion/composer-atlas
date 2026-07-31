@@ -4466,6 +4466,14 @@
       {
         "id": "riley",
         "note": "American minimalism (Reich, Glass, Riley) was emerging at the same moment as Canto Ostinato"
+      },
+      {
+        "id": "glass",
+        "note": "American minimalism (Reich, Glass, Riley) was emerging at the same moment as Canto Ostinato"
+      },
+      {
+        "id": "reich",
+        "note": "American minimalism (Reich, Glass, Riley) was emerging at the same moment as Canto Ostinato"
       }
     ],
     "lifeEvents": [
@@ -4703,6 +4711,10 @@
       {
         "id": "milhaud",
         "note": "Dies at Geneva on 22 June 1974 aged 81 after decades of debilitating arthritis had confined him to a wheelchair; his California pupils at Mills College had included Dave Brubeck, Steve Reich, and Philip Glass"
+      },
+      {
+        "id": "ten-holt",
+        "note": "American minimalism (Reich, Glass, Riley) was emerging at the same moment as Canto Ostinato"
       }
     ],
     "lifeEvents": [
@@ -9650,6 +9662,10 @@
       {
         "id": "copland",
         "note": "American contemporaries who circulated in the same New York and Tanglewood milieu; both defined the 20th-century American classical mainstream from opposite temperaments — Copland the populist, Barber the lyricist."
+      },
+      {
+        "id": "carter",
+        "note": "American modernism split between accessible populists (Copland, Barber) and complex serialists — Carter was the complex wing's presiding elder for decades"
       }
     ],
     "lifeEvents": [
@@ -10703,6 +10719,10 @@
       {
         "id": "milhaud",
         "note": "Dies at Geneva on 22 June 1974 aged 81 after decades of debilitating arthritis had confined him to a wheelchair; his California pupils at Mills College had included Dave Brubeck, Steve Reich, and Philip Glass"
+      },
+      {
+        "id": "ten-holt",
+        "note": "American minimalism (Reich, Glass, Riley) was emerging at the same moment as Canto Ostinato"
       }
     ],
     "lifeEvents": [
@@ -19840,6 +19860,10 @@
       {
         "id": "copland",
         "note": "Contemporaries who both studied with Nadia Boulanger and shared the Aaron Copland-Roger Sessions concerts platform through the 1930s."
+      },
+      {
+        "id": "barber",
+        "note": "American modernism split between accessible populists (Copland, Barber) and complex serialists — Carter was the complex wing's presiding elder for decades"
       }
     ],
     "lifeEvents": [
