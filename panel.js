@@ -29,7 +29,16 @@ export function renderDetail(targetEl, composer, allComposersById, callbacks = {
     `;
   }).join("");
 
-  const connections = (composer.relationships || []).map(rel => {
+  const connections = (composer.relationships || [])
+    .slice()
+    .sort((a, b) => {
+      const aId = typeof a === "string" ? a : a.id;
+      const bId = typeof b === "string" ? b : b.id;
+      const aBorn = allComposersById.get(aId)?.born ?? Infinity;
+      const bBorn = allComposersById.get(bId)?.born ?? Infinity;
+      return aBorn - bBorn;
+    })
+    .map(rel => {
     const rid = typeof rel === "string" ? rel : rel.id;
     const note = typeof rel === "string" ? "" : (rel.note || "");
     const c = allComposersById.get(rid);
