@@ -13,7 +13,10 @@ export function renderDetail(targetEl, composer, allComposersById, callbacks = {
   const lifeMin = composer.born;
   const lifeMax = composer.died ?? new Date().getFullYear();
 
-  const works = (composer.keyWorks || []).map(w => {
+  const works = (composer.keyWorks || [])
+    .slice()
+    .sort((a, b) => (parseYear(a.year) ?? Infinity) - (parseYear(b.year) ?? Infinity))
+    .map(w => {
     const url = w.mediaUrl || youtubeSearch(composer.name, w.title);
     return `
       <li class="work">
