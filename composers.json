@@ -30394,5 +30394,73 @@
       "His father Walter Goehr was Schoenberg's pupil and a leading BBC conductor — a direct line back to the Second Viennese School",
       "His long Cambridge tenure shaped a generation of British composition students"
     ]
+  },
+  {
+    "id": "raz",
+    "name": "Yehezkel Raz",
+    "born": 1988,
+    "died": null,
+    "era": "Contemporary",
+    "portrait": "",
+    "wiki": "",
+    "birthPlace": {
+      "city": "Tel Aviv",
+      "country": "Israel",
+      "lat": 32.0853,
+      "lng": 34.7818
+    },
+    "locations": [
+      {
+        "city": "Tel Aviv",
+        "type": "birth",
+        "years": "c.1988",
+        "lat": 32.0853,
+        "lng": 34.7818
+      },
+      {
+        "city": "Tel Aviv",
+        "type": "lived",
+        "years": "present",
+        "lat": 32.0853,
+        "lng": 34.7818
+      }
+    ],
+    "relationships": [],
+    "lifeEvents": [
+      {
+        "year": 1988,
+        "event": "Born in Israel (approximate); grows up in the Tel Aviv area and trains in piano and composition"
+      },
+      {
+        "year": 2015,
+        "event": "Begins releasing solo piano and cinematic instrumental works through independent streaming-focused labels"
+      },
+      {
+        "year": 2020,
+        "event": "Tracks including 'Yellowstone', 'Chapter One', and 'Ballad of a Little Bird' rack up hundreds of millions of streams, placing him among the most-heard neoclassical composers of the 2020s"
+      }
+    ],
+    "keyWorks": [
+      {
+        "title": "Yellowstone",
+        "year": "2018",
+        "context": "Piano-and-strings miniature that became one of the era's most-streamed contemporary classical tracks"
+      },
+      {
+        "title": "Ballad of a Little Bird",
+        "year": "2019",
+        "context": "Solo piano work in his characteristic lyrical minimalist idiom"
+      },
+      {
+        "title": "Chapter One",
+        "year": "2020",
+        "context": "Expansive minimalist piece that became a signature track on streaming curator playlists"
+      }
+    ],
+    "worldContext": [
+      "Streaming platforms in the 2010s and 2020s created a new commercial ecosystem for neoclassical / cinematic composers outside the traditional concert-hall path",
+      "Israeli neoclassical and film music has emerged as a distinct international presence in the streaming era",
+      "He has no Wikipedia entry as of this writing; birth year and biographical details are approximate and drawn from label press material"
+    ]
   }
 ]
