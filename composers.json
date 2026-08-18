@@ -30462,5 +30462,124 @@
       "Israeli neoclassical and film music has emerged as a distinct international presence in the streaming era",
       "He has no Wikipedia entry as of this writing; birth year and biographical details are approximate and drawn from label press material"
     ]
+  },
+  {
+    "id": "rosch",
+    "name": "Felix Rösch",
+    "born": 1985,
+    "died": null,
+    "era": "Contemporary",
+    "portrait": "https://commons.wikimedia.org/wiki/Special:FilePath/Portrait%20Felix.jpg?width=400",
+    "wiki": "",
+    "birthPlace": {
+      "city": "Düsseldorf",
+      "country": "Germany",
+      "lat": 51.2277,
+      "lng": 6.7735
+    },
+    "locations": [
+      {
+        "city": "Düsseldorf",
+        "type": "birth",
+        "years": "1985",
+        "lat": 51.2277,
+        "lng": 6.7735
+      },
+      {
+        "city": "Düsseldorf (Robert Schumann Hochschule / Fachhochschule)",
+        "type": "lived",
+        "years": "2000s–2012",
+        "lat": 51.2277,
+        "lng": 6.7735
+      },
+      {
+        "city": "Potsdam (Filmuniversität Babelsberg)",
+        "type": "lived",
+        "years": "2015–2017",
+        "lat": 52.3906,
+        "lng": 13.0645
+      },
+      {
+        "city": "Berlin",
+        "type": "lived",
+        "years": "present",
+        "lat": 52.52,
+        "lng": 13.405
+      }
+    ],
+    "relationships": [],
+    "lifeEvents": [
+      {
+        "year": 1985,
+        "event": "Born on 8 November in Düsseldorf; begins piano lessons at age five"
+      },
+      {
+        "year": 2006,
+        "event": "Begins working as a freelance composer while still a student, writing film scores, stage music, and radio-play scores"
+      },
+      {
+        "year": 2011,
+        "event": "Wins first prize in the Berlinale Score Competition; also receives the North Rhine-Westphalia Young Artists prize for composition"
+      },
+      {
+        "year": 2012,
+        "event": "Graduates in audio and video engineering (Dipl. Ing.) from the Düsseldorf Fachhochschule after classical piano studies at the Robert Schumann Hochschule"
+      },
+      {
+        "year": 2016,
+        "event": "Wins the Deutscher Hörbuchpreis for the WDR radio-play production of Die unendliche Geschichte"
+      },
+      {
+        "year": 2017,
+        "event": "Completes his Master of Music in composition for film and television at the Filmuniversität Babelsberg; settles in Berlin"
+      }
+    ],
+    "keyWorks": [
+      {
+        "title": "Iteration I",
+        "year": "2009",
+        "context": "Solo piano work; the first of his 'Iteration' cycle exploring pattern and gradual transformation"
+      },
+      {
+        "title": "Variation für Streichquartett, Videoinstallation & Pitch-shifter",
+        "year": "2011",
+        "context": "String quartet paired with a live video installation and pitch-shifted playback — a hybrid concert-installation piece"
+      },
+      {
+        "title": "Iteration II",
+        "year": "2015",
+        "context": "Solo piano continuation of the earlier 'Iteration' concept"
+      },
+      {
+        "title": "Delay",
+        "year": "2016",
+        "context": "Piece for mixed choir; later reworked as a WDR radio-play score"
+      },
+      {
+        "title": "Orchesterverfremdung",
+        "year": "2018",
+        "context": "Album applying electronic 'estrangement' techniques to orchestral source recordings"
+      },
+      {
+        "title": "Becoming Ocean",
+        "year": "2019",
+        "context": "Single in his neoclassical / ambient idiom"
+      },
+      {
+        "title": "str:orchestra",
+        "year": "2020",
+        "context": "EP of works for string orchestra"
+      },
+      {
+        "title": "Piano",
+        "year": "2021",
+        "context": "Solo piano album"
+      }
+    ],
+    "worldContext": [
+      "Frequent commissions from the Düsseldorfer Schauspielhaus, Staatstheater Hannover, Volksbühne Berlin, and Deutsches Theater Berlin have made him a leading composer for German-language theatre",
+      "WDR (West German Broadcasting) has commissioned and recorded much of his radio-play, choral, and orchestral output",
+      "His work sits at the intersection of contemporary concert music, electronic composition, and theatre/film scoring — a hybrid path shaped by his dual degrees in classical piano and audio engineering"
+    ]
   }
 ]
