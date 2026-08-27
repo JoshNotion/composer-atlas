@@ -497,6 +497,12 @@ body { display: flex; flex-direction: column; }
   background: #111 !important;
   font-family: inherit;
 }
+/* Apply a dark-mode filter to the OSM raster tiles so they match the app's
+   charcoal theme (replaces the old CARTO dark_all tile source that now
+   requires an API key). Markers/popups/controls are excluded via specificity. */
+.leaflet-tile {
+  filter: brightness(0.55) invert(1) contrast(2.4) hue-rotate(200deg) saturate(0.25) brightness(0.7);
+}
 .leaflet-popup-content-wrapper, .leaflet-popup-tip {
   background: var(--surface) !important;
   color: var(--text) !important;
