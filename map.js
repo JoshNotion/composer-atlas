@@ -14,11 +14,12 @@ export function createMap(mapHostEl) {
     worldCopyJump: true,
   }).setView([48, 10], 4);
 
-  // CARTO Basemaps raster tiles — dark-matter style. The API key is domain-
-  // restricted at CARTO to composer-atlas.joshnotion.workers.dev, so it's fine
-  // to include client-side.
-  L.tileLayer("https://basemaps.cartocdn.com/rastertiles/dark-matter/{z}/{x}/{y}.png?key=cb1_2d9s_1_a32774cc0662c7d50b68627e", {
+  // CARTO Basemaps raster tiles — classic dark_all style. The API key is
+  // domain-restricted at CARTO to composer-atlas.joshnotion.workers.dev, so
+  // it's fine to include client-side.
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=cb1_2d9s_1_a32774cc0662c7d50b68627e", {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    subdomains: "abcd",
     maxZoom: 19,
   }).addTo(map);
 
