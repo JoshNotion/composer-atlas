@@ -4769,7 +4769,7 @@
     "born": 1505,
     "died": 1585,
     "era": "Renaissance",
-    "portrait": "",
+    "portrait": "https://www.liedboekcompendium.nl/files/uploads/fotos/personen/K-Z/Tallis,%20Thomas.jpg",
     "wiki": "Thomas Tallis",
     "birthPlace": {
       "city": "Kent",
@@ -5038,7 +5038,7 @@
     "born": 1582,
     "died": 1652,
     "era": "Baroque",
-    "portrait": "",
+    "portrait": "https://upload.wikimedia.org/wikipedia/commons/b/b2/Gregorio_Allegri.jpg?utm_source=nl.wikipedia.org&utm_campaign=index&utm_content=original",
     "wiki": "Gregorio Allegri",
     "birthPlace": {
       "city": "Rome",
@@ -5135,7 +5135,7 @@
     "born": 1619,
     "died": 1677,
     "era": "Baroque",
-    "portrait": "https://commons.wikimedia.org/wiki/Special:FilePath/Femme%20tenant%20une%20viole%20de%20gambe%20-%20la%20cantatrice%20Barbara%20Strozzi%20-%20Bernardo%20Strozzi%20-%20btv1b84339302.jpg?width=500",
+    "portrait": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Bernardo_Strozzi_001.jpg/960px-Bernardo_Strozzi_001.jpg?utm_source=nl.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
     "wiki": "Barbara Strozzi",
     "birthPlace": {
       "city": "Venice",
@@ -17165,7 +17165,7 @@
     "born": 1450,
     "died": 1521,
     "era": "Renaissance",
-    "portrait": "",
+    "portrait": "https://upload.wikimedia.org/wikipedia/commons/1/10/Josquin.jpg?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail_unscaled",
     "wiki": "Josquin des Prez",
     "birthPlace": {
       "city": "Beaurevoir or Condé-sur-l'Escaut (uncertain)",
@@ -17272,7 +17272,7 @@
     "born": 1525,
     "died": 1594,
     "era": "Renaissance",
-    "portrait": "",
+    "portrait": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Retrato_de_Palestrina.jpg/250px-Retrato_de_Palestrina.jpg?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail",
     "wiki": "Giovanni Pierluigi da Palestrina",
     "birthPlace": {
       "city": "Palestrina",
@@ -17383,7 +17383,7 @@
     "born": 1543,
     "died": 1623,
     "era": "Renaissance",
-    "portrait": "",
+    "portrait": "https://upload.wikimedia.org/wikipedia/commons/b/bf/William_Byrd.jpg?utm_source=nl.wikipedia.org&utm_campaign=index&utm_content=original",
     "wiki": "William Byrd",
     "birthPlace": {
       "city": "Lincolnshire (uncertain)",
@@ -21440,7 +21440,7 @@
     "born": 1485,
     "died": 1558,
     "era": "Renaissance",
-    "portrait": "",
+    "portrait": "https://www.earlymusicamerica.org/wp-content/uploads/2025/03/Ricciardi-janequin-portrait.jpg",
     "wiki": "Clément Janequin",
     "birthPlace": {
       "city": "Châtellerault",
@@ -21655,7 +21655,7 @@
     "born": 1549,
     "died": 1611,
     "era": "Renaissance",
-    "portrait": "",
+    "portrait": "https://i.scdn.co/image/b9da58fbe567666930bf0c37da4475aeeaa7c442",
     "wiki": "Tomás Luis de Victoria",
     "birthPlace": {
       "city": "Ávila",
@@ -21968,7 +21968,7 @@
     "born": 1583,
     "died": 1625,
     "era": "Renaissance",
-    "portrait": "",
+    "portrait": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Orlando_Gibbons.jpg/960px-Orlando_Gibbons.jpg?utm_source=nl.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
     "wiki": "Orlando Gibbons",
     "birthPlace": {
       "city": "Oxford",
@@ -22201,7 +22201,7 @@
     "born": 1643,
     "died": 1704,
     "era": "Baroque",
-    "portrait": "",
+    "portrait": "https://upload.wikimedia.org/wikipedia/commons/5/55/MA_Charpentier_II.gif?utm_source=nl.wikipedia.org&utm_campaign=index&utm_content=original",
     "wiki": "Marc-Antoine Charpentier",
     "birthPlace": {
       "city": "Paris",
@@ -22747,7 +22747,7 @@
     "born": 1671,
     "died": 1751,
     "era": "Baroque",
-    "portrait": "",
+    "portrait": "https://res.cloudinary.com/pim-red/image/upload/q_auto,f_auto,c_limit,w_370/v1615220906/rundel/persons/24_Albinoni.jpg",
     "wiki": "Tomaso Albinoni",
     "birthPlace": {
       "city": "Venice",
@@ -22820,7 +22820,7 @@
     "born": 1684,
     "died": 1750,
     "era": "Baroque",
-    "portrait": "https://upload.wikimedia.org/wikipedia/commons/2/28/Alessandro_Marcello.png",
+    "portrait": "https://www.staatsoper.de/media/_processed_/e/e/csm_Marcello_154fa4daff.png",
     "wiki": "Alessandro Marcello",
     "birthPlace": {
       "city": "Venice",
@@ -22891,7 +22891,7 @@
     "born": 1686,
     "died": 1739,
     "era": "Baroque",
-    "portrait": "",
+    "portrait": "https://www.meisterdrucke.nl/kunstwerke/1260px/Anonymous_Anonymous_-_Benedetto_Marcello_%281686-1739%29_Italian_composer_anonymous_painting_of_the_18th_c_-_%28MeisterDrucke-1025213%29.jpg",
     "wiki": "Benedetto Marcello",
     "birthPlace": {
       "city": "Venice",
@@ -23118,7 +23118,7 @@
     "born": 1739,
     "died": 1799,
     "era": "Classical",
-    "portrait": "",
+    "portrait": "https://cdn.naxos.com/sharedfiles/images/composers/pictures/27161-1.jpg",
     "wiki": "Carl Ditters von Dittersdorf",
     "birthPlace": {
       "city": "Vienna",
@@ -23200,7 +23200,7 @@
     "born": 1743,
     "died": 1805,
     "era": "Classical",
-    "portrait": "",
+    "portrait": "https://upload.wikimedia.org/wikipedia/commons/e/ed/LBoccheriniFXD.jpg?utm_source=nl.wikipedia.org&utm_campaign=index&utm_content=original",
     "wiki": "Luigi Boccherini",
     "birthPlace": {
       "city": "Lucca",
