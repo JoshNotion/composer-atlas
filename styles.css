@@ -991,3 +991,6 @@ body { display: flex; flex-direction: column; }
 .callout .catalogue-foot { margin-top: 10px; }
 .panel.expanded .detail .callout { max-width: 760px; }
 .callout .catalogue-group:last-of-type { border-bottom: none; }
+
+/* Key works inside the catalogue's Recommended view */
+.catalogue-keygroup .works-list { padding: 4px 0 12px 22px; }

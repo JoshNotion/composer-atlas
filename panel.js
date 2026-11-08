@@ -14,25 +14,6 @@ export function renderDetail(targetEl, composer, allComposersById, callbacks = {
   const lifeMin = composer.born;
   const lifeMax = composer.died ?? new Date().getFullYear();
 
-  const works = (composer.keyWorks || [])
-    .slice()
-    .sort((a, b) => (parseYear(a.year) ?? Infinity) - (parseYear(b.year) ?? Infinity))
-    .map(w => {
-    const url = w.mediaUrl || youtubeSearch(composer.name, w.title);
-    return `
-      <li class="work">
-        <div class="work-head">
-          <span class="work-title">${escapeHtml(w.title)}</span>
-          <span class="work-year">${escapeHtml(w.year)}</span>
-          <a class="work-listen" href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer" title="Listen on ${w.mediaUrl ? "this link" : "YouTube"}">
-            <span class="play-tri">▶</span>Listen
-          </a>
-        </div>
-        <div class="work-context">${escapeHtml(w.context)}</div>
-      </li>
-    `;
-  }).join("");
-
   const connections = (composer.relationships || [])
     .slice()
     .sort((a, b) => {
@@ -86,16 +67,12 @@ export function renderDetail(targetEl, composer, allComposersById, callbacks = {
         <div class="life-tl" id="life-tl"></div>
       </div>
 
-      <div class="section">
-        <h3>Key works</h3>
-        <ul class="works-list">${works}</ul>
-      </div>
-
       <div class="section section-catalogue">
         <aside class="callout" style="--callout-accent:${color}">
           <div class="callout-label">Works catalogue <span class="catalogue-src">via Open Opus</span></div>
           <div class="catalogue" id="catalogue">
-            <div class="catalogue-note">Loading from Open Opus…</div>
+            ${keyGroupHtml(composer)}
+            <div class="catalogue-note">Loading the full catalogue from Open Opus…</div>
           </div>
         </aside>
       </div>
@@ -183,6 +160,50 @@ async function mountAbout(host, composer) {
   }
 }
 
+
+// ---- Key works (curated) live inside the catalogue's "Recommended" view ----------
+
+function keyWorksSorted(composer) {
+  return (composer.keyWorks || [])
+    .slice()
+    .sort((a, b) => (parseYear(a.year) ?? Infinity) - (parseYear(b.year) ?? Infinity));
+}
+
+function keyGroupHtml(composer) {
+  const items = keyWorksSorted(composer).map(w => {
+    const url = w.mediaUrl || youtubeSearch(composer.name, w.title);
+    return `
+      <li class="work">
+        <div class="work-head">
+          <span class="work-title">${escapeHtml(w.title)}</span>
+          <span class="work-year">${escapeHtml(w.year)}</span>
+          <a class="work-listen" href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer" title="Listen on ${w.mediaUrl ? "this link" : "YouTube"}">
+            <span class="play-tri">▶</span>Listen
+          </a>
+        </div>
+        <div class="work-context">${escapeHtml(w.context)}</div>
+      </li>`;
+  }).join("");
+  if (!items) return "";
+  return `
+    <details class="catalogue-group catalogue-keygroup" open>
+      <summary><span class="catalogue-genre">Key works</span><span class="catalogue-count">${keyWorksSorted(composer).length}</span></summary>
+      <ul class="works-list">${items}</ul>
+    </details>`;
+}
+
+// Does an Open Opus title describe the same piece as a curated key work?
+// Token-subset match either way ("Symphony No. 5" ⊂ "Symphony no. 5 in C minor, op.67").
+function titleTokens(s) {
+  return new Set(String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().split(/[^a-z0-9]+/).filter(Boolean));
+}
+function isSubset(a, b) { for (const t of a) if (!b.has(t)) return false; return a.size > 0; }
+function matchesKeyWork(ooTitle, keyTokenSets) {
+  const full = titleTokens(ooTitle);
+  const head = titleTokens(String(ooTitle).split(",")[0]);
+  return keyTokenSets.some(k => isSubset(k, full) || isSubset(head, k));
+}
+
 // ---- Works catalogue (Open Opus) ---------------------------------------------
 
 const CATALOGUE_GENRE_ORDER = ["Keyboard", "Orchestral", "Chamber", "Vocal", "Stage"];
@@ -198,14 +219,14 @@ async function mountCatalogue(host, composer) {
 
 function renderCatalogue(host, composer, result) {
   if (result.state === "missing") {
-    host.innerHTML = `<div class="catalogue-note">${escapeHtml(composer.name)} isn't in the Open Opus catalogue (it focuses on the mainstream concert repertoire), so only the key works above are shown.</div>`;
+    host.innerHTML = `${keyGroupHtml(composer)}<div class="catalogue-note">${escapeHtml(composer.name)} isn't in the Open Opus catalogue (it focuses on the mainstream concert repertoire)${keyWorksSorted(composer).length ? ", so only the key works are shown" : ""}.</div>`;
     return;
   }
 
   if (result.state === "error") {
-    host.innerHTML = `<div class="catalogue-note">Couldn't reach Open Opus right now. <button type="button" class="catalogue-retry">Try again</button></div>`;
+    host.innerHTML = `${keyGroupHtml(composer)}<div class="catalogue-note">Couldn't reach Open Opus right now. <button type="button" class="catalogue-retry">Try again</button></div>`;
     host.querySelector(".catalogue-retry").addEventListener("click", () => {
-      host.innerHTML = `<div class="catalogue-note">Loading from Open Opus…</div>`;
+      host.innerHTML = `${keyGroupHtml(composer)}<div class="catalogue-note">Loading the full catalogue from Open Opus…</div>`;
       mountCatalogue(host, composer);
     });
     return;
@@ -213,15 +234,19 @@ function renderCatalogue(host, composer, result) {
 
   const works = result.works;
   if (!works.length) {
-    host.innerHTML = `<div class="catalogue-note">Open Opus lists no works for ${escapeHtml(composer.name)} yet.</div>`;
+    host.innerHTML = `${keyGroupHtml(composer)}<div class="catalogue-note">Open Opus lists no works for ${escapeHtml(composer.name)} yet.</div>`;
     return;
   }
 
-  const recommendedCount = works.filter(w => w.recommended).length;
+  const keyTokenSets = (composer.keyWorks || []).map(w => titleTokens(w.title));
+  const keyCount = keyTokenSets.length;
+  // Open Opus "recommended" pieces that aren't already covered by a curated key work
+  const recommendedWorks = works.filter(w => w.recommended && !matchesKeyWork(w.title, keyTokenSets));
+  const recommendedCount = keyCount + recommendedWorks.length;
   let mode = recommendedCount > 0 ? "recommended" : "all";
 
   function draw() {
-    const shown = mode === "recommended" ? works.filter(w => w.recommended) : works;
+    const shown = mode === "recommended" ? recommendedWorks : works;
 
     const byGenre = new Map();
     shown.forEach(w => {
@@ -238,7 +263,7 @@ function renderCatalogue(host, composer, result) {
 
     // Short lists start fully open; long ones open only the first group, so the
     // panel isn't a wall of 900 titles or a column of collapsed headers.
-    const openAll = shown.length <= 40;
+    const openAll = shown.length + (mode === "recommended" ? keyCount : 0) <= 40;
     const groups = genres.map((g, gi) => {
       const items = byGenre.get(g).map(w => `
         <li class="catalogue-work">
@@ -262,6 +287,7 @@ function renderCatalogue(host, composer, result) {
         ${recommendedCount > 0 ? filterBtn("recommended", "Recommended", recommendedCount) : ""}
         ${filterBtn("all", "All works", works.length)}
       </div>
+      ${mode === "recommended" ? keyGroupHtml(composer) : ""}
       ${groups}
       <div class="catalogue-foot">Works data from <a href="https://openopus.org" target="_blank" rel="noopener noreferrer">Open Opus</a> (open data). “Listen” searches YouTube.</div>
     `;
