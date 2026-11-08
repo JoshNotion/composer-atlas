@@ -1642,7 +1642,24 @@ body { display: flex; flex-direction: column; }
 .catalogue-foot a { color: var(--text-dim); }
 .panel.expanded .detail .catalogue { max-width: 760px; }
 
-/* About (Wikipedia) */
+/* About (Wikipedia): callout box, flat like the other cards, accented with the era colour */
+.about-callout {
+  --about-accent: var(--text-dim);
+  background: var(--surface);
+  background: color-mix(in srgb, var(--about-accent) 7%, var(--surface));
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--about-accent);
+  border-radius: 8px;
+  padding: 12px 14px 11px;
+}
+.about-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  color: var(--text-dim);
+  font-weight: 600;
+  margin: 0 0 8px;
+}
 .about-text {
   margin: 0;
   color: var(--text);
@@ -1667,7 +1684,8 @@ body { display: flex; flex-direction: column; }
   text-underline-offset: 2px;
 }
 .about-toggle:hover { color: var(--text); }
-.panel.expanded .detail .about { max-width: 760px; }
+.about-callout .catalogue-foot { margin-top: 10px; }
+.panel.expanded .detail .about-callout { max-width: 760px; }
 
 </style>
 </head>
@@ -2552,10 +2570,12 @@ function renderDetail(targetEl, composer, allComposersById, callbacks = {}) {
       </div>
 
       <div class="section section-about">
-        <h3>About <span class="catalogue-src">via Wikipedia</span></h3>
-        <div class="about" id="about">
-          <div class="catalogue-note">Loading…</div>
-        </div>
+        <aside class="about about-callout" style="--about-accent:${color}">
+          <div class="about-label">About <span class="catalogue-src">via Wikipedia</span></div>
+          <div class="about-body" id="about">
+            <div class="catalogue-note">Loading…</div>
+          </div>
+        </aside>
       </div>
 
       <div class="section">

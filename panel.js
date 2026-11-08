@@ -77,10 +77,12 @@ export function renderDetail(targetEl, composer, allComposersById, callbacks = {
       </div>
 
       <div class="section section-about">
-        <h3>About <span class="catalogue-src">via Wikipedia</span></h3>
-        <div class="about" id="about">
-          <div class="catalogue-note">Loading…</div>
-        </div>
+        <aside class="about about-callout" style="--about-accent:${color}">
+          <div class="about-label">About <span class="catalogue-src">via Wikipedia</span></div>
+          <div class="about-body" id="about">
+            <div class="catalogue-note">Loading…</div>
+          </div>
+        </aside>
       </div>
 
       <div class="section">
