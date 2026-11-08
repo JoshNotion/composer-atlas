@@ -70,15 +70,11 @@ export function renderDetail(targetEl, composer, allComposersById, callbacks = {
           <div class="detail-years">${composer.born}&nbsp;–&nbsp;${composer.died ?? "present"}</div>
           <span class="era-badge" style="background:${color}">${escapeHtml(composer.era)}</span>
         </div>
-        <aside class="detail-context-aside" aria-label="World context">
-          <h3>World context</h3>
-          <ul class="context-list">${contextItems}</ul>
-        </aside>
       </div>
 
       <div class="section section-about">
-        <aside class="about about-callout" style="--about-accent:${color}">
-          <div class="about-label">About <span class="catalogue-src">via Wikipedia</span></div>
+        <aside class="about callout" style="--callout-accent:${color}">
+          <div class="callout-label">About <span class="catalogue-src">via Wikipedia</span></div>
           <div class="about-body" id="about">
             <div class="catalogue-note">Loading…</div>
           </div>
@@ -96,10 +92,12 @@ export function renderDetail(targetEl, composer, allComposersById, callbacks = {
       </div>
 
       <div class="section section-catalogue">
-        <h3>Works catalogue <span class="catalogue-src">via Open Opus</span></h3>
-        <div class="catalogue" id="catalogue">
-          <div class="catalogue-note">Loading from Open Opus…</div>
-        </div>
+        <aside class="callout" style="--callout-accent:${color}">
+          <div class="callout-label">Works catalogue <span class="catalogue-src">via Open Opus</span></div>
+          <div class="catalogue" id="catalogue">
+            <div class="catalogue-note">Loading from Open Opus…</div>
+          </div>
+        </aside>
       </div>
 
       <div class="section">

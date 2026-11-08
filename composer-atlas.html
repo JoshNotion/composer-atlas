@@ -1048,8 +1048,7 @@ body { display: flex; flex-direction: column; }
   max-width: 64ch;
 }
 
-/* In full-page mode: bigger head, world context becomes an aside */
-.detail-context-aside { display: none; }
+/* In full-page mode: bigger head */
 .panel.expanded .detail-head {
   display: flex;
   align-items: flex-start;
@@ -1085,29 +1084,7 @@ body { display: flex; flex-direction: column; }
   padding: 4px 14px;
   font-size: 12px;
 }
-.panel.expanded .detail-context-aside {
-  display: block;
-  flex: 1 1 280px;
-  min-width: 240px;
-  max-width: 460px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 14px 16px 16px;
-  align-self: stretch;
-}
-.panel.expanded .detail-context-aside h3 {
-  margin-top: 0;
-  margin-bottom: 8px;
-}
-.panel.expanded .detail-context-aside .context-list {
-  padding-left: 18px;
-  font-size: 12.5px;
-  line-height: 1.5;
-  margin: 0;
-}
-.panel.expanded .detail-context-aside .context-list li { margin-bottom: 6px; }
-.panel.expanded .section-world-context { display: none; }
+.panel.expanded .section-world-context { max-width: 760px; }
 .panel-controls {
   position: absolute;
   top: 10px; left: 10px;
@@ -1643,16 +1620,16 @@ body { display: flex; flex-direction: column; }
 .panel.expanded .detail .catalogue { max-width: 760px; }
 
 /* About (Wikipedia): callout box, flat like the other cards, accented with the era colour */
-.about-callout {
-  --about-accent: var(--text-dim);
+.callout {
+  --callout-accent: var(--text-dim);
   background: var(--surface);
-  background: color-mix(in srgb, var(--about-accent) 7%, var(--surface));
+  background: color-mix(in srgb, var(--callout-accent) 7%, var(--surface));
   border: 1px solid var(--border);
-  border-left: 3px solid var(--about-accent);
+  border-left: 3px solid var(--callout-accent);
   border-radius: 8px;
   padding: 12px 14px 11px;
 }
-.about-label {
+.callout-label {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 1.4px;
@@ -1684,8 +1661,9 @@ body { display: flex; flex-direction: column; }
   text-underline-offset: 2px;
 }
 .about-toggle:hover { color: var(--text); }
-.about-callout .catalogue-foot { margin-top: 10px; }
-.panel.expanded .detail .about-callout { max-width: 760px; }
+.callout .catalogue-foot { margin-top: 10px; }
+.panel.expanded .detail .callout { max-width: 760px; }
+.callout .catalogue-group:last-of-type { border-bottom: none; }
 
 </style>
 </head>
@@ -2563,15 +2541,11 @@ function renderDetail(targetEl, composer, allComposersById, callbacks = {}) {
           <div class="detail-years">${composer.born}&nbsp;–&nbsp;${composer.died ?? "present"}</div>
           <span class="era-badge" style="background:${color}">${escapeHtml(composer.era)}</span>
         </div>
-        <aside class="detail-context-aside" aria-label="World context">
-          <h3>World context</h3>
-          <ul class="context-list">${contextItems}</ul>
-        </aside>
       </div>
 
       <div class="section section-about">
-        <aside class="about about-callout" style="--about-accent:${color}">
-          <div class="about-label">About <span class="catalogue-src">via Wikipedia</span></div>
+        <aside class="about callout" style="--callout-accent:${color}">
+          <div class="callout-label">About <span class="catalogue-src">via Wikipedia</span></div>
           <div class="about-body" id="about">
             <div class="catalogue-note">Loading…</div>
           </div>
@@ -2589,10 +2563,12 @@ function renderDetail(targetEl, composer, allComposersById, callbacks = {}) {
       </div>
 
       <div class="section section-catalogue">
-        <h3>Works catalogue <span class="catalogue-src">via Open Opus</span></h3>
-        <div class="catalogue" id="catalogue">
-          <div class="catalogue-note">Loading from Open Opus…</div>
-        </div>
+        <aside class="callout" style="--callout-accent:${color}">
+          <div class="callout-label">Works catalogue <span class="catalogue-src">via Open Opus</span></div>
+          <div class="catalogue" id="catalogue">
+            <div class="catalogue-note">Loading from Open Opus…</div>
+          </div>
+        </aside>
       </div>
 
       <div class="section">
