@@ -1642,6 +1642,33 @@ body { display: flex; flex-direction: column; }
 .catalogue-foot a { color: var(--text-dim); }
 .panel.expanded .detail .catalogue { max-width: 760px; }
 
+/* About (Wikipedia) */
+.about-text {
+  margin: 0;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.about-text.clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+  line-clamp: 6;
+  overflow: hidden;
+}
+.about-toggle {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 12px;
+  padding: 4px 0 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.about-toggle:hover { color: var(--text); }
+.panel.expanded .detail .about { max-width: 760px; }
+
 </style>
 </head>
 <body>
@@ -1719,6 +1746,34 @@ body { display: flex; flex-direction: column; }
 // via https://en.wikipedia.org/api/rest_v1/page/summary/{title}.
 
 const cache = new Map();
+
+// One cached Wikipedia REST summary per article title, shared by the portrait and the
+// panel's "About" text so each composer costs a single request. Resolves to the parsed
+// summary (thumbnail, extract, content_urls, ...) or null. A missing article (404) is
+// remembered for the session; network errors and 5xx are not, so a later open retries.
+function fetchWikiSummary(composer) {
+  if (!composer || !composer.wiki) return Promise.resolve(null);
+
+  const key = composer.wiki;
+  if (cache.has(key)) return cache.get(key);
+
+  const title = encodeURIComponent(key.replace(/ /g, "_"));
+  const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${title}`;
+
+  const promise = fetch(url, { headers: { accept: "application/json" } })
+    .then(r => {
+      if (r.ok) return r.json();
+      if (r.status >= 500) cache.delete(key);
+      return null;
+    })
+    .catch(() => {
+      cache.delete(key);
+      return null;
+    });
+
+  cache.set(key, promise);
+  return promise;
+}
 function initialsFor(name) {
   if (!name) return "?";
   const cleaned = name.replace(/[().,"]/g, "").trim();
@@ -1730,24 +1785,11 @@ function initialsFor(name) {
 function resolvePortraitUrl(composer) {
   if (!composer) return Promise.resolve(null);
   if (composer.portrait) return Promise.resolve(composer.portrait);
-  if (!composer.wiki) return Promise.resolve(null);
 
-  const key = composer.wiki;
-  if (cache.has(key)) return cache.get(key);
-
-  const title = encodeURIComponent(key.replace(/ /g, "_"));
-  const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${title}`;
-
-  const promise = fetch(url, { headers: { accept: "application/json" } })
-    .then(r => (r.ok ? r.json() : null))
-    .then(data => {
-      if (!data) return null;
-      return data.thumbnail?.source || data.originalimage?.source || null;
-    })
-    .catch(() => null);
-
-  cache.set(key, promise);
-  return promise;
+  return fetchWikiSummary(composer).then(data => {
+    if (!data) return null;
+    return data.thumbnail?.source || data.originalimage?.source || null;
+  });
 }
 
 // Mounts an img into `hostEl` once the URL resolves. Bails out if the host
@@ -2509,6 +2551,13 @@ function renderDetail(targetEl, composer, allComposersById, callbacks = {}) {
         </aside>
       </div>
 
+      <div class="section section-about">
+        <h3>About <span class="catalogue-src">via Wikipedia</span></h3>
+        <div class="about" id="about">
+          <div class="catalogue-note">Loading…</div>
+        </div>
+      </div>
+
       <div class="section">
         <h3>Life &amp; works</h3>
         <div class="life-tl" id="life-tl"></div>
@@ -2545,6 +2594,9 @@ function renderDetail(targetEl, composer, allComposersById, callbacks = {}) {
   mountPortrait(portraitEl, composer);
   portraitEl.addEventListener("click", () => onPortraitClick(composer));
 
+  // Short biography from Wikipedia (async; the section removes itself if there's nothing to show)
+  mountAbout(targetEl.querySelector("#about"), composer);
+
   // Full works catalogue from Open Opus (async; the curated key works above stay as-is)
   mountCatalogue(targetEl.querySelector("#catalogue"), composer);
 
@@ -2561,6 +2613,48 @@ function renderDetail(targetEl, composer, allComposersById, callbacks = {}) {
 }
 function renderEmpty(targetEl) {
   targetEl.innerHTML = `<div class="empty">Select a composer in the timeline to begin.</div>`;
+}
+
+// ---- About (Wikipedia) ---------------------------------------------------------
+
+async function mountAbout(host, composer) {
+  if (!host) return;
+  const data = await fetchWikiSummary(composer);
+  if (!host.isConnected) return;   // the panel moved on to another composer
+
+  const text = data && data.type !== "disambiguation" ? String(data.extract || "").trim() : "";
+  if (!text) {
+    // Nothing useful (no article, offline, disambiguation page): drop the section quietly.
+    const section = host.closest(".section");
+    if (section) section.remove();
+    return;
+  }
+
+  const fallbackUrl = `https://en.wikipedia.org/wiki/${encodeURIComponent(String(composer.wiki).replace(/ /g, "_"))}`;
+  const pageUrl = String(data.content_urls?.desktop?.page || "").startsWith("https://")
+    ? data.content_urls.desktop.page
+    : fallbackUrl;
+  const isLong = text.length > 520;   // short intros (the usual case) show in full
+
+  host.innerHTML = `
+    <p class="about-text${isLong ? " clamp" : ""}">${escapeHtml(text)}</p>
+    ${isLong ? `<button type="button" class="about-toggle" aria-expanded="false">Read more</button>` : ""}
+    <div class="catalogue-foot">
+      From <a href="${escapeAttr(pageUrl)}" target="_blank" rel="noopener noreferrer">Wikipedia</a>
+      (<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a>)
+      · <a href="${escapeAttr(pageUrl)}" target="_blank" rel="noopener noreferrer">Read the full article</a>
+    </div>
+  `;
+
+  const toggle = host.querySelector(".about-toggle");
+  if (toggle) {
+    const para = host.querySelector(".about-text");
+    toggle.addEventListener("click", () => {
+      const open = para.classList.toggle("clamp") === false;
+      toggle.textContent = open ? "Show less" : "Read more";
+      toggle.setAttribute("aria-expanded", String(open));
+    });
+  }
 }
 
 // ---- Works catalogue (Open Opus) ---------------------------------------------

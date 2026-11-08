@@ -4,6 +4,34 @@
 
 const cache = new Map();
 
+// One cached Wikipedia REST summary per article title, shared by the portrait and the
+// panel's "About" text so each composer costs a single request. Resolves to the parsed
+// summary (thumbnail, extract, content_urls, ...) or null. A missing article (404) is
+// remembered for the session; network errors and 5xx are not, so a later open retries.
+export function fetchWikiSummary(composer) {
+  if (!composer || !composer.wiki) return Promise.resolve(null);
+
+  const key = composer.wiki;
+  if (cache.has(key)) return cache.get(key);
+
+  const title = encodeURIComponent(key.replace(/ /g, "_"));
+  const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${title}`;
+
+  const promise = fetch(url, { headers: { accept: "application/json" } })
+    .then(r => {
+      if (r.ok) return r.json();
+      if (r.status >= 500) cache.delete(key);
+      return null;
+    })
+    .catch(() => {
+      cache.delete(key);
+      return null;
+    });
+
+  cache.set(key, promise);
+  return promise;
+}
+
 export function initialsFor(name) {
   if (!name) return "?";
   const cleaned = name.replace(/[().,"]/g, "").trim();
@@ -16,24 +44,11 @@ export function initialsFor(name) {
 export function resolvePortraitUrl(composer) {
   if (!composer) return Promise.resolve(null);
   if (composer.portrait) return Promise.resolve(composer.portrait);
-  if (!composer.wiki) return Promise.resolve(null);
 
-  const key = composer.wiki;
-  if (cache.has(key)) return cache.get(key);
-
-  const title = encodeURIComponent(key.replace(/ /g, "_"));
-  const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${title}`;
-
-  const promise = fetch(url, { headers: { accept: "application/json" } })
-    .then(r => (r.ok ? r.json() : null))
-    .then(data => {
-      if (!data) return null;
-      return data.thumbnail?.source || data.originalimage?.source || null;
-    })
-    .catch(() => null);
-
-  cache.set(key, promise);
-  return promise;
+  return fetchWikiSummary(composer).then(data => {
+    if (!data) return null;
+    return data.thumbnail?.source || data.originalimage?.source || null;
+  });
 }
 
 // Mounts an img into `hostEl` once the URL resolves. Bails out if the host

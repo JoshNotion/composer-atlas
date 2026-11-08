@@ -36,7 +36,7 @@ This produces `composer-atlas.html` (~1.4 MB) with **everything inlined** — CS
 - `timeline.js` — D3 timeline: sticky-top axis, vertical bar list, horizontal-scroll at zoom > 1, six zoom levels, world-event markers, dashed relationship lines, era filter.
 - `map.js` — Leaflet map with CartoDB dark-matter tiles; birth/lived/death markers with toggleable layers; journey polyline.
 - `panel.js` — composer detail card: portrait, dual-row Life & Works timeline with popover, key works with Listen link, connection cards with notes, world-context aside.
-- `portraits.js` — initials fallback + lazy Wikipedia thumbnail fetch + per-title cache; higher-resolution swap for the lightbox.
+- `portraits.js` — initials fallback + lazy Wikipedia summary fetch (one cached request per article, shared by the portrait and the About text); higher-resolution swap for the lightbox.
 - `openopus.js` — Open Opus integration: resolves a composer to an Open Opus id and loads their full works catalogue (cached; see below).
 - `app.js` — glue: loads JSON, mirrors relationships, wires selection, zoom, lightbox, keyboard, tooltip, panel state machine, hash-based era filter.
 - `composers.json` — the data file (194 composers).
@@ -59,6 +59,7 @@ This produces `composer-atlas.html` (~1.4 MB) with **everything inlined** — CS
 - **Portrait** — click the portrait to enlarge it in a lightbox with a link out to Wikipedia.
 - **Life & Works timeline** — dual-row track sharing one x-axis. Filled dots = life events; open rings = key works. Hover any dot for the year, kind, title, and (for works) the era-context blurb.
 - **▶ Listen** — every key work has a Listen pill that opens a YouTube search for `{composer} {work}`. Override per work by adding `mediaUrl` in `composers.json`.
+- **About** — a short introduction to the composer at the top of the panel, taken from the composer's Wikipedia article (the `wiki` field in `composers.json`). It's a general summary, not a life story: the turning points live in the curated "Life & works" timeline right below it. Long summaries collapse behind "Read more"; the section removes itself when there's no article (or you're offline). Wikipedia text is CC BY-SA 4.0, so each About links back to the article.
 - **Works catalogue** — below the curated key works, a full works list from [Open Opus](https://openopus.org), grouped by genre. Starts on Open Opus's *Recommended* works; switch to *All works* for the complete list (hundreds for the big names). Each work has a YouTube Listen link. See "Open Opus works catalogue" below.
 - **Connection cards** — each shows the connected composer's name, lifespan, and a note explaining the relationship; click to jump to them. Cross-era navigation works even while the timeline is filtered.
 

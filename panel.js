@@ -2,7 +2,7 @@
 // key works with Listen link, connections with explanatory notes.
 
 import { eraColor } from "./timeline.js";
-import { initialsFor, mountPortrait } from "./portraits.js";
+import { initialsFor, mountPortrait, fetchWikiSummary } from "./portraits.js";
 import { loadOpenOpusWorks } from "./openopus.js";
 
 export function renderDetail(targetEl, composer, allComposersById, callbacks = {}) {
@@ -76,6 +76,13 @@ export function renderDetail(targetEl, composer, allComposersById, callbacks = {
         </aside>
       </div>
 
+      <div class="section section-about">
+        <h3>About <span class="catalogue-src">via Wikipedia</span></h3>
+        <div class="about" id="about">
+          <div class="catalogue-note">Loading…</div>
+        </div>
+      </div>
+
       <div class="section">
         <h3>Life &amp; works</h3>
         <div class="life-tl" id="life-tl"></div>
@@ -112,6 +119,9 @@ export function renderDetail(targetEl, composer, allComposersById, callbacks = {
   mountPortrait(portraitEl, composer);
   portraitEl.addEventListener("click", () => onPortraitClick(composer));
 
+  // Short biography from Wikipedia (async; the section removes itself if there's nothing to show)
+  mountAbout(targetEl.querySelector("#about"), composer);
+
   // Full works catalogue from Open Opus (async; the curated key works above stay as-is)
   mountCatalogue(targetEl.querySelector("#catalogue"), composer);
 
@@ -129,6 +139,48 @@ export function renderDetail(targetEl, composer, allComposersById, callbacks = {
 
 export function renderEmpty(targetEl) {
   targetEl.innerHTML = `<div class="empty">Select a composer in the timeline to begin.</div>`;
+}
+
+// ---- About (Wikipedia) ---------------------------------------------------------
+
+async function mountAbout(host, composer) {
+  if (!host) return;
+  const data = await fetchWikiSummary(composer);
+  if (!host.isConnected) return;   // the panel moved on to another composer
+
+  const text = data && data.type !== "disambiguation" ? String(data.extract || "").trim() : "";
+  if (!text) {
+    // Nothing useful (no article, offline, disambiguation page): drop the section quietly.
+    const section = host.closest(".section");
+    if (section) section.remove();
+    return;
+  }
+
+  const fallbackUrl = `https://en.wikipedia.org/wiki/${encodeURIComponent(String(composer.wiki).replace(/ /g, "_"))}`;
+  const pageUrl = String(data.content_urls?.desktop?.page || "").startsWith("https://")
+    ? data.content_urls.desktop.page
+    : fallbackUrl;
+  const isLong = text.length > 520;   // short intros (the usual case) show in full
+
+  host.innerHTML = `
+    <p class="about-text${isLong ? " clamp" : ""}">${escapeHtml(text)}</p>
+    ${isLong ? `<button type="button" class="about-toggle" aria-expanded="false">Read more</button>` : ""}
+    <div class="catalogue-foot">
+      From <a href="${escapeAttr(pageUrl)}" target="_blank" rel="noopener noreferrer">Wikipedia</a>
+      (<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a>)
+      · <a href="${escapeAttr(pageUrl)}" target="_blank" rel="noopener noreferrer">Read the full article</a>
+    </div>
+  `;
+
+  const toggle = host.querySelector(".about-toggle");
+  if (toggle) {
+    const para = host.querySelector(".about-text");
+    toggle.addEventListener("click", () => {
+      const open = para.classList.toggle("clamp") === false;
+      toggle.textContent = open ? "Show less" : "Read more";
+      toggle.setAttribute("aria-expanded", String(open));
+    });
+  }
 }
 
 // ---- Works catalogue (Open Opus) ---------------------------------------------
