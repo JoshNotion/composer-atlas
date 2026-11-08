@@ -3,6 +3,7 @@
 
 import { eraColor } from "./timeline.js";
 import { initialsFor, mountPortrait } from "./portraits.js";
+import { loadOpenOpusWorks } from "./openopus.js";
 
 export function renderDetail(targetEl, composer, allComposersById, callbacks = {}) {
   const onConnectionClick = callbacks.onConnectionClick || (() => {});
@@ -85,6 +86,13 @@ export function renderDetail(targetEl, composer, allComposersById, callbacks = {
         <ul class="works-list">${works}</ul>
       </div>
 
+      <div class="section section-catalogue">
+        <h3>Works catalogue <span class="catalogue-src">via Open Opus</span></h3>
+        <div class="catalogue" id="catalogue">
+          <div class="catalogue-note">Loading from Open Opus…</div>
+        </div>
+      </div>
+
       <div class="section">
         <h3>Connections</h3>
         ${connections
@@ -104,6 +112,9 @@ export function renderDetail(targetEl, composer, allComposersById, callbacks = {
   mountPortrait(portraitEl, composer);
   portraitEl.addEventListener("click", () => onPortraitClick(composer));
 
+  // Full works catalogue from Open Opus (async; the curated key works above stay as-is)
+  mountCatalogue(targetEl.querySelector("#catalogue"), composer);
+
   // Life events + key works on a shared timeline
   drawTimeline(targetEl.querySelector("#life-tl"), composer.lifeEvents || [], composer.keyWorks || [], lifeMin, lifeMax, color);
 
@@ -118,6 +129,100 @@ export function renderDetail(targetEl, composer, allComposersById, callbacks = {
 
 export function renderEmpty(targetEl) {
   targetEl.innerHTML = `<div class="empty">Select a composer in the timeline to begin.</div>`;
+}
+
+// ---- Works catalogue (Open Opus) ---------------------------------------------
+
+const CATALOGUE_GENRE_ORDER = ["Keyboard", "Orchestral", "Chamber", "Vocal", "Stage"];
+
+async function mountCatalogue(host, composer) {
+  if (!host) return;
+  const result = await loadOpenOpusWorks(composer);
+  // The panel re-renders on every selection; if this host was replaced while the
+  // request was in flight, the user has moved on and there is nothing to update.
+  if (!host.isConnected) return;
+  renderCatalogue(host, composer, result);
+}
+
+function renderCatalogue(host, composer, result) {
+  if (result.state === "missing") {
+    host.innerHTML = `<div class="catalogue-note">${escapeHtml(composer.name)} isn't in the Open Opus catalogue (it focuses on the mainstream concert repertoire), so only the key works above are shown.</div>`;
+    return;
+  }
+
+  if (result.state === "error") {
+    host.innerHTML = `<div class="catalogue-note">Couldn't reach Open Opus right now. <button type="button" class="catalogue-retry">Try again</button></div>`;
+    host.querySelector(".catalogue-retry").addEventListener("click", () => {
+      host.innerHTML = `<div class="catalogue-note">Loading from Open Opus…</div>`;
+      mountCatalogue(host, composer);
+    });
+    return;
+  }
+
+  const works = result.works;
+  if (!works.length) {
+    host.innerHTML = `<div class="catalogue-note">Open Opus lists no works for ${escapeHtml(composer.name)} yet.</div>`;
+    return;
+  }
+
+  const recommendedCount = works.filter(w => w.recommended).length;
+  let mode = recommendedCount > 0 ? "recommended" : "all";
+
+  function draw() {
+    const shown = mode === "recommended" ? works.filter(w => w.recommended) : works;
+
+    const byGenre = new Map();
+    shown.forEach(w => {
+      const g = w.genre || "Other";
+      if (!byGenre.has(g)) byGenre.set(g, []);
+      byGenre.get(g).push(w);
+    });
+    const genres = [...byGenre.keys()].sort((a, b) => {
+      const ia = CATALOGUE_GENRE_ORDER.indexOf(a);
+      const ib = CATALOGUE_GENRE_ORDER.indexOf(b);
+      if (ia !== -1 || ib !== -1) return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+      return a.localeCompare(b);
+    });
+
+    // Short lists start fully open; long ones open only the first group, so the
+    // panel isn't a wall of 900 titles or a column of collapsed headers.
+    const openAll = shown.length <= 40;
+    const groups = genres.map((g, gi) => {
+      const items = byGenre.get(g).map(w => `
+        <li class="catalogue-work">
+          <span class="catalogue-title">${escapeHtml(w.title)}${w.subtitle ? ` <span class="catalogue-sub">${escapeHtml(w.subtitle)}</span>` : ""}</span>
+          <a class="work-listen" href="${escapeAttr(youtubeSearch(composer.name, w.title))}" target="_blank" rel="noopener noreferrer" title="Search YouTube for this work">
+            <span class="play-tri">▶</span>Listen
+          </a>
+        </li>`).join("");
+      return `
+        <details class="catalogue-group"${openAll || gi === 0 ? " open" : ""}>
+          <summary><span class="catalogue-genre">${escapeHtml(g)}</span><span class="catalogue-count">${byGenre.get(g).length}</span></summary>
+          <ul class="catalogue-list">${items}</ul>
+        </details>`;
+    }).join("");
+
+    const filterBtn = (m, label, count) =>
+      `<button type="button" class="catalogue-filter${mode === m ? " on" : ""}" data-mode="${m}">${label} <span class="catalogue-count">${count}</span></button>`;
+
+    host.innerHTML = `
+      <div class="catalogue-filters">
+        ${recommendedCount > 0 ? filterBtn("recommended", "Recommended", recommendedCount) : ""}
+        ${filterBtn("all", "All works", works.length)}
+      </div>
+      ${groups}
+      <div class="catalogue-foot">Works data from <a href="https://openopus.org" target="_blank" rel="noopener noreferrer">Open Opus</a> (open data). “Listen” searches YouTube.</div>
+    `;
+
+    host.querySelectorAll(".catalogue-filter").forEach(btn => {
+      btn.addEventListener("click", () => {
+        mode = btn.getAttribute("data-mode");
+        draw();
+      });
+    });
+  }
+
+  draw();
 }
 
 function youtubeSearch(composerName, workTitle) {

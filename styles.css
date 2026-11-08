@@ -878,3 +878,93 @@ body { display: flex; flex-direction: column; }
     padding-right: 0;
   }
 }
+
+/* Works catalogue (Open Opus) */
+.catalogue-src {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+  color: var(--text-faint);
+  margin-left: 6px;
+}
+.catalogue-note {
+  color: var(--text-faint);
+  font-size: 12.5px;
+  font-style: italic;
+  line-height: 1.5;
+}
+.catalogue-retry {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-dim);
+  font-size: 11.5px;
+  padding: 2px 8px;
+  margin-left: 6px;
+  cursor: pointer;
+  font-style: normal;
+  transition: all .2s var(--ease);
+}
+.catalogue-retry:hover { color: var(--text); border-color: #555; background: var(--surface-2); }
+.catalogue-filters { display: flex; gap: 6px; margin-bottom: 10px; }
+.catalogue-filter {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 4px 10px;
+  font-size: 11.5px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all .2s var(--ease);
+}
+.catalogue-filter.on { color: var(--text); border-color: #555; background: var(--surface-2); }
+.catalogue-filter:hover { color: var(--text); }
+.catalogue-count { color: var(--text-faint); font-size: 11px; margin-left: 4px; }
+.catalogue-group { border-top: 1px solid var(--border); }
+.catalogue-group:last-of-type { border-bottom: 1px solid var(--border); }
+.catalogue-group > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 2px;
+  cursor: pointer;
+  list-style: none;
+  color: var(--text);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.catalogue-group > summary::-webkit-details-marker { display: none; }
+.catalogue-group > summary::before {
+  content: "▸";
+  color: var(--text-faint);
+  font-size: 10px;
+  margin-right: 8px;
+  transition: transform .2s var(--ease);
+}
+.catalogue-group[open] > summary::before { transform: rotate(90deg); }
+.catalogue-genre { flex: 1 1 auto; }
+.catalogue-list {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+  max-height: 340px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #3a3a3a var(--bg);
+}
+.catalogue-work {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 2px 4px 14px;
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+.catalogue-work:hover { background: var(--surface); }
+.catalogue-title { min-width: 0; color: var(--text); }
+.catalogue-sub { color: var(--text-dim); font-size: 11.5px; }
+.catalogue-work .work-listen { flex: 0 0 auto; }
+.catalogue-foot { margin-top: 10px; color: var(--text-faint); font-size: 11.5px; }
+.catalogue-foot a { color: var(--text-dim); }
+.panel.expanded .detail .catalogue { max-width: 760px; }

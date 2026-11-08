@@ -33,7 +33,7 @@ function safeJson(obj) {
   const composers = JSON.parse(read('composers.json'));
 
   // --- 2. Concatenate our JS modules, stripping import/export
-  const modules = ['portraits.js', 'timeline.js', 'map.js', 'panel.js', 'app.js'];
+  const modules = ['portraits.js', 'timeline.js', 'map.js', 'openopus.js', 'panel.js', 'app.js'];
   let scripts = modules.map(f => {
     let code = read(f);
     code = code.replace(/^\s*import\s[^;]*;?\s*$/gm, '');
@@ -68,12 +68,15 @@ function safeJson(obj) {
   const styleTag =
     `<style>\n${leafletCss}\n</style>\n` +
     `<style>\n${read('styles.css')}\n</style>`;
-  html = html.replace('</head>', `${styleTag}\n</head>`);
+  // NB: replacements below use a function, not a string. With a string, JS expands
+  // `$&`, `` $` `` and `$'` inside the replacement, and minified D3 contains those
+  // sequences, which splices copies of the page into the middle of the library.
+  html = html.replace('</head>', () => `${styleTag}\n</head>`);
 
   const libScript = `<script>${d3Src}\n${leafletJs}</script>`;
   const dataScript = `<script>window.__COMPOSER_ATLAS_DATA__ = ${safeJson(composers)};</script>`;
   const bundleScript = `<script>\n(function(){\n${scripts}\n})();\n</script>`;
-  html = html.replace('</body>', `${libScript}\n${dataScript}\n${bundleScript}\n</body>`);
+  html = html.replace('</body>', () => `${libScript}\n${dataScript}\n${bundleScript}\n</body>`);
 
   // --- 6. Write output
   const out = p('composer-atlas.html');

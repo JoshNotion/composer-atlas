@@ -37,6 +37,7 @@ This produces `composer-atlas.html` (~1.4 MB) with **everything inlined** — CS
 - `map.js` — Leaflet map with CartoDB dark-matter tiles; birth/lived/death markers with toggleable layers; journey polyline.
 - `panel.js` — composer detail card: portrait, dual-row Life & Works timeline with popover, key works with Listen link, connection cards with notes, world-context aside.
 - `portraits.js` — initials fallback + lazy Wikipedia thumbnail fetch + per-title cache; higher-resolution swap for the lightbox.
+- `openopus.js` — Open Opus integration: resolves a composer to an Open Opus id and loads their full works catalogue (cached; see below).
 - `app.js` — glue: loads JSON, mirrors relationships, wires selection, zoom, lightbox, keyboard, tooltip, panel state machine, hash-based era filter.
 - `composers.json` — the data file (194 composers).
 - `build.cjs` — single-file bundler for the Notion / offline HTML.
@@ -58,6 +59,7 @@ This produces `composer-atlas.html` (~1.4 MB) with **everything inlined** — CS
 - **Portrait** — click the portrait to enlarge it in a lightbox with a link out to Wikipedia.
 - **Life & Works timeline** — dual-row track sharing one x-axis. Filled dots = life events; open rings = key works. Hover any dot for the year, kind, title, and (for works) the era-context blurb.
 - **▶ Listen** — every key work has a Listen pill that opens a YouTube search for `{composer} {work}`. Override per work by adding `mediaUrl` in `composers.json`.
+- **Works catalogue** — below the curated key works, a full works list from [Open Opus](https://openopus.org), grouped by genre. Starts on Open Opus's *Recommended* works; switch to *All works* for the complete list (hundreds for the big names). Each work has a YouTube Listen link. See "Open Opus works catalogue" below.
 - **Connection cards** — each shows the connected composer's name, lifespan, and a note explaining the relationship; click to jump to them. Cross-era navigation works even while the timeline is filtered.
 
 ### Keyboard
@@ -110,6 +112,16 @@ Notes on individual fields:
 - **`keyWorks[].year`** can be a single year (`"1721"`), a range (`"1722–1742"`), or a prefixed estimate (`"c.1680"`). The Life & Works timeline extracts the first four-digit number for positioning and shows the original string in the popover.
 - **`keyWorks[].mediaUrl`** is optional. When absent, the ▶ Listen pill falls back to a YouTube search of `{composer name} {work title}`.
 - **`relationships[]`** should list a note that describes the connection from either side (the mirroring copies the same note to the other composer). Relationships to composers not in the data file are silently ignored.
+
+## Open Opus works catalogue
+
+[Open Opus](https://openopus.org) is a free, open (public-domain) catalogue of classical composers and works. Its API allows cross-origin requests, so the browser calls it directly: no backend, no API key. It needs an internet connection; everything else in the app still works offline.
+
+- **How it's wired:** `panel.js` calls `loadOpenOpusWorks(composer)` from `openopus.js` when you open a composer and fills the "Works catalogue" section when the response arrives. The curated `keyWorks` in `composers.json` are untouched.
+- **Matching composers:** `openopus.js` carries a built-in map of `composers.json` ids to Open Opus ids (checked against the live API: exact name match with a matching birth year), so opening a composer is one request. Composers not in the map (for example newly added ones) are looked up by name and birth year the first time they're opened.
+- **Not every composer is in Open Opus.** It focuses on the mainstream concert repertoire. Many film/contemporary composers, medieval figures and several women composers (Farrenc, Clara Schumann, Hildegard, Saariaho, …) aren't there, and the panel says so and shows only the curated key works. Open Opus is wiki-style, so entries can be added at openopus.org.
+- **Override a match** by adding `"openopusId": 87` to a composer in `composers.json` (the number is Open Opus's composer id), or `"openopusId": null` to skip Open Opus for that composer.
+- **Caching:** results are kept in memory and in `localStorage` (found: 7 days, not found: 1 day). Network errors are never cached; the panel shows a "Try again" button.
 
 ## Adding composers programmatically
 
