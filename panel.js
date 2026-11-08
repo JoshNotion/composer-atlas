@@ -46,20 +46,19 @@ export function renderDetail(targetEl, composer, allComposersById, callbacks = {
         <div class="portrait" id="detail-portrait" data-composer-id="${escapeAttr(composer.id)}" style="background:${color}" title="Click to enlarge">
           <span class="initials">${escapeHtml(initials)}</span>
         </div>
-        <div class="detail-meta">
-          <h2>${escapeHtml(composer.name)}</h2>
-          <div class="detail-years">${composer.born}&nbsp;–&nbsp;${composer.died ?? "present"}</div>
-          <span class="era-badge" style="background:${color}">${escapeHtml(composer.era)}</span>
-        </div>
-      </div>
-
-      <div class="section section-about">
-        <aside class="about callout" style="--callout-accent:${color}">
-          <div class="callout-label">About <span class="catalogue-src">via Wikipedia</span></div>
-          <div class="about-body" id="about">
-            <div class="catalogue-note">Loading…</div>
+        <div class="detail-side">
+          <div class="detail-meta">
+            <h2>${escapeHtml(composer.name)}</h2>
+            <div class="detail-years">${composer.born}&nbsp;–&nbsp;${composer.died ?? "present"}</div>
+            <span class="era-badge" style="background:${color}">${escapeHtml(composer.era)}</span>
           </div>
-        </aside>
+          <aside class="about callout" style="--callout-accent:${color}">
+            <div class="callout-label">About <span class="catalogue-src">via Wikipedia</span></div>
+            <div class="about-body" id="about">
+              <div class="catalogue-note">Loading…</div>
+            </div>
+          </aside>
+        </div>
       </div>
 
       <div class="section">
@@ -128,8 +127,8 @@ async function mountAbout(host, composer) {
   const text = data && data.type !== "disambiguation" ? String(data.extract || "").trim() : "";
   if (!text) {
     // Nothing useful (no article, offline, disambiguation page): drop the section quietly.
-    const section = host.closest(".section");
-    if (section) section.remove();
+    const box = host.closest(".callout");
+    if (box) box.remove();
     return;
   }
 

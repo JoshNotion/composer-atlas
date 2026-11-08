@@ -380,7 +380,6 @@ body { display: flex; flex-direction: column; }
   display: flex;
   align-items: flex-start;
   gap: 28px;
-  flex-wrap: wrap;
 }
 .panel.expanded .portrait {
   width: 150px;
@@ -392,10 +391,6 @@ body { display: flex; flex-direction: column; }
 .panel.expanded .detail-meta {
   flex: 0 1 auto;
   min-width: 200px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-self: stretch;
 }
 .panel.expanded .detail-meta h2 {
   font-size: 30px;
@@ -566,7 +561,8 @@ body { display: flex; flex-direction: column; }
   letter-spacing: 1px;
 }
 .portrait.has-img .initials { display: none; }
-.detail-meta { flex: 1 1 auto; min-width: 0; }
+.detail-side { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+.detail-meta { flex: 0 0 auto; min-width: 0; }
 .detail-meta h2 {
   margin: 0 0 6px;
   font-size: 20px;
@@ -994,3 +990,6 @@ body { display: flex; flex-direction: column; }
 
 /* Key works inside the catalogue's Recommended view */
 .catalogue-keygroup .works-list { padding: 4px 0 12px 22px; }
+
+.detail-side .callout { margin: 0; }
+.panel.expanded .detail-side .callout { max-width: 760px; }
