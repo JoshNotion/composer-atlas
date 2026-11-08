@@ -1234,7 +1234,9 @@ body { display: flex; flex-direction: column; }
   letter-spacing: 1px;
 }
 .portrait.has-img .initials { display: none; }
-.detail-side { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+.detail-id { flex: 0 0 auto; width: 190px; display: flex; flex-direction: column; gap: 14px; }
+.detail-head > .callout { flex: 1 1 0; min-width: 0; align-self: stretch; }
+.panel.expanded .detail-id { width: 240px; }
 .detail-meta { flex: 0 0 auto; min-width: 0; }
 .detail-meta h2 {
   margin: 0 0 6px;
@@ -1664,8 +1666,7 @@ body { display: flex; flex-direction: column; }
 /* Key works inside the catalogue's Recommended view */
 .catalogue-keygroup .works-list { padding: 4px 0 12px 22px; }
 
-.detail-side .callout { margin: 0; }
-.panel.expanded .detail-side .callout { max-width: 760px; }
+.detail-head > .callout { margin: 0; }
 
 </style>
 </head>
@@ -2516,22 +2517,22 @@ function renderDetail(targetEl, composer, allComposersById, callbacks = {}) {
   targetEl.innerHTML = `
     <div class="detail">
       <div class="detail-head">
-        <div class="portrait" id="detail-portrait" data-composer-id="${escapeAttr(composer.id)}" style="background:${color}" title="Click to enlarge">
-          <span class="initials">${escapeHtml(initials)}</span>
-        </div>
-        <div class="detail-side">
+        <div class="detail-id">
           <div class="detail-meta">
             <h2>${escapeHtml(composer.name)}</h2>
             <div class="detail-years">${composer.born}&nbsp;–&nbsp;${composer.died ?? "present"}</div>
             <span class="era-badge" style="background:${color}">${escapeHtml(composer.era)}</span>
           </div>
-          <aside class="about callout" style="--callout-accent:${color}">
-            <div class="callout-label">About <span class="catalogue-src">via Wikipedia</span></div>
-            <div class="about-body" id="about">
-              <div class="catalogue-note">Loading…</div>
-            </div>
-          </aside>
+          <div class="portrait" id="detail-portrait" data-composer-id="${escapeAttr(composer.id)}" style="background:${color}" title="Click to enlarge">
+            <span class="initials">${escapeHtml(initials)}</span>
+          </div>
         </div>
+        <aside class="about callout" style="--callout-accent:${color}">
+          <div class="callout-label">About <span class="catalogue-src">via Wikipedia</span></div>
+          <div class="about-body" id="about">
+            <div class="catalogue-note">Loading…</div>
+          </div>
+        </aside>
       </div>
 
       <div class="section">

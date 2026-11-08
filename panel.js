@@ -43,22 +43,22 @@ export function renderDetail(targetEl, composer, allComposersById, callbacks = {
   targetEl.innerHTML = `
     <div class="detail">
       <div class="detail-head">
-        <div class="portrait" id="detail-portrait" data-composer-id="${escapeAttr(composer.id)}" style="background:${color}" title="Click to enlarge">
-          <span class="initials">${escapeHtml(initials)}</span>
-        </div>
-        <div class="detail-side">
+        <div class="detail-id">
           <div class="detail-meta">
             <h2>${escapeHtml(composer.name)}</h2>
             <div class="detail-years">${composer.born}&nbsp;–&nbsp;${composer.died ?? "present"}</div>
             <span class="era-badge" style="background:${color}">${escapeHtml(composer.era)}</span>
           </div>
-          <aside class="about callout" style="--callout-accent:${color}">
-            <div class="callout-label">About <span class="catalogue-src">via Wikipedia</span></div>
-            <div class="about-body" id="about">
-              <div class="catalogue-note">Loading…</div>
-            </div>
-          </aside>
+          <div class="portrait" id="detail-portrait" data-composer-id="${escapeAttr(composer.id)}" style="background:${color}" title="Click to enlarge">
+            <span class="initials">${escapeHtml(initials)}</span>
+          </div>
         </div>
+        <aside class="about callout" style="--callout-accent:${color}">
+          <div class="callout-label">About <span class="catalogue-src">via Wikipedia</span></div>
+          <div class="about-body" id="about">
+            <div class="catalogue-note">Loading…</div>
+          </div>
+        </aside>
       </div>
 
       <div class="section">
