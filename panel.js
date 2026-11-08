@@ -43,16 +43,17 @@ export function renderDetail(targetEl, composer, allComposersById, callbacks = {
   targetEl.innerHTML = `
     <div class="detail">
       <div class="detail-head">
-        <div class="detail-id">
-          <div class="detail-meta">
-            <h2>${escapeHtml(composer.name)}</h2>
-            <div class="detail-years">${composer.born}&nbsp;–&nbsp;${composer.died ?? "present"}</div>
-            <span class="era-badge" style="background:${color}">${escapeHtml(composer.era)}</span>
-          </div>
-          <div class="portrait" id="detail-portrait" data-composer-id="${escapeAttr(composer.id)}" style="background:${color}" title="Click to enlarge">
-            <span class="initials">${escapeHtml(initials)}</span>
-          </div>
+        <div class="portrait" id="detail-portrait" data-composer-id="${escapeAttr(composer.id)}" style="background:${color}" title="Click to enlarge">
+          <span class="initials">${escapeHtml(initials)}</span>
         </div>
+        <div class="detail-meta">
+          <h2>${escapeHtml(composer.name)}</h2>
+          <div class="detail-years">${composer.born}&nbsp;–&nbsp;${composer.died ?? "present"}</div>
+          <span class="era-badge" style="background:${color}">${escapeHtml(composer.era)}</span>
+        </div>
+      </div>
+
+      <div class="section section-about">
         <aside class="about callout" style="--callout-accent:${color}">
           <div class="callout-label">About <span class="catalogue-src">via Wikipedia</span></div>
           <div class="about-body" id="about">
@@ -127,8 +128,8 @@ async function mountAbout(host, composer) {
   const text = data && data.type !== "disambiguation" ? String(data.extract || "").trim() : "";
   if (!text) {
     // Nothing useful (no article, offline, disambiguation page): drop the section quietly.
-    const box = host.closest(".callout");
-    if (box) box.remove();
+    const section = host.closest(".section");
+    if (section) section.remove();
     return;
   }
 
