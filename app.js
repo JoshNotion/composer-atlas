@@ -222,6 +222,12 @@ async function main() {
   let panelMode = "closed";
 
   let collapseTimer = null;
+  // Panel slide duration comes from the CSS (--panel-dur) so open and close always match
+  const panelDurMs = () => {
+    const v = getComputedStyle(document.documentElement).getPropertyValue("--panel-dur").trim();
+    const n = parseFloat(v) || 0.9;
+    return Math.round((v.endsWith("ms") ? n : n * 1000));
+  };
 
   function openPanel(mode = panelMode === "closed" ? "peek" : panelMode) {
     clearTimeout(collapseTimer);
@@ -236,7 +242,7 @@ async function main() {
       expandBtnEl.setAttribute("title", label);
     }
     requestAnimationFrame(() => mapApi.invalidateSize());
-    setTimeout(() => mapApi.invalidateSize(), 320);
+    setTimeout(() => mapApi.invalidateSize(), panelDurMs() + 20);
   }
   function closePanel() {
     panelMode = "closed";
@@ -247,7 +253,7 @@ async function main() {
     clearTimeout(collapseTimer);
     collapseTimer = setTimeout(() => {
       if (panelMode === "closed") panelEl.classList.remove("expanded");
-    }, 940);
+    }, panelDurMs() + 40);
     timeline.clear();
   }
 

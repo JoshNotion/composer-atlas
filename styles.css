@@ -27,6 +27,8 @@
   --panel-w-effective: clamp(var(--panel-w-min), var(--panel-w), 720px);
 
   --ease: cubic-bezier(.2,.6,.2,1);
+  /* One speed for the panel opening AND closing (side peek and full page). JS reads this too. */
+  --panel-dur: .9s;
 }
 
 * { box-sizing: border-box; }
@@ -150,7 +152,7 @@ body { display: flex; flex-direction: column; }
   min-height: 0;
   position: relative;
   width: 100%;
-  transition: padding-right .3s var(--ease);
+  transition: padding-right var(--panel-dur) var(--ease);
 }
 
 /* When the panel is open in peek mode, push the timeline aside so contemporary
@@ -324,7 +326,7 @@ body { display: flex; flex-direction: column; }
   display: flex;
   flex-direction: column;
   transform: translateX(100%);
-  transition: transform .3s var(--ease), opacity .25s var(--ease);
+  transition: transform var(--panel-dur) var(--ease), opacity var(--panel-dur) var(--ease);
   opacity: 0;
   z-index: 20;
   box-shadow: -16px 0 36px rgba(0, 0, 0, 0.55);
@@ -343,7 +345,7 @@ body { display: flex; flex-direction: column; }
   min-width: 0;
   border-left: none;
   box-shadow: none;
-  transition: transform .9s var(--ease), opacity .8s var(--ease), width .3s var(--ease);
+  transition: transform var(--panel-dur) var(--ease), opacity var(--panel-dur) var(--ease), width var(--panel-dur) var(--ease);
 }
 .panel.expanded .panel-inner {
   display: flex;
