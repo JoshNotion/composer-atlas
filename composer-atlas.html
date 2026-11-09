@@ -732,6 +732,9 @@ body { display: flex; flex-direction: column; }
 }
 
 .brand {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
   display: flex;
   align-items: baseline;
   gap: 12px;
@@ -749,6 +752,8 @@ body { display: flex; flex-direction: column; }
   background: linear-gradient(135deg, var(--era-baroque) 0%, var(--era-romantic) 50%, var(--era-modern) 100%);
   align-self: center;
 }
+.brand:hover h1 { color: #fff; }
+.brand:focus-visible { outline: 2px solid var(--text-dim); outline-offset: 4px; border-radius: 4px; }
 .brand-sub {
   color: var(--text-dim);
   font-size: 12px;
@@ -1676,11 +1681,11 @@ body { display: flex; flex-direction: column; }
 </head>
 <body>
   <header class="topbar">
-    <div class="brand">
+    <a class="brand" id="brand-home" href="./" title="Back to the timeline" aria-label="Composer Atlas: back to the timeline">
       <span class="brand-mark"></span>
       <h1>Composer Atlas</h1>
       <span class="brand-sub" id="brand-sub">&nbsp;</span>
-    </div>
+    </a>
     <div class="legend" id="legend"></div>
   </header>
 
@@ -3181,7 +3186,10 @@ async function main() {
   // Panel mode: "closed" | "peek" | "full"
   let panelMode = "closed";
 
+  let collapseTimer = null;
+
   function openPanel(mode = panelMode === "closed" ? "peek" : panelMode) {
+    clearTimeout(collapseTimer);
     panelMode = mode;
     panelEl.classList.add("open");
     panelEl.classList.toggle("expanded", mode === "full");
@@ -3197,10 +3205,25 @@ async function main() {
   }
   function closePanel() {
     panelMode = "closed";
-    panelEl.classList.remove("open", "expanded");
+    // Slide out first; only drop the full-page width once the slide has finished,
+    // so a full-page panel doesn't visibly shrink while it leaves.
+    panelEl.classList.remove("open");
     panelEl.setAttribute("aria-hidden", "true");
+    clearTimeout(collapseTimer);
+    collapseTimer = setTimeout(() => {
+      if (panelMode === "closed") panelEl.classList.remove("expanded");
+    }, 340);
     timeline.clear();
   }
+
+  // Clicking the logo returns to the main timeline without reloading the page
+  document.getElementById("brand-home").addEventListener("click", (e) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return; // allow open-in-new-tab
+    e.preventDefault();
+    closeLightbox();
+    closePanel();
+    setEraFilter(null);
+  });
   function togglePanelExpanded() {
     if (panelMode === "closed") return;
     openPanel(panelMode === "full" ? "peek" : "full");

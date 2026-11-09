@@ -221,7 +221,10 @@ async function main() {
   // Panel mode: "closed" | "peek" | "full"
   let panelMode = "closed";
 
+  let collapseTimer = null;
+
   function openPanel(mode = panelMode === "closed" ? "peek" : panelMode) {
+    clearTimeout(collapseTimer);
     panelMode = mode;
     panelEl.classList.add("open");
     panelEl.classList.toggle("expanded", mode === "full");
@@ -237,10 +240,25 @@ async function main() {
   }
   function closePanel() {
     panelMode = "closed";
-    panelEl.classList.remove("open", "expanded");
+    // Slide out first; only drop the full-page width once the slide has finished,
+    // so a full-page panel doesn't visibly shrink while it leaves.
+    panelEl.classList.remove("open");
     panelEl.setAttribute("aria-hidden", "true");
+    clearTimeout(collapseTimer);
+    collapseTimer = setTimeout(() => {
+      if (panelMode === "closed") panelEl.classList.remove("expanded");
+    }, 340);
     timeline.clear();
   }
+
+  // Clicking the logo returns to the main timeline without reloading the page
+  document.getElementById("brand-home").addEventListener("click", (e) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return; // allow open-in-new-tab
+    e.preventDefault();
+    closeLightbox();
+    closePanel();
+    setEraFilter(null);
+  });
   function togglePanelExpanded() {
     if (panelMode === "closed") return;
     openPanel(panelMode === "full" ? "peek" : "full");
