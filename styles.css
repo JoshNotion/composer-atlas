@@ -1,4 +1,6 @@
 :root {
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, "Times New Roman", serif;
   --bg: #1a1a1a;
   --surface: #242424;
   --surface-2: #2c2c2c;
@@ -34,7 +36,7 @@ html, body {
   height: 100%;
   background: var(--bg);
   color: var(--text);
-  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, "Times New Roman", serif;
+  font-family: var(--font-sans);
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -991,3 +993,8 @@ body { display: flex; flex-direction: column; }
 
 /* Key works inside the catalogue's Recommended view */
 .catalogue-keygroup .works-list { padding: 4px 0 12px 22px; }
+
+/* Serif for headings only; body text stays sans */
+.detail-meta h2,
+.section h3 { font-family: var(--font-serif); }
+.detail-meta h2 { font-weight: 600; }
