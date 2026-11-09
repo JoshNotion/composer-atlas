@@ -1016,7 +1016,7 @@ body { display: flex; flex-direction: column; }
   min-width: 0;
   border-left: none;
   box-shadow: none;
-  transition: transform .55s var(--ease), opacity .5s var(--ease), width .3s var(--ease);
+  transition: transform .9s var(--ease), opacity .8s var(--ease), width .3s var(--ease);
 }
 .panel.expanded .panel-inner {
   display: flex;
@@ -3212,7 +3212,7 @@ async function main() {
     clearTimeout(collapseTimer);
     collapseTimer = setTimeout(() => {
       if (panelMode === "closed") panelEl.classList.remove("expanded");
-    }, 580);
+    }, 940);
     timeline.clear();
   }
 

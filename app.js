@@ -247,7 +247,7 @@ async function main() {
     clearTimeout(collapseTimer);
     collapseTimer = setTimeout(() => {
       if (panelMode === "closed") panelEl.classList.remove("expanded");
-    }, 580);
+    }, 940);
     timeline.clear();
   }
 
