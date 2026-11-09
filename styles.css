@@ -343,7 +343,7 @@ body { display: flex; flex-direction: column; }
   min-width: 0;
   border-left: none;
   box-shadow: none;
-  transition: transform .3s var(--ease), opacity .25s var(--ease), width .3s var(--ease);
+  transition: transform .55s var(--ease), opacity .5s var(--ease), width .3s var(--ease);
 }
 .panel.expanded .panel-inner {
   display: flex;
