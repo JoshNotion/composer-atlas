@@ -359,6 +359,7 @@ async function main() {
     panelEl.classList.remove("open");
     panelEl.setAttribute("aria-hidden", "true");
     mapApi.pauseJourney();
+    if (worldMap) worldMap.clearFocus();
     clearTimeout(collapseTimer);
     collapseTimer = setTimeout(() => {
       if (panelMode === "closed") panelEl.classList.remove("expanded");
