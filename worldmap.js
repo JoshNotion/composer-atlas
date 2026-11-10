@@ -60,6 +60,7 @@ export function createWorldMap(hostEl, composers, opts = {}) {
     era: null,
     bracket: null, // null = all time, otherwise the bracket's start year
     types: { birth: true, lived: true, death: true },
+    paths: true,
   };
 
   // Flatten to one record per (composer, location) with parsed spans.
@@ -89,6 +90,7 @@ export function createWorldMap(hostEl, composers, opts = {}) {
       </div>
       <div class="wm-types" id="wm-types">
         ${WM_TYPES.map(t => `<button class="layer-btn on" data-type="${t}"><span class="dot ${t}"></span>${WM_TYPE_LABEL[t]}</button>`).join("")}
+        <button class="layer-btn on" id="wm-paths" type="button" title="Connect each composer's places in order (shown when a period is selected)"><span class="wm-path-icon"></span>Journeys</button>
         <span class="wm-summary" id="wm-summary"></span>
       </div>
     </div>
@@ -103,7 +105,9 @@ export function createWorldMap(hostEl, composers, opts = {}) {
 
   const map = L.map(mapEl, { zoomControl: true, worldCopyJump: true, minZoom: 2 }).setView([40, 5], 3);
   L.tileLayer(TILE_URL, TILE_OPTIONS).addTo(map);
+  const lineLayer = L.layerGroup().addTo(map);
   const pinLayer = L.layerGroup().addTo(map);
+  const pathByComposer = new Map();
 
   // ---- filtering ----------------------------------------------------------------
 
@@ -182,16 +186,59 @@ export function createWorldMap(hostEl, composers, opts = {}) {
       detail.textContent = `${kinds} · ${e.years.join(", ")}`;
       row.append(dot, name, detail);
       row.addEventListener("click", () => opts.onSelect && opts.onSelect(e.composer.id));
+      row.addEventListener("mouseenter", () => highlightPath(e.composer.id, true));
+      row.addEventListener("mouseleave", () => highlightPath(e.composer.id, false));
       list.appendChild(row);
     });
     root.appendChild(list);
     return root;
   }
 
+  function highlightPath(id, on) {
+    const line = pathByComposer.get(id);
+    if (!line) return;
+    line.setStyle(on ? { weight: 3, opacity: 0.95 } : { weight: 1.4, opacity: 0.4 });
+    if (on) line.bringToFront();
+  }
+
+  // One thin line per composer joining their places in this period, in the order they lived
+  // there, so the same person shown at several places reads as one journey.
+  function drawPaths(recs) {
+    lineLayer.clearLayers();
+    pathByComposer.clear();
+    if (!state.paths || state.bracket == null) return;
+    const byComposer = new Map();
+    recs.forEach(r => {
+      if (!byComposer.has(r.composer.id)) byComposer.set(r.composer.id, []);
+      byComposer.get(r.composer.id).push(r);
+    });
+    byComposer.forEach(list => {
+      list.sort((a, b) => a.spans[0][0] - b.spans[0][0]);
+      const pts = [];
+      let lastKey = null;
+      list.forEach(r => {
+        const key = placeKey(r.loc);
+        if (key === lastKey) return;
+        lastKey = key;
+        pts.push([r.loc.lat, r.loc.lng]);
+      });
+      if (pts.length < 2) return;
+      const c = list[0].composer;
+      const line = L.polyline(pts, { color: eraColor(c.era), weight: 1.4, opacity: 0.4, lineJoin: "round" });
+      line.bindTooltip(escapeWm(c.name), { sticky: true, className: "wm-tip" });
+      line.on("mouseover", () => highlightPath(c.id, true));
+      line.on("mouseout", () => highlightPath(c.id, false));
+      line.on("click", () => opts.onSelect && opts.onSelect(c.id));
+      lineLayer.addLayer(line);
+      pathByComposer.set(c.id, line);
+    });
+  }
+
   function render() {
     const recs = activeRecords(state.bracket);
     const places = groupByPlace(recs);
     pinLayer.clearLayers();
+    drawPaths(recs);
 
     // Quiet pins: a single composer is a small dot that opens their card directly; several
     // composers share a thin ring with a count and open a list. Era colours are the same
@@ -219,6 +266,8 @@ export function createWorldMap(hostEl, composers, opts = {}) {
           { direction: "top", offset: [0, -6], className: "wm-tip" }
         );
         marker.on("click", () => opts.onSelect && opts.onSelect(only.composer.id));
+        marker.on("mouseover", () => highlightPath(only.composer.id, true));
+        marker.on("mouseout", () => highlightPath(only.composer.id, false));
       } else {
         marker.bindTooltip(`${escapeWm(place.city)} · ${n} composers`, { direction: "top", offset: [0, -8], className: "wm-tip" });
         marker.bindPopup(() => popupFor(place), { maxWidth: 340, minWidth: 240, className: "wm-leaflet-popup" });
@@ -279,9 +328,21 @@ export function createWorldMap(hostEl, composers, opts = {}) {
     render();
   }
 
+  // Zoom to wherever composers are in the chosen period; all time shows the wider world.
+  function fitToActive() {
+    if (state.bracket == null) {
+      map.flyTo([40, 5], 3, { duration: 0.8 });
+      return;
+    }
+    const pts = activeRecords(state.bracket).map(r => [r.loc.lat, r.loc.lng]);
+    if (!pts.length) return;
+    map.flyToBounds(L.latLngBounds(pts), { padding: [60, 60], maxZoom: 6, duration: 0.8 });
+  }
+
   function setBracket(b) {
     state.bracket = b;
     refresh();
+    fitToActive();
     if (opts.onChange) opts.onChange(state);
   }
 
@@ -291,6 +352,13 @@ export function createWorldMap(hostEl, composers, opts = {}) {
     stopPlay();
     const v = btn.getAttribute("data-b");
     setBracket(v === "" ? null : parseInt(v, 10));
+  });
+
+  const pathsBtn = hostEl.querySelector("#wm-paths");
+  pathsBtn.addEventListener("click", () => {
+    state.paths = !state.paths;
+    pathsBtn.classList.toggle("on", state.paths);
+    render();
   });
 
   ribbonEl.addEventListener("click", (e) => {
@@ -303,7 +371,7 @@ export function createWorldMap(hostEl, composers, opts = {}) {
   });
 
   hostEl.querySelector("#wm-types").addEventListener("click", (e) => {
-    const btn = e.target.closest(".layer-btn");
+    const btn = e.target.closest(".layer-btn[data-type]");
     if (!btn) return;
     const t = btn.getAttribute("data-type");
     state.types[t] = !state.types[t];

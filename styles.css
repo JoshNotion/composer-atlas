@@ -1561,3 +1561,12 @@ body[data-view="home"] .legend { display: none; }
 .leaflet-container { z-index: 0; }
 .panel { z-index: 2000; }
 .browse-toolbar-inner { max-width: 1184px; }
+
+.wm-path-icon {
+  display: inline-block; width: 14px; height: 8px; margin-right: 6px; vertical-align: middle;
+  background:
+    radial-gradient(circle, currentColor 0 1.6px, transparent 2px) 0 50% / 8px 8px no-repeat,
+    radial-gradient(circle, currentColor 0 1.6px, transparent 2px) 100% 50% / 8px 8px no-repeat,
+    linear-gradient(currentColor, currentColor) 50% 50% / 100% 1px no-repeat;
+  opacity: .8;
+}
