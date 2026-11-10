@@ -3,6 +3,9 @@
 
 import { createTimeline, eraColor, ZOOM_LEVELS } from "./timeline.js";
 import { createMap } from "./map.js";
+import { createWorldMap } from "./worldmap.js";
+import { createHome } from "./home.js";
+import { createBrowse } from "./browse.js";
 import { renderDetail, renderEmpty } from "./panel.js";
 import { initialsFor, mountPortrait, resolvePortraitUrl } from "./portraits.js";
 
@@ -63,21 +66,71 @@ async function main() {
   }
   function hideTooltip() { tooltip.hidden = true; }
 
-  // --- Timeline
+  // --- Views (created lazily the first time they are shown, so Leaflet and D3
+  //     always measure a visible container)
+  const views = {
+    home: document.getElementById("view-home"),
+    timeline: document.getElementById("timeline-wrap"),
+    map: document.getElementById("view-map"),
+    composers: document.getElementById("view-composers"),
+  };
+  const VIEW_TITLES = { home: "Composer Atlas", timeline: "Timeline", map: "World map", composers: "Composers" };
+
+  let currentView = null;
+  let currentEra = null;
+  let timeline = null;
+  let worldMap = null;
+  let browse = null;
+  let homeBuilt = false;
+
   const zoomReadout = document.getElementById("zoom-readout");
   const zoomInBtn = document.getElementById("zoom-in");
   const zoomOutBtn = document.getElementById("zoom-out");
 
-  const timeline = createTimeline(
-    document.getElementById("timeline-scroll"),
-    composers,
-    {
-      onSelect: (id) => selectComposer(id),
-      onHover: (c, ev) => showTooltip(c, ev),
-      onHoverEnd: () => hideTooltip(),
-      onZoomChange: (z) => updateZoomUi(z),
+  function ensureTimeline() {
+    if (timeline) return;
+    timeline = createTimeline(
+      document.getElementById("timeline-scroll"),
+      composers,
+      {
+        onSelect: (id) => selectComposer(id),
+        onHover: (c, ev) => showTooltip(c, ev),
+        onHoverEnd: () => hideTooltip(),
+        onZoomChange: (z) => updateZoomUi(z),
+      }
+    );
+    // Ctrl/Cmd + wheel zooms the timeline
+    document.getElementById("timeline-scroll").addEventListener("wheel", (e) => {
+      if (!(e.ctrlKey || e.metaKey)) return;
+      e.preventDefault();
+      nudgeZoom(e.deltaY > 0 ? -1 : +1);
+    }, { passive: false });
+    timeline.setFilter(currentEra);
+    updateZoomUi(timeline.getZoom());
+  }
+
+  function ensureWorldMap(bracket) {
+    if (!worldMap) {
+      worldMap = createWorldMap(views.map, composers, {
+        onSelect: (id) => selectComposer(id),
+        onChange: () => writeHash(),
+      });
+      worldMap.setEra(currentEra);
     }
-  );
+    if (bracket !== undefined && worldMap.getBracket() !== bracket) worldMap.setBracket(bracket);
+  }
+
+  function ensureBrowse() {
+    if (browse) return;
+    browse = createBrowse(views.composers, composers, { onSelect: (id) => selectComposer(id) });
+    browse.setEra(currentEra);
+  }
+
+  function ensureHome() {
+    if (homeBuilt) return;
+    homeBuilt = true;
+    createHome(views.home, composers, { onSelect: (id) => selectComposer(id) });
+  }
 
   function updateZoomUi(z) {
     zoomReadout.textContent = formatZoom(z);
@@ -88,6 +141,7 @@ async function main() {
     return Number.isInteger(z) ? `${z}×` : `${z}×`;
   }
   function nudgeZoom(dir) {
+    if (!timeline || currentView !== "timeline") return;
     const z = timeline.getZoom();
     const idx = ZOOM_LEVELS.findIndex(v => Math.abs(v - z) < 0.01);
     const nextIdx = idx === -1
@@ -99,39 +153,79 @@ async function main() {
   zoomInBtn.addEventListener("click", () => nudgeZoom(+1));
   zoomOutBtn.addEventListener("click", () => nudgeZoom(-1));
 
-  // --- Era filter
+  // --- Era filter (shared by the timeline, the world map and the composers grid)
   function setEraFilter(era, opts = {}) {
     const normalized = era && ERA_ORDER.includes(era) ? era : null;
-    timeline.setFilter(normalized);
+    currentEra = normalized;
+    if (timeline) timeline.setFilter(normalized);
+    if (worldMap) worldMap.setEra(normalized);
+    if (browse) browse.setEra(normalized);
     highlightLegend(document.getElementById("legend"), normalized);
-    updateBrandSub(timeline.getFilteredData(), normalized);
-    if (!opts.skipHash) {
-      const hash = normalized ? `#era=${encodeURIComponent(normalized)}` : "";
-      if (location.hash !== hash) {
-        history.replaceState(null, "", hash || location.pathname);
-      }
+    updateBrandSub(normalized ? composers.filter(c => c.era === normalized) : composers, normalized);
+    if (!opts.skipHash) writeHash();
+  }
+
+  // --- Routing. Hash forms: #/  #/timeline  #/map  #/composers, each with an optional
+  //     ?era=Baroque (map also takes &b=1700). The old #era=Baroque form still works.
+  function parseRoute() {
+    const h = location.hash;
+    const legacy = h.match(/^#era=([^&]+)/);
+    if (legacy) return { view: "timeline", era: safeDecode(legacy[1]), bracket: undefined };
+    const m = h.match(/^#\/([a-z]*)(?:\?(.*))?$/);
+    if (!m) return { view: "home", era: null, bracket: undefined };
+    const view = views[m[1]] ? m[1] : "home";
+    const params = new URLSearchParams(m[2] || "");
+    const b = params.get("b");
+    return {
+      view,
+      era: params.get("era"),
+      bracket: view === "map" ? (b && /^\d+$/.test(b) ? parseInt(b, 10) : null) : undefined,
+    };
+  }
+
+  function writeHash() {
+    const params = new URLSearchParams();
+    if (currentView !== "home" && currentEra) params.set("era", currentEra);
+    if (currentView === "map" && worldMap && worldMap.getBracket() != null) params.set("b", String(worldMap.getBracket()));
+    const q = params.toString();
+    const hash = currentView === "home" ? "#/" : `#/${currentView}${q ? "?" + q : ""}`;
+    if (location.hash !== hash) history.replaceState(null, "", hash);
+  }
+
+  function showView(name, route) {
+    const changed = name !== currentView;
+    if (changed) {
+      if (worldMap && currentView === "map") worldMap.stop();
+      closeLightbox();
+      closePanel();
     }
+    currentView = name;
+    Object.entries(views).forEach(([key, el]) => { el.hidden = key !== name; });
+    document.body.dataset.view = name;
+    document.title = name === "home" ? "Composer Atlas" : `${VIEW_TITLES[name]} · Composer Atlas`;
+    document.querySelectorAll("#nav a").forEach(a => {
+      const on = a.getAttribute("data-view") === name;
+      a.classList.toggle("active", on);
+      if (on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+    });
+
+    if (name === "home") ensureHome();
+    if (name === "timeline") ensureTimeline();
+    if (name === "map") ensureWorldMap(route ? route.bracket : undefined);
+    if (name === "composers") ensureBrowse();
+    if (name === "map" && worldMap) requestAnimationFrame(() => worldMap.invalidateSize());
   }
 
-  function readEraFromHash() {
-    const m = location.hash.match(/^#era=([^&]+)/);
-    if (!m) return null;
-    try { return decodeURIComponent(m[1]); } catch { return null; }
+  function applyRoute() {
+    const route = parseRoute();
+    const era = route.era && ERA_ORDER.includes(route.era) ? route.era : null;
+    currentEra = era;
+    showView(route.view, route);
+    setEraFilter(era, { skipHash: true });
+    writeHash();
   }
 
-  window.addEventListener("hashchange", () => {
-    setEraFilter(readEraFromHash(), { skipHash: true });
-  });
-  // Highlight "All" at start, then apply any initial hash filter
-  highlightLegend(document.getElementById("legend"), null);
-  setEraFilter(readEraFromHash());
-
-  // Ctrl/Cmd + wheel zooms the timeline
-  document.getElementById("timeline-scroll").addEventListener("wheel", (e) => {
-    if (!(e.ctrlKey || e.metaKey)) return;
-    e.preventDefault();
-    nudgeZoom(e.deltaY > 0 ? -1 : +1);
-  }, { passive: false });
+  window.addEventListener("hashchange", applyRoute);
 
   // --- Panel + Map
   const panelEl = document.getElementById("panel");
@@ -241,8 +335,9 @@ async function main() {
       expandBtnEl.setAttribute("aria-label", label);
       expandBtnEl.setAttribute("title", label);
     }
-    requestAnimationFrame(() => mapApi.invalidateSize());
-    setTimeout(() => mapApi.invalidateSize(), panelDurMs() + 20);
+    const refit = () => { mapApi.invalidateSize(); if (worldMap) worldMap.invalidateSize(); };
+    requestAnimationFrame(refit);
+    setTimeout(refit, panelDurMs() + 20);
   }
   function closePanel() {
     panelMode = "closed";
@@ -254,17 +349,10 @@ async function main() {
     collapseTimer = setTimeout(() => {
       if (panelMode === "closed") panelEl.classList.remove("expanded");
     }, panelDurMs() + 40);
-    timeline.clear();
+    if (timeline) timeline.clear();
+    if (worldMap) setTimeout(() => worldMap.invalidateSize(), panelDurMs() + 20);
   }
 
-  // Clicking the logo returns to the main timeline without reloading the page
-  document.getElementById("brand-home").addEventListener("click", (e) => {
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return; // allow open-in-new-tab
-    e.preventDefault();
-    closeLightbox();
-    closePanel();
-    setEraFilter(null);
-  });
   function togglePanelExpanded() {
     if (panelMode === "closed") return;
     openPanel(panelMode === "full" ? "peek" : "full");
@@ -273,7 +361,7 @@ async function main() {
   function selectComposer(id) {
     const c = byId.get(id);
     if (!c) return;
-    timeline.select(id);
+    if (timeline) timeline.select(id);
     renderDetail(detailTarget, c, byId, {
       onConnectionClick: (nextId) => selectComposer(nextId),
       onPortraitClick: (comp) => openLightbox(comp),
@@ -284,7 +372,11 @@ async function main() {
   }
 
   renderEmpty(detailTarget);
-  updateZoomUi(timeline.getZoom());
+  applyRoute();
+}
+
+function safeDecode(v) {
+  try { return decodeURIComponent(v); } catch { return null; }
 }
 
 function isTypingTarget(el) {

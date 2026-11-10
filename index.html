@@ -9,16 +9,28 @@
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" id="brand-home" href="./" title="Back to the timeline" aria-label="Composer Atlas: back to the timeline">
+    <a class="brand" id="brand-home" href="#/" title="Home" aria-label="Composer Atlas: home">
       <span class="brand-mark"></span>
       <h1>Composer Atlas</h1>
       <span class="brand-sub" id="brand-sub">&nbsp;</span>
     </a>
+    <nav class="nav" id="nav" aria-label="Sections">
+      <a href="#/" data-view="home">Home</a>
+      <a href="#/timeline" data-view="timeline">Timeline</a>
+      <a href="#/map" data-view="map">World map</a>
+      <a href="#/composers" data-view="composers">Composers</a>
+    </nav>
     <div class="legend" id="legend"></div>
   </header>
 
   <main class="layout">
-    <section class="timeline-wrap" id="timeline-wrap">
+    <section class="view view-home" id="view-home" hidden></section>
+
+    <section class="view view-map" id="view-map" hidden></section>
+
+    <section class="view view-composers" id="view-composers" hidden></section>
+
+    <section class="view timeline-wrap" id="timeline-wrap" hidden>
       <div class="timeline-controls">
         <button class="zoom-btn" id="zoom-out" title="Zoom out (−)" aria-label="Zoom out">−</button>
         <span class="zoom-readout" id="zoom-readout">1×</span>

@@ -7,6 +7,16 @@ const TYPE_COLOR = {
   death: "#E04060",
 };
 
+// CARTO Basemaps raster tiles — classic dark_all style. The API key is
+// domain-restricted at CARTO to composer-atlas.joshnotion.workers.dev, so
+// it's fine to include client-side. Shared with the world map view.
+export const TILE_URL = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=cb1_2d9s_1_a32774cc0662c7d50b68627e";
+export const TILE_OPTIONS = {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  subdomains: "abcd",
+  maxZoom: 19,
+};
+
 export function createMap(mapHostEl) {
   const map = L.map(mapHostEl, {
     zoomControl: true,
@@ -14,14 +24,7 @@ export function createMap(mapHostEl) {
     worldCopyJump: true,
   }).setView([48, 10], 4);
 
-  // CARTO Basemaps raster tiles — classic dark_all style. The API key is
-  // domain-restricted at CARTO to composer-atlas.joshnotion.workers.dev, so
-  // it's fine to include client-side.
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=cb1_2d9s_1_a32774cc0662c7d50b68627e", {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    subdomains: "abcd",
-    maxZoom: 19,
-  }).addTo(map);
+  L.tileLayer(TILE_URL, TILE_OPTIONS).addTo(map);
 
   const layers = {
     birth: L.layerGroup().addTo(map),

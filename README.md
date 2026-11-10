@@ -1,6 +1,6 @@
 # Composer Atlas
 
-A personal classical-music exploration tool: **194 composers spanning ~950 years** of music history (Petrus Abaelardus, 1079 → present), rendered as an interactive D3.js timeline with a Leaflet map panel for each composer's geographic journey.
+A personal classical-music exploration tool: **309 composers spanning ~950 years** of music history (Petrus Abaelardus, 1079 → present). A home page leads to an interactive D3.js timeline, a world map of where composers lived (filterable by 50-year bracket, era and birth/lived/death), and a searchable composers grid. Each composer opens in a detail panel with a Leaflet map of their journey.
 
 ## Run it locally
 
@@ -27,11 +27,17 @@ For an environment that can't serve a folder (a Notion HTML block, an email atta
 node build.cjs
 ```
 
+Without network access, run `npm i d3@7.9.0 leaflet@1.9.4` in some folder and build with `ATLAS_LIBS=<that folder> node build.cjs`.
+
 This produces `composer-atlas.html` (~1.4 MB) with **everything inlined** — CSS, all JS modules, `composers.json`, D3, and Leaflet. Just drop it anywhere and open. The build fetches D3 and Leaflet from their CDNs at build time so no internet is needed at runtime either.
 
 ## Files
 
-- `index.html` — page shell.
+- `index.html` — page shell: top bar with navigation, one `.view` section per page, shared detail panel.
+- `app.js` — data loading, hash router (`#/`, `#/timeline`, `#/map?era=Romantic&b=1850`, `#/composers`; the old `#era=Baroque` still works), shared era filter, detail panel.
+- `home.js` — landing page.
+- `worldmap.js` — world map view: places aggregated into count pins, 50-year bracket strip with play button, era and place-type filters.
+- `browse.js` — composers grid with search and sort.
 - `styles.css` — dark theme, panel transitions, Leaflet overrides, the Clair-de-lune sheet-paper background baked in as a filtered SVG data URI.
 - `timeline.js` — D3 timeline: sticky-top axis, vertical bar list, horizontal-scroll at zoom > 1, six zoom levels, world-event markers, dashed relationship lines, era filter.
 - `map.js` — Leaflet map with CartoDB dark-matter tiles; birth/lived/death markers with toggleable layers; journey polyline.

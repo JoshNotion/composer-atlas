@@ -33,7 +33,7 @@ function safeJson(obj) {
   const composers = JSON.parse(read('composers.json'));
 
   // --- 2. Concatenate our JS modules, stripping import/export
-  const modules = ['portraits.js', 'timeline.js', 'map.js', 'openopus.js', 'panel.js', 'app.js'];
+  const modules = ['portraits.js', 'timeline.js', 'map.js', 'worldmap.js', 'home.js', 'browse.js', 'openopus.js', 'panel.js', 'app.js'];
   let scripts = modules.map(f => {
     let code = read(f);
     code = code.replace(/^\s*import\s[^;]*;?\s*$/gm, '');
@@ -48,12 +48,23 @@ function safeJson(obj) {
   );
 
   // --- 3. Fetch external libraries (D3 + Leaflet JS/CSS) once at build time.
-  console.log('Fetching D3, Leaflet...');
-  const [d3Src, leafletJs, leafletCss] = await Promise.all([
-    fetchText('https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js'),
-    fetchText('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'),
-    fetchText('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'),
-  ]);
+  // Set ATLAS_LIBS to a folder with node_modules/d3 and node_modules/leaflet to build
+  // without network access (e.g. `npm i d3@7.9.0 leaflet@1.9.4` in that folder).
+  let d3Src, leafletJs, leafletCss;
+  if (process.env.ATLAS_LIBS) {
+    console.log('Reading D3, Leaflet from', process.env.ATLAS_LIBS);
+    const lib = (f) => fs.readFileSync(path.join(process.env.ATLAS_LIBS, 'node_modules', f), 'utf8');
+    d3Src = lib('d3/dist/d3.min.js');
+    leafletJs = lib('leaflet/dist/leaflet.js');
+    leafletCss = lib('leaflet/dist/leaflet.css');
+  } else {
+    console.log('Fetching D3, Leaflet...');
+    [d3Src, leafletJs, leafletCss] = await Promise.all([
+      fetchText('https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js'),
+      fetchText('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'),
+      fetchText('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'),
+    ]);
+  }
 
   // --- 4. Read HTML shell; strip the tags that pointed at local files / CDN
   let html = read('index.html');
