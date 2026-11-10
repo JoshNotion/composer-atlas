@@ -2183,6 +2183,58 @@ body[data-view="home"] .legend { display: none; }
    always paints above them, including when it expands to the full page. */
 .view { isolation: isolate; }
 
+
+/* ================= Composers toolbar: full-width, fades into the page ================= */
+
+.browse-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding: 16px 28px 26px;
+  margin: 0;
+  gap: 0;
+  display: block;
+  background: linear-gradient(to bottom, rgba(26, 26, 26, .96) 0%, rgba(26, 26, 26, .96) 62%, rgba(26, 26, 26, 0) 100%);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  pointer-events: none;
+}
+.browse-toolbar-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  pointer-events: auto;
+}
+.browse-inner { padding-top: 0; }
+.browse-search-wrap {
+  position: relative;
+  flex: 1 1 280px;
+  max-width: 440px;
+  display: block;
+  color: var(--text-faint);
+}
+.browse-search-wrap svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+.browse-search-wrap .browse-search {
+  width: 100%;
+  max-width: none;
+  height: 38px;
+  padding: 0 16px 0 38px;
+  background: rgba(36, 36, 36, .9);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+.browse-search-wrap:focus-within { color: var(--text-dim); }
+.browse-sort select { height: 32px; background: rgba(36, 36, 36, .9); }
+.browse-jump { order: 5; flex: 1 0 100%; display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* Belt and braces: Leaflet layers stay under the detail panel in every view */
+.leaflet-container { z-index: 0; }
+.panel { z-index: 2000; }
+.browse-toolbar-inner { max-width: 1184px; }
+
 </style>
 </head>
 <body>
@@ -3374,9 +3426,12 @@ function createBrowse(hostEl, composers, opts = {}) {
   const state = { era: null, query: "", sort: "born" };
 
   hostEl.innerHTML = `
-    <div class="browse-inner">
-      <div class="browse-toolbar">
-        <input class="browse-search" id="browse-search" type="search" placeholder="Search composers, cities, countries" autocomplete="off" aria-label="Search composers" />
+    <div class="browse-toolbar">
+      <div class="browse-toolbar-inner">
+        <label class="browse-search-wrap">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+          <input class="browse-search" id="browse-search" type="search" placeholder="Search composers, cities, countries" autocomplete="off" aria-label="Search composers" />
+        </label>
         <label class="browse-sort">Sort
           <select id="browse-sort" aria-label="Sort composers">
             <option value="born">Birth year</option>
@@ -3387,6 +3442,8 @@ function createBrowse(hostEl, composers, opts = {}) {
         <span class="browse-count" id="browse-count"></span>
         <div class="browse-jump" id="browse-jump" aria-label="Jump to a period"></div>
       </div>
+    </div>
+    <div class="browse-inner">
       <div class="browse-groups" id="browse-groups"></div>
     </div>
   `;

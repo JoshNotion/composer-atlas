@@ -70,10 +70,10 @@ function safeJson(obj) {
   let html = read('index.html');
   html = html
     .replace(/<link\s+rel="stylesheet"\s+href="https:\/\/unpkg\.com\/leaflet[^"]*"[^>]*>/, '')
-    .replace(/<link\s+rel="stylesheet"\s+href="styles\.css"[^>]*>/, '')
+    .replace(/<link\s+rel="stylesheet"\s+href="styles\.css[^"]*"[^>]*>/, '')
     .replace(/<script\s+src="https:\/\/unpkg\.com\/leaflet[^"]*"[^>]*><\/script>/, '')
     .replace(/<script\s+src="https:\/\/cdn\.jsdelivr\.net\/npm\/d3[^"]*"[^>]*><\/script>/, '')
-    .replace(/<script\s+type="module"\s+src="app\.js"[^>]*><\/script>/, '');
+    .replace(/<script\s+type="module"\s+src="app\.js[^"]*"[^>]*><\/script>/, '');
 
   // --- 5. Inject inline styles, data, and bundled scripts.
   const styleTag =

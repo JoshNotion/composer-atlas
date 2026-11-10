@@ -17,9 +17,12 @@ export function createBrowse(hostEl, composers, opts = {}) {
   const state = { era: null, query: "", sort: "born" };
 
   hostEl.innerHTML = `
-    <div class="browse-inner">
-      <div class="browse-toolbar">
-        <input class="browse-search" id="browse-search" type="search" placeholder="Search composers, cities, countries" autocomplete="off" aria-label="Search composers" />
+    <div class="browse-toolbar">
+      <div class="browse-toolbar-inner">
+        <label class="browse-search-wrap">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+          <input class="browse-search" id="browse-search" type="search" placeholder="Search composers, cities, countries" autocomplete="off" aria-label="Search composers" />
+        </label>
         <label class="browse-sort">Sort
           <select id="browse-sort" aria-label="Sort composers">
             <option value="born">Birth year</option>
@@ -30,6 +33,8 @@ export function createBrowse(hostEl, composers, opts = {}) {
         <span class="browse-count" id="browse-count"></span>
         <div class="browse-jump" id="browse-jump" aria-label="Jump to a period"></div>
       </div>
+    </div>
+    <div class="browse-inner">
       <div class="browse-groups" id="browse-groups"></div>
     </div>
   `;
