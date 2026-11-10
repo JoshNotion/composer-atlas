@@ -1505,3 +1505,7 @@ body[data-view="home"] .legend { display: none; }
 }
 .jm-years { display: block; font-family: var(--font-serif); font-size: 15px; line-height: 1.2; color: var(--text); font-variant-numeric: tabular-nums; }
 .jm-city { display: block; font-size: 10.5px; color: var(--text-dim); letter-spacing: .02em; }
+
+/* Keep each view's Leaflet layers (z-index 400+) inside the view, so the detail panel
+   always paints above them, including when it expands to the full page. */
+.view { isolation: isolate; }
