@@ -1928,7 +1928,7 @@ body[data-view="home"] .legend { display: none; }
 
 .view-composers { overflow: auto; scrollbar-color: #3a3a3a var(--bg); scrollbar-width: thin; }
 .browse-inner { max-width: 1240px; margin: 0 auto; padding: 22px 28px 60px; }
-.browse-toolbar { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; position: sticky; top: 0; z-index: 2; background: var(--bg); padding: 4px 0 12px; }
+.browse-toolbar { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; position: sticky; top: 0; z-index: 2; background: rgba(26, 26, 26, .86); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); padding: 8px 0 12px; }
 .browse-search {
   flex: 1 1 260px;
   max-width: 420px;
@@ -1995,6 +1995,90 @@ body[data-view="home"] .legend { display: none; }
   .topbar { flex-wrap: wrap; row-gap: 6px; }
   .legend { order: 4; width: 100%; }
 }
+
+/* ================= Classical backdrop (Home + Composers) ================= */
+
+.view-home, .view-composers {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 70% 45% at 12% 0%, rgba(232, 160, 32, .075), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 92% 8%, rgba(224, 96, 138, .06), transparent 70%),
+    radial-gradient(ellipse 80% 40% at 50% 112%, rgba(80, 160, 232, .06), transparent 70%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1260' height='230'%3E%3Cg stroke='%23f0ede8' stroke-width='1' fill='none'%3E%3Cg opacity='.055'%3E%3Cpath d='M0 70h1260M0 79h1260M0 88h1260M0 97h1260M0 106h1260'/%3E%3C/g%3E%3Cg opacity='.08'%3E%3Cpath d='M.5 70v36'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat, no-repeat, repeat;
+}
+.view-composers {
+  background-image:
+    radial-gradient(ellipse 70% 40% at 8% 0%, rgba(155, 143, 232, .06), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 95% 6%, rgba(232, 160, 32, .05), transparent 70%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1260' height='230'%3E%3Cg stroke='%23f0ede8' stroke-width='1' fill='none'%3E%3Cg opacity='.04'%3E%3Cpath d='M0 70h1260M0 79h1260M0 88h1260M0 97h1260M0 106h1260'/%3E%3C/g%3E%3Cg opacity='.06'%3E%3Cpath d='M.5 70v36'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat, repeat;
+}
+
+/* ================= Quieter world-map pins ================= */
+
+.wm-pin {
+  border: 1px solid var(--pin);
+  box-shadow: none;
+  opacity: 1;
+  color: var(--text);
+  transition: transform .15s var(--ease), background .15s var(--ease);
+}
+.wm-pin-one { background: color-mix(in srgb, var(--pin) 70%, transparent); }
+.wm-pin-many {
+  background: color-mix(in srgb, var(--pin) 16%, transparent);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .02em;
+  color: #e4e0d8;
+}
+.wm-pin-wrap:hover .wm-pin-one { background: var(--pin); transform: scale(1.5); }
+.wm-pin-wrap:hover .wm-pin-many { background: color-mix(in srgb, var(--pin) 34%, transparent); transform: scale(1.08); }
+.wm-tip {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .45) !important;
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+.leaflet-tooltip-top.wm-tip::before { border-top-color: var(--border) !important; }
+
+/* ================= Composers grouped by period ================= */
+
+.browse-toolbar { gap: 12px 16px; }
+.browse-jump { flex: 1 0 100%; display: flex; flex-wrap: wrap; gap: 6px; order: 5; }
+.browse-jump-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  font: inherit; font-size: 12px;
+  color: var(--text-dim);
+  background: rgba(36, 36, 36, .8);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 11px;
+  cursor: pointer;
+  transition: color .15s var(--ease), border-color .15s var(--ease);
+}
+.browse-jump-chip:hover { color: var(--text); border-color: #555; }
+.browse-jump-n { color: var(--text-faint); font-variant-numeric: tabular-nums; }
+.browse-era-group { margin-top: 38px; }
+.browse-era-group:first-child { margin-top: 12px; }
+.browse-era-head {
+  display: flex; align-items: baseline; gap: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid color-mix(in srgb, var(--era) 40%, var(--border));
+}
+.browse-era-head h3 { margin: 0; font-family: var(--font-serif); font-weight: 500; font-size: 28px; letter-spacing: -.005em; }
+.browse-era-mark { width: 4px; height: 24px; border-radius: 2px; background: var(--era); align-self: center; }
+.browse-era-range { color: var(--text-dim); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.browse-era-n { margin-left: auto; color: var(--text-faint); font-size: 12px; }
+.browse-era-blurb { margin: 8px 0 18px; color: var(--text-dim); font-family: var(--font-serif); font-style: italic; font-size: 15px; }
+.browse-card { background: rgba(36, 36, 36, .86); border-top: 2px solid var(--era); }
+.browse-era-group .browse-portrait { filter: saturate(.85); }
+
+/* Muted placeholder tiles until a portrait loads */
+.browse-portrait { background: color-mix(in srgb, var(--era) 24%, #202020) !important; }
+.browse-portrait .initials { color: color-mix(in srgb, var(--era) 80%, #fff); opacity: .9; }
 
 </style>
 </head>
@@ -2762,20 +2846,36 @@ function createWorldMap(hostEl, composers, opts = {}) {
     const places = groupByPlace(recs);
     pinLayer.clearLayers();
 
-    // Biggest pins first so small ones stay clickable on top.
-    places.sort((a, b) => b.people.size - a.people.size);
+    // Quiet pins: a single composer is a small dot that opens their card directly; several
+    // composers share a thin ring with a count and open a list. Era colours are the same
+    // as the timeline's, drawn translucent so the map stays calm.
     places.forEach(place => {
       const n = place.people.size;
-      const size = n === 1 ? 12 : Math.round(Math.min(46, 16 + Math.sqrt(n) * 6));
-      const color = eraColor(dominantEra([...place.people.values()]));
+      const era = dominantEra([...place.people.values()]);
+      const color = eraColor(era);
+      const size = n === 1 ? 9 : Math.round(Math.min(34, 15 + Math.sqrt(n) * 3.4));
+      const html = n === 1
+        ? `<div class="wm-pin wm-pin-one" style="width:${size}px;height:${size}px;--pin:${color}"></div>`
+        : `<div class="wm-pin wm-pin-many" style="width:${size}px;height:${size}px;--pin:${color}">${size >= 20 ? n : ""}</div>`;
       const icon = L.divIcon({
         className: "wm-pin-wrap",
-        html: `<div class="wm-pin${n === 1 ? " wm-pin-one" : ""}" style="width:${size}px;height:${size}px;background:${color}">${n > 1 ? n : ""}</div>`,
+        html,
         iconSize: [size, size],
         iconAnchor: [size / 2, size / 2],
       });
-      const marker = L.marker([place.lat, place.lng], { icon, title: place.city, riseOnHover: true });
-      marker.bindPopup(() => popupFor(place), { maxWidth: 340, minWidth: 240, className: "wm-leaflet-popup" });
+      // Smaller pins sit above larger ones, so a dot is never hidden under a ring.
+      const marker = L.marker([place.lat, place.lng], { icon, riseOnHover: true, zIndexOffset: 1000 - n });
+      if (n === 1) {
+        const only = [...place.people.values()][0];
+        marker.bindTooltip(
+          `<strong>${escapeWm(only.composer.name)}</strong><br>${escapeWm(place.city)} · ${escapeWm(only.years.join(", "))}`,
+          { direction: "top", offset: [0, -6], className: "wm-tip" }
+        );
+        marker.on("click", () => opts.onSelect && opts.onSelect(only.composer.id));
+      } else {
+        marker.bindTooltip(`${escapeWm(place.city)} · ${n} composers`, { direction: "top", offset: [0, -8], className: "wm-tip" });
+        marker.bindPopup(() => popupFor(place), { maxWidth: 340, minWidth: 240, className: "wm-leaflet-popup" });
+      }
       pinLayer.addLayer(marker);
     });
 
@@ -2865,6 +2965,12 @@ function createWorldMap(hostEl, composers, opts = {}) {
   };
 }
 
+function escapeWm(s) {
+  return String(s ?? "")
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 
 // ===== home.js =====
 // Home view: landing page with entry cards into each section.
@@ -2944,6 +3050,17 @@ function createHome(hostEl, composers, opts = {}) {
 
 // ===== browse.js =====
 // Composers view: searchable, sortable grid. The era filter is shared with the top bar.
+
+
+const BROWSE_ERAS = [
+  { name: "Medieval", blurb: "Plainchant, troubadours and the first polyphony" },
+  { name: "Renaissance", blurb: "Vocal polyphony, the madrigal and the printed score" },
+  { name: "Baroque", blurb: "Counterpoint, ornament and the birth of opera" },
+  { name: "Classical", blurb: "Balance, clarity and the sonata" },
+  { name: "Romantic", blurb: "Feeling, nation and the virtuoso" },
+  { name: "Modern", blurb: "Tonality stretched, broken and rebuilt" },
+  { name: "Contemporary", blurb: "Minimalism, electronics and a global stage" },
+];
 function createBrowse(hostEl, composers, opts = {}) {
   const state = { era: null, query: "", sort: "born" };
 
@@ -2959,12 +3076,14 @@ function createBrowse(hostEl, composers, opts = {}) {
           </select>
         </label>
         <span class="browse-count" id="browse-count"></span>
+        <div class="browse-jump" id="browse-jump" aria-label="Jump to a period"></div>
       </div>
-      <div class="browse-grid" id="browse-grid"></div>
+      <div class="browse-groups" id="browse-groups"></div>
     </div>
   `;
 
-  const grid = hostEl.querySelector("#browse-grid");
+  const groupsEl = hostEl.querySelector("#browse-groups");
+  const jumpEl = hostEl.querySelector("#browse-jump");
   const countEl = hostEl.querySelector("#browse-count");
   const searchEl = hostEl.querySelector("#browse-search");
   const sortEl = hostEl.querySelector("#browse-sort");
@@ -3000,35 +3119,73 @@ function createBrowse(hostEl, composers, opts = {}) {
     return list;
   }
 
+  function cardFor(c) {
+    const color = eraColor(c.era);
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "browse-card";
+    card.innerHTML = `
+      <span class="browse-portrait" data-composer-id="${escapeBrowse(c.id)}" style="background:${color}"><span class="initials">${escapeBrowse(initialsFor(c.name))}</span></span>
+      <span class="browse-name">${escapeBrowse(c.name)}</span>
+      <span class="browse-meta">${c.born}&nbsp;–&nbsp;${c.died ?? "present"}</span>
+      ${c.birthPlace ? `<span class="browse-place">${escapeBrowse(c.birthPlace.city)}${c.birthPlace.country ? ", " + escapeBrowse(c.birthPlace.country) : ""}</span>` : ""}
+    `;
+    card.addEventListener("click", () => opts.onSelect && opts.onSelect(c.id));
+    const portrait = card.querySelector(".browse-portrait");
+    if (observer) observer.observe(portrait);
+    else mountPortrait(portrait, c);
+    return card;
+  }
+
   function render() {
     const list = visible();
     countEl.textContent = `${list.length} composer${list.length === 1 ? "" : "s"}`;
     if (observer) observer.disconnect();
-    grid.innerHTML = "";
+    groupsEl.innerHTML = "";
+    jumpEl.innerHTML = "";
     if (!list.length) {
-      grid.innerHTML = `<div class="browse-empty">No composers match.</div>`;
+      groupsEl.innerHTML = `<div class="browse-empty">No composers match.</div>`;
       return;
     }
-    const frag = document.createDocumentFragment();
-    list.forEach(c => {
-      const color = eraColor(c.era);
-      const card = document.createElement("button");
-      card.type = "button";
-      card.className = "browse-card";
-      card.innerHTML = `
-        <span class="browse-portrait" data-composer-id="${escapeBrowse(c.id)}" style="background:${color}"><span class="initials">${escapeBrowse(initialsFor(c.name))}</span></span>
-        <span class="browse-name">${escapeBrowse(c.name)}</span>
-        <span class="browse-meta">${c.born}&nbsp;–&nbsp;${c.died ?? "present"}</span>
-        <span class="browse-era" style="background:${color}">${escapeBrowse(c.era)}</span>
-        ${c.birthPlace ? `<span class="browse-place">${escapeBrowse(c.birthPlace.city)}${c.birthPlace.country ? ", " + escapeBrowse(c.birthPlace.country) : ""}</span>` : ""}
+    const known = BROWSE_ERAS.map(e => e.name);
+    const extra = [...new Set(list.map(c => c.era))].filter(e => !known.includes(e));
+    const order = [...BROWSE_ERAS, ...extra.map(name => ({ name, blurb: "" }))];
+
+    order.forEach(era => {
+      const members = list.filter(c => c.era === era.name);
+      if (!members.length) return;
+      const color = eraColor(era.name);
+      const born = members.map(c => c.born);
+      const section = document.createElement("section");
+      section.className = "browse-era-group";
+      section.id = `browse-era-${era.name}`;
+      section.style.setProperty("--era", color);
+      section.innerHTML = `
+        <header class="browse-era-head">
+          <span class="browse-era-mark"></span>
+          <h3>${escapeBrowse(era.name)}</h3>
+          <span class="browse-era-range">born ${Math.min(...born)}–${Math.max(...born)}</span>
+          <span class="browse-era-n">${members.length} composer${members.length === 1 ? "" : "s"}</span>
+        </header>
+        ${era.blurb ? `<p class="browse-era-blurb">${escapeBrowse(era.blurb)}</p>` : ""}
+        <div class="browse-grid"></div>
       `;
-      card.addEventListener("click", () => opts.onSelect && opts.onSelect(c.id));
-      frag.appendChild(card);
-      const portrait = card.querySelector(".browse-portrait");
-      if (observer) observer.observe(portrait);
-      else mountPortrait(portrait, c);
+      const grid = section.querySelector(".browse-grid");
+      members.forEach(c => grid.appendChild(cardFor(c)));
+      groupsEl.appendChild(section);
+
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "browse-jump-chip";
+      chip.innerHTML = `<span class="legend-swatch" style="background:${color}"></span>${escapeBrowse(era.name)}<span class="browse-jump-n">${members.length}</span>`;
+      chip.addEventListener("click", () => {
+        // Scroll the view itself; scrollIntoView would also shift the page layout sideways.
+        const top = section.getBoundingClientRect().top - hostEl.getBoundingClientRect().top + hostEl.scrollTop;
+        const toolbar = hostEl.querySelector(".browse-toolbar");
+        hostEl.scrollTo({ top: Math.max(0, top - (toolbar ? toolbar.offsetHeight : 0) - 8), behavior: "smooth" });
+      });
+      jumpEl.appendChild(chip);
     });
-    grid.appendChild(frag);
   }
 
   let debounce = null;

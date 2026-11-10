@@ -3,6 +3,16 @@
 import { eraColor } from "./timeline.js";
 import { initialsFor, mountPortrait } from "./portraits.js";
 
+const BROWSE_ERAS = [
+  { name: "Medieval", blurb: "Plainchant, troubadours and the first polyphony" },
+  { name: "Renaissance", blurb: "Vocal polyphony, the madrigal and the printed score" },
+  { name: "Baroque", blurb: "Counterpoint, ornament and the birth of opera" },
+  { name: "Classical", blurb: "Balance, clarity and the sonata" },
+  { name: "Romantic", blurb: "Feeling, nation and the virtuoso" },
+  { name: "Modern", blurb: "Tonality stretched, broken and rebuilt" },
+  { name: "Contemporary", blurb: "Minimalism, electronics and a global stage" },
+];
+
 export function createBrowse(hostEl, composers, opts = {}) {
   const state = { era: null, query: "", sort: "born" };
 
@@ -18,12 +28,14 @@ export function createBrowse(hostEl, composers, opts = {}) {
           </select>
         </label>
         <span class="browse-count" id="browse-count"></span>
+        <div class="browse-jump" id="browse-jump" aria-label="Jump to a period"></div>
       </div>
-      <div class="browse-grid" id="browse-grid"></div>
+      <div class="browse-groups" id="browse-groups"></div>
     </div>
   `;
 
-  const grid = hostEl.querySelector("#browse-grid");
+  const groupsEl = hostEl.querySelector("#browse-groups");
+  const jumpEl = hostEl.querySelector("#browse-jump");
   const countEl = hostEl.querySelector("#browse-count");
   const searchEl = hostEl.querySelector("#browse-search");
   const sortEl = hostEl.querySelector("#browse-sort");
@@ -59,35 +71,73 @@ export function createBrowse(hostEl, composers, opts = {}) {
     return list;
   }
 
+  function cardFor(c) {
+    const color = eraColor(c.era);
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "browse-card";
+    card.innerHTML = `
+      <span class="browse-portrait" data-composer-id="${escapeBrowse(c.id)}" style="background:${color}"><span class="initials">${escapeBrowse(initialsFor(c.name))}</span></span>
+      <span class="browse-name">${escapeBrowse(c.name)}</span>
+      <span class="browse-meta">${c.born}&nbsp;–&nbsp;${c.died ?? "present"}</span>
+      ${c.birthPlace ? `<span class="browse-place">${escapeBrowse(c.birthPlace.city)}${c.birthPlace.country ? ", " + escapeBrowse(c.birthPlace.country) : ""}</span>` : ""}
+    `;
+    card.addEventListener("click", () => opts.onSelect && opts.onSelect(c.id));
+    const portrait = card.querySelector(".browse-portrait");
+    if (observer) observer.observe(portrait);
+    else mountPortrait(portrait, c);
+    return card;
+  }
+
   function render() {
     const list = visible();
     countEl.textContent = `${list.length} composer${list.length === 1 ? "" : "s"}`;
     if (observer) observer.disconnect();
-    grid.innerHTML = "";
+    groupsEl.innerHTML = "";
+    jumpEl.innerHTML = "";
     if (!list.length) {
-      grid.innerHTML = `<div class="browse-empty">No composers match.</div>`;
+      groupsEl.innerHTML = `<div class="browse-empty">No composers match.</div>`;
       return;
     }
-    const frag = document.createDocumentFragment();
-    list.forEach(c => {
-      const color = eraColor(c.era);
-      const card = document.createElement("button");
-      card.type = "button";
-      card.className = "browse-card";
-      card.innerHTML = `
-        <span class="browse-portrait" data-composer-id="${escapeBrowse(c.id)}" style="background:${color}"><span class="initials">${escapeBrowse(initialsFor(c.name))}</span></span>
-        <span class="browse-name">${escapeBrowse(c.name)}</span>
-        <span class="browse-meta">${c.born}&nbsp;–&nbsp;${c.died ?? "present"}</span>
-        <span class="browse-era" style="background:${color}">${escapeBrowse(c.era)}</span>
-        ${c.birthPlace ? `<span class="browse-place">${escapeBrowse(c.birthPlace.city)}${c.birthPlace.country ? ", " + escapeBrowse(c.birthPlace.country) : ""}</span>` : ""}
+    const known = BROWSE_ERAS.map(e => e.name);
+    const extra = [...new Set(list.map(c => c.era))].filter(e => !known.includes(e));
+    const order = [...BROWSE_ERAS, ...extra.map(name => ({ name, blurb: "" }))];
+
+    order.forEach(era => {
+      const members = list.filter(c => c.era === era.name);
+      if (!members.length) return;
+      const color = eraColor(era.name);
+      const born = members.map(c => c.born);
+      const section = document.createElement("section");
+      section.className = "browse-era-group";
+      section.id = `browse-era-${era.name}`;
+      section.style.setProperty("--era", color);
+      section.innerHTML = `
+        <header class="browse-era-head">
+          <span class="browse-era-mark"></span>
+          <h3>${escapeBrowse(era.name)}</h3>
+          <span class="browse-era-range">born ${Math.min(...born)}–${Math.max(...born)}</span>
+          <span class="browse-era-n">${members.length} composer${members.length === 1 ? "" : "s"}</span>
+        </header>
+        ${era.blurb ? `<p class="browse-era-blurb">${escapeBrowse(era.blurb)}</p>` : ""}
+        <div class="browse-grid"></div>
       `;
-      card.addEventListener("click", () => opts.onSelect && opts.onSelect(c.id));
-      frag.appendChild(card);
-      const portrait = card.querySelector(".browse-portrait");
-      if (observer) observer.observe(portrait);
-      else mountPortrait(portrait, c);
+      const grid = section.querySelector(".browse-grid");
+      members.forEach(c => grid.appendChild(cardFor(c)));
+      groupsEl.appendChild(section);
+
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "browse-jump-chip";
+      chip.innerHTML = `<span class="legend-swatch" style="background:${color}"></span>${escapeBrowse(era.name)}<span class="browse-jump-n">${members.length}</span>`;
+      chip.addEventListener("click", () => {
+        // Scroll the view itself; scrollIntoView would also shift the page layout sideways.
+        const top = section.getBoundingClientRect().top - hostEl.getBoundingClientRect().top + hostEl.scrollTop;
+        const toolbar = hostEl.querySelector(".browse-toolbar");
+        hostEl.scrollTo({ top: Math.max(0, top - (toolbar ? toolbar.offsetHeight : 0) - 8), behavior: "smooth" });
+      });
+      jumpEl.appendChild(chip);
     });
-    grid.appendChild(frag);
   }
 
   let debounce = null;

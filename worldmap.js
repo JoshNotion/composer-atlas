@@ -177,20 +177,36 @@ export function createWorldMap(hostEl, composers, opts = {}) {
     const places = groupByPlace(recs);
     pinLayer.clearLayers();
 
-    // Biggest pins first so small ones stay clickable on top.
-    places.sort((a, b) => b.people.size - a.people.size);
+    // Quiet pins: a single composer is a small dot that opens their card directly; several
+    // composers share a thin ring with a count and open a list. Era colours are the same
+    // as the timeline's, drawn translucent so the map stays calm.
     places.forEach(place => {
       const n = place.people.size;
-      const size = n === 1 ? 12 : Math.round(Math.min(46, 16 + Math.sqrt(n) * 6));
-      const color = eraColor(dominantEra([...place.people.values()]));
+      const era = dominantEra([...place.people.values()]);
+      const color = eraColor(era);
+      const size = n === 1 ? 9 : Math.round(Math.min(34, 15 + Math.sqrt(n) * 3.4));
+      const html = n === 1
+        ? `<div class="wm-pin wm-pin-one" style="width:${size}px;height:${size}px;--pin:${color}"></div>`
+        : `<div class="wm-pin wm-pin-many" style="width:${size}px;height:${size}px;--pin:${color}">${size >= 20 ? n : ""}</div>`;
       const icon = L.divIcon({
         className: "wm-pin-wrap",
-        html: `<div class="wm-pin${n === 1 ? " wm-pin-one" : ""}" style="width:${size}px;height:${size}px;background:${color}">${n > 1 ? n : ""}</div>`,
+        html,
         iconSize: [size, size],
         iconAnchor: [size / 2, size / 2],
       });
-      const marker = L.marker([place.lat, place.lng], { icon, title: place.city, riseOnHover: true });
-      marker.bindPopup(() => popupFor(place), { maxWidth: 340, minWidth: 240, className: "wm-leaflet-popup" });
+      // Smaller pins sit above larger ones, so a dot is never hidden under a ring.
+      const marker = L.marker([place.lat, place.lng], { icon, riseOnHover: true, zIndexOffset: 1000 - n });
+      if (n === 1) {
+        const only = [...place.people.values()][0];
+        marker.bindTooltip(
+          `<strong>${escapeWm(only.composer.name)}</strong><br>${escapeWm(place.city)} · ${escapeWm(only.years.join(", "))}`,
+          { direction: "top", offset: [0, -6], className: "wm-tip" }
+        );
+        marker.on("click", () => opts.onSelect && opts.onSelect(only.composer.id));
+      } else {
+        marker.bindTooltip(`${escapeWm(place.city)} · ${n} composers`, { direction: "top", offset: [0, -8], className: "wm-tip" });
+        marker.bindPopup(() => popupFor(place), { maxWidth: 340, minWidth: 240, className: "wm-leaflet-popup" });
+      }
       pinLayer.addLayer(marker);
     });
 
@@ -278,4 +294,10 @@ export function createWorldMap(hostEl, composers, opts = {}) {
     stop: stopPlay,
     invalidateSize() { map.invalidateSize(); },
   };
+}
+
+function escapeWm(s) {
+  return String(s ?? "")
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
