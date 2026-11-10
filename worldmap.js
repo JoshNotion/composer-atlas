@@ -117,6 +117,11 @@ export function createWorldMap(hostEl, composers, opts = {}) {
     return rec.spans.some(s => s[0] <= hi && s[1] >= lo);
   }
 
+  // a focused composer is shown with their whole life, regardless of bracket or type filters
+  function focusRecords() {
+    return records.filter(r => r.composer.id === state.focus);
+  }
+
   function activeRecords(bracket) {
     return records.filter(r =>
       (!state.era || r.composer.era === state.era) &&
@@ -245,14 +250,14 @@ export function createWorldMap(hostEl, composers, opts = {}) {
     });
     focusEl.hidden = false;
     focusEl.innerHTML = `<span class="wm-focus-dot" style="background:${color}"></span><span>Showing <strong>${escapeWm(c.name)}</strong> only</span><span class="wm-focus-x">Show everyone &times;</span>`;
-    const label = state.bracket == null ? "All time" : `${state.bracket}–${state.bracket + WM_STEP}`;
+    const label = "Whole life";
     summaryEl.textContent = `${label} · ${stops.length} place${stops.length === 1 ? "" : "s"}`;
   }
 
   function render() {
     let recs = activeRecords(state.bracket);
     if (state.focus) {
-      const mine = recs.filter(r => r.composer.id === state.focus);
+      const mine = focusRecords();
       if (mine.length) { renderFocus(mine); return; }
       state.focus = null; // nothing left to show for them with the current filters
     }
@@ -350,7 +355,7 @@ export function createWorldMap(hostEl, composers, opts = {}) {
   // Zoom to wherever composers are in the chosen period; all time shows the wider world.
   function fitToActive() {
     if (state.focus) {
-      const pts = activeRecords(state.bracket).filter(r => r.composer.id === state.focus).map(r => [r.loc.lat, r.loc.lng]);
+      const pts = focusRecords().map(r => [r.loc.lat, r.loc.lng]);
       if (pts.length) map.flyToBounds(L.latLngBounds(pts), { padding: [80, 80], maxZoom: 7, duration: 0.8 });
       return;
     }
