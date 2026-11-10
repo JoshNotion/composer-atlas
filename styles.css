@@ -1406,3 +1406,102 @@ body[data-view="home"] .legend { display: none; }
 /* Muted placeholder tiles until a portrait loads */
 .browse-portrait { background: color-mix(in srgb, var(--era) 24%, #202020) !important; }
 .browse-portrait .initials { color: color-mix(in srgb, var(--era) 80%, #fff); opacity: .9; }
+
+
+/* ================= World map: full-width period strip ================= */
+
+.wm-timeline { flex: 1 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: thin; scrollbar-color: #3a3a3a var(--bg); }
+.wm-timeline-inner { min-width: 900px; display: flex; flex-direction: column; gap: 5px; }
+.wm-brackets {
+  display: grid;
+  grid-template-columns: 70px repeat(20, minmax(0, 1fr));
+  gap: 4px;
+  overflow: visible;
+  padding-bottom: 0;
+}
+.wm-bracket { min-width: 0; width: 100%; padding-bottom: 8px; }
+.wm-bracket:first-child { min-width: 0; }
+.wm-period-line { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; opacity: .85; pointer-events: none; }
+.wm-bracket.active .wm-period-line { height: 4px; opacity: 1; }
+.wm-bracket.empty .wm-period-line { opacity: .35; }
+
+.wm-ribbon { position: relative; height: 22px; margin-left: 74px; }
+.wm-period {
+  position: absolute;
+  top: 0; bottom: 0;
+  min-width: 0;
+  padding: 0 6px;
+  font: inherit;
+  font-size: 10.5px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--era) 70%, var(--text));
+  background: color-mix(in srgb, var(--era) 14%, transparent);
+  border: 0;
+  border-top: 2px solid var(--era);
+  border-right: 1px solid var(--bg);
+  border-radius: 3px 3px 0 0;
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: left;
+  transition: background .15s var(--ease);
+}
+.wm-period span { display: block; overflow: hidden; text-overflow: ellipsis; }
+.wm-period:hover { background: color-mix(in srgb, var(--era) 26%, transparent); }
+.wm-period.on { background: color-mix(in srgb, var(--era) 34%, transparent); color: var(--text); }
+
+/* ================= Journey playback ================= */
+
+.journey-btn {
+  position: absolute;
+  left: 12px; bottom: 26px;
+  z-index: 1000;
+  display: inline-flex; align-items: center; gap: 7px;
+  font: inherit; font-size: 12px;
+  color: var(--text);
+  background: rgba(36, 36, 36, .92);
+  border: 1px solid #555;
+  border-radius: 999px;
+  padding: 6px 13px 6px 10px;
+  cursor: pointer;
+  transition: background .15s var(--ease);
+}
+.journey-btn:hover { background: var(--surface-2); }
+.journey-btn[hidden] { display: none; }
+.journey-btn .ji-pause { display: none; }
+.journey-btn.playing .ji-pause { display: block; }
+.journey-btn.playing .ji-play { display: none; }
+
+.jm-icon { background: none; border: none; overflow: visible; }
+.jm-dot {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #f0ede8;
+  border: 2px solid #1a1a1a;
+  box-shadow: 0 0 0 4px rgba(240, 237, 232, .16), 0 0 16px rgba(240, 237, 232, .4);
+  box-sizing: border-box;
+}
+.jm-label {
+  position: absolute;
+  left: 50%; bottom: 26px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  text-align: center;
+  background: rgba(26, 26, 26, .94);
+  border: 1px solid #484848;
+  border-radius: 8px;
+  padding: 4px 11px 5px;
+  pointer-events: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .5);
+}
+.jm-label::after {
+  content: "";
+  position: absolute; left: 50%; bottom: -5px;
+  width: 8px; height: 8px;
+  background: rgba(26, 26, 26, .94);
+  border-right: 1px solid #484848; border-bottom: 1px solid #484848;
+  transform: translateX(-50%) rotate(45deg);
+}
+.jm-years { display: block; font-family: var(--font-serif); font-size: 15px; line-height: 1.2; color: var(--text); font-variant-numeric: tabular-nums; }
+.jm-city { display: block; font-size: 10.5px; color: var(--text-dim); letter-spacing: .02em; }

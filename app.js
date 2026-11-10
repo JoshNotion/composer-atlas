@@ -240,6 +240,11 @@ async function main() {
         <button class="layer-btn on" data-layer="death"><span class="dot death"></span>Death</button>
       </div>
       <div class="map-host" id="map-host"></div>
+      <button class="journey-btn" id="journey-play" type="button" hidden>
+        <svg class="ji-play" viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"></path></svg>
+        <svg class="ji-pause" viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"></path></svg>
+        <span class="ji-text">Play journey</span>
+      </button>
     </section>
     <div id="detail-target"></div>
   `;
@@ -247,6 +252,14 @@ async function main() {
   const mapHost = document.getElementById("map-host");
   const detailTarget = document.getElementById("detail-target");
   const mapApi = createMap(mapHost);
+
+  const journeyBtn = document.getElementById("journey-play");
+  journeyBtn.addEventListener("click", () => mapApi.toggleJourney());
+  mapApi.onJourneyState((st) => {
+    journeyBtn.hidden = !st.playable;
+    journeyBtn.classList.toggle("playing", st.playing);
+    journeyBtn.querySelector(".ji-text").textContent = st.playing ? "Pause" : (st.finished ? "Replay journey" : "Play journey");
+  });
 
   document.querySelectorAll(".layer-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -345,6 +358,7 @@ async function main() {
     // so a full-page panel doesn't visibly shrink while it leaves.
     panelEl.classList.remove("open");
     panelEl.setAttribute("aria-hidden", "true");
+    mapApi.pauseJourney();
     clearTimeout(collapseTimer);
     collapseTimer = setTimeout(() => {
       if (panelMode === "closed") panelEl.classList.remove("expanded");

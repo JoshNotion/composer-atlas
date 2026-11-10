@@ -8,6 +8,16 @@ const WM_FIRST_BRACKET = 1050;
 const WM_LAST_BRACKET = 2000;
 const WM_STEP = 50;
 const WM_TYPES = ["birth", "lived", "death"];
+// Conventional period boundaries, used for the ribbon and the colour under each bracket.
+const WM_PERIODS = [
+  { era: "Medieval", from: 1050, to: 1400 },
+  { era: "Renaissance", from: 1400, to: 1600 },
+  { era: "Baroque", from: 1600, to: 1750 },
+  { era: "Classical", from: 1750, to: 1820 },
+  { era: "Romantic", from: 1820, to: 1900 },
+  { era: "Modern", from: 1900, to: 1975 },
+  { era: "Contemporary", from: 1975, to: 2050 },
+];
 const WM_TYPE_LABEL = { birth: "Born", lived: "Lived", death: "Died" };
 
 // ---- year parsing -------------------------------------------------------------
@@ -70,7 +80,12 @@ export function createWorldMap(hostEl, composers, opts = {}) {
           <svg class="wm-icon-play" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"></path></svg>
           <svg class="wm-icon-pause" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"></path></svg>
         </button>
-        <div class="wm-brackets" id="wm-brackets" role="group" aria-label="Time period"></div>
+        <div class="wm-timeline">
+          <div class="wm-timeline-inner">
+            <div class="wm-ribbon" id="wm-ribbon" aria-label="Classical periods"></div>
+            <div class="wm-brackets" id="wm-brackets" role="group" aria-label="Time period"></div>
+          </div>
+        </div>
       </div>
       <div class="wm-types" id="wm-types">
         ${WM_TYPES.map(t => `<button class="layer-btn on" data-type="${t}"><span class="dot ${t}"></span>${WM_TYPE_LABEL[t]}</button>`).join("")}
@@ -81,6 +96,7 @@ export function createWorldMap(hostEl, composers, opts = {}) {
   `;
 
   const bracketsEl = hostEl.querySelector("#wm-brackets");
+  const ribbonEl = hostEl.querySelector("#wm-ribbon");
   const summaryEl = hostEl.querySelector("#wm-summary");
   const playBtn = hostEl.querySelector("#wm-play");
   const mapEl = hostEl.querySelector("#wm-map");
@@ -215,19 +231,47 @@ export function createWorldMap(hostEl, composers, opts = {}) {
     summaryEl.textContent = `${label} · ${composerCount} composer${composerCount === 1 ? "" : "s"} · ${places.length} place${places.length === 1 ? "" : "s"}`;
   }
 
+  // Hard-stop gradient showing which periods a 50-year bracket covers.
+  function periodGradient(b) {
+    const lo = b, hi = b + WM_STEP;
+    const stops = [];
+    WM_PERIODS.forEach(p => {
+      const from = Math.max(lo, p.from), to = Math.min(hi, p.to);
+      if (to <= from) return;
+      const x0 = ((from - lo) / WM_STEP) * 100, x1 = ((to - lo) / WM_STEP) * 100;
+      const c = eraColor(p.era);
+      stops.push(`${c} ${x0.toFixed(1)}%`, `${c} ${x1.toFixed(1)}%`);
+    });
+    return `linear-gradient(90deg, ${stops.join(", ")})`;
+  }
+
+  function renderRibbon() {
+    const span = WM_LAST_BRACKET + WM_STEP - WM_FIRST_BRACKET;
+    const bLo = state.bracket, bHi = state.bracket == null ? null : state.bracket + WM_STEP;
+    ribbonEl.innerHTML = WM_PERIODS.map(p => {
+      const left = ((p.from - WM_FIRST_BRACKET) / span) * 100;
+      const width = ((p.to - p.from) / span) * 100;
+      const on = bLo != null && p.from < bHi && p.to > bLo;
+      return `<button class="wm-period${on ? " on" : ""}" data-from="${p.from}" style="left:${left}%;width:${width}%;--era:${eraColor(p.era)}" title="${p.era} · c. ${p.from}–${p.to}">
+        <span>${p.era}</span></button>`;
+    }).join("");
+  }
+
   function renderBrackets() {
     const counts = brackets.map(b => new Set(activeRecords(b).map(r => r.composer.id)).size);
     const max = Math.max(1, ...counts);
     const allCount = new Set(activeRecords(null).map(r => r.composer.id)).size;
     bracketsEl.innerHTML =
-      `<button class="wm-bracket${state.bracket == null ? " active" : ""}" data-b="">
+      `<button class="wm-bracket wm-bracket-all${state.bracket == null ? " active" : ""}" data-b="">
          <span class="wm-bar" style="height:100%"></span><span class="wm-blabel">All time</span><span class="wm-bcount">${allCount}</span>
        </button>` +
       brackets.map((b, i) => `
         <button class="wm-bracket${state.bracket === b ? " active" : ""}${counts[i] === 0 ? " empty" : ""}" data-b="${b}" title="${b}–${b + WM_STEP}: ${counts[i]} composers">
           <span class="wm-bar" style="height:${Math.max(6, Math.round((counts[i] / max) * 100))}%"></span>
           <span class="wm-blabel">${b}</span><span class="wm-bcount">${counts[i]}</span>
+          <span class="wm-period-line" style="background:${periodGradient(b)}"></span>
         </button>`).join("");
+    renderRibbon();
   }
 
   function refresh() {
@@ -238,12 +282,6 @@ export function createWorldMap(hostEl, composers, opts = {}) {
   function setBracket(b) {
     state.bracket = b;
     refresh();
-    // Scroll the strip itself; scrollIntoView would also scroll the page layout sideways.
-    const active = bracketsEl.querySelector(".wm-bracket.active");
-    if (active) {
-      const target = active.offsetLeft - (bracketsEl.clientWidth - active.offsetWidth) / 2;
-      bracketsEl.scrollTo({ left: Math.max(0, target), behavior: "smooth" });
-    }
     if (opts.onChange) opts.onChange(state);
   }
 
@@ -253,6 +291,15 @@ export function createWorldMap(hostEl, composers, opts = {}) {
     stopPlay();
     const v = btn.getAttribute("data-b");
     setBracket(v === "" ? null : parseInt(v, 10));
+  });
+
+  ribbonEl.addEventListener("click", (e) => {
+    const seg = e.target.closest(".wm-period");
+    if (!seg) return;
+    const from = parseInt(seg.getAttribute("data-from"), 10);
+    const b = WM_FIRST_BRACKET + Math.floor((from - WM_FIRST_BRACKET) / WM_STEP) * WM_STEP;
+    stopPlay();
+    setBracket(b);
   });
 
   hostEl.querySelector("#wm-types").addEventListener("click", (e) => {

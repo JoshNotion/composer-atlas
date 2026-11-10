@@ -2080,6 +2080,105 @@ body[data-view="home"] .legend { display: none; }
 .browse-portrait { background: color-mix(in srgb, var(--era) 24%, #202020) !important; }
 .browse-portrait .initials { color: color-mix(in srgb, var(--era) 80%, #fff); opacity: .9; }
 
+
+/* ================= World map: full-width period strip ================= */
+
+.wm-timeline { flex: 1 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: thin; scrollbar-color: #3a3a3a var(--bg); }
+.wm-timeline-inner { min-width: 900px; display: flex; flex-direction: column; gap: 5px; }
+.wm-brackets {
+  display: grid;
+  grid-template-columns: 70px repeat(20, minmax(0, 1fr));
+  gap: 4px;
+  overflow: visible;
+  padding-bottom: 0;
+}
+.wm-bracket { min-width: 0; width: 100%; padding-bottom: 8px; }
+.wm-bracket:first-child { min-width: 0; }
+.wm-period-line { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; opacity: .85; pointer-events: none; }
+.wm-bracket.active .wm-period-line { height: 4px; opacity: 1; }
+.wm-bracket.empty .wm-period-line { opacity: .35; }
+
+.wm-ribbon { position: relative; height: 22px; margin-left: 74px; }
+.wm-period {
+  position: absolute;
+  top: 0; bottom: 0;
+  min-width: 0;
+  padding: 0 6px;
+  font: inherit;
+  font-size: 10.5px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--era) 70%, var(--text));
+  background: color-mix(in srgb, var(--era) 14%, transparent);
+  border: 0;
+  border-top: 2px solid var(--era);
+  border-right: 1px solid var(--bg);
+  border-radius: 3px 3px 0 0;
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: left;
+  transition: background .15s var(--ease);
+}
+.wm-period span { display: block; overflow: hidden; text-overflow: ellipsis; }
+.wm-period:hover { background: color-mix(in srgb, var(--era) 26%, transparent); }
+.wm-period.on { background: color-mix(in srgb, var(--era) 34%, transparent); color: var(--text); }
+
+/* ================= Journey playback ================= */
+
+.journey-btn {
+  position: absolute;
+  left: 12px; bottom: 26px;
+  z-index: 1000;
+  display: inline-flex; align-items: center; gap: 7px;
+  font: inherit; font-size: 12px;
+  color: var(--text);
+  background: rgba(36, 36, 36, .92);
+  border: 1px solid #555;
+  border-radius: 999px;
+  padding: 6px 13px 6px 10px;
+  cursor: pointer;
+  transition: background .15s var(--ease);
+}
+.journey-btn:hover { background: var(--surface-2); }
+.journey-btn[hidden] { display: none; }
+.journey-btn .ji-pause { display: none; }
+.journey-btn.playing .ji-pause { display: block; }
+.journey-btn.playing .ji-play { display: none; }
+
+.jm-icon { background: none; border: none; overflow: visible; }
+.jm-dot {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #f0ede8;
+  border: 2px solid #1a1a1a;
+  box-shadow: 0 0 0 4px rgba(240, 237, 232, .16), 0 0 16px rgba(240, 237, 232, .4);
+  box-sizing: border-box;
+}
+.jm-label {
+  position: absolute;
+  left: 50%; bottom: 26px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  text-align: center;
+  background: rgba(26, 26, 26, .94);
+  border: 1px solid #484848;
+  border-radius: 8px;
+  padding: 4px 11px 5px;
+  pointer-events: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .5);
+}
+.jm-label::after {
+  content: "";
+  position: absolute; left: 50%; bottom: -5px;
+  width: 8px; height: 8px;
+  background: rgba(26, 26, 26, .94);
+  border-right: 1px solid #484848; border-bottom: 1px solid #484848;
+  transform: translateX(-50%) rotate(45deg);
+}
+.jm-years { display: block; font-family: var(--font-serif); font-size: 15px; line-height: 1.2; color: var(--text); font-variant-numeric: tabular-nums; }
+.jm-city { display: block; font-size: 10.5px; color: var(--text-dim); letter-spacing: .02em; }
+
 </style>
 </head>
 <body>
@@ -2569,6 +2668,48 @@ const TILE_OPTIONS = {
   subdomains: "abcd",
   maxZoom: 19,
 };
+
+const JM_CURRENT_YEAR = new Date().getFullYear();
+const JM_DWELL_MS = 1500;
+
+// First and last year mentioned in a years string ("1703–1706", "1890s–1910s", "2010–present").
+function jmBounds(years) {
+  const s = String(years || "");
+  const nums = (s.match(/\d{3,4}/g) || []).map(Number);
+  const present = /present/i.test(s);
+  return {
+    start: nums.length ? nums[0] : null,
+    end: present ? JM_CURRENT_YEAR : (nums.length ? nums[nums.length - 1] : null),
+  };
+}
+
+function jmJoinYears(a, b) {
+  if (a === b) return a;
+  if (/,/.test(a) || /,/.test(b)) return `${a}, ${b}`;
+  const start = a.split(/[–-]/)[0].trim();
+  const parts = b.split(/[–-]/);
+  const end = parts[parts.length - 1].trim();
+  return start === end ? start : `${start}–${end}`;
+}
+
+// One stop per place visited, in order. Consecutive entries at the same place (for example
+// "lived 1712–1759" then "died 1759") merge into a single stop.
+function jmBuildStops(composer) {
+  const stops = [];
+  ((composer && composer.locations) || []).forEach(loc => {
+    if (!Number.isFinite(loc.lat) || !Number.isFinite(loc.lng)) return;
+    const prev = stops[stops.length - 1];
+    if (prev && Math.abs(prev.lat - loc.lat) < 0.01 && Math.abs(prev.lng - loc.lng) < 0.01) {
+      prev.years = jmJoinYears(prev.years, String(loc.years || ""));
+      return;
+    }
+    stops.push({ city: loc.city, lat: loc.lat, lng: loc.lng, years: String(loc.years || "") });
+  });
+  stops.forEach(s => { s.bounds = jmBounds(s.years); });
+  return stops;
+}
+
+function jmEase(p) { return p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; }
 function createMap(mapHostEl) {
   const map = L.map(mapHostEl, {
     zoomControl: true,
@@ -2588,7 +2729,118 @@ function createMap(mapHostEl) {
   const visible = { birth: true, lived: true, death: true };
   let currentComposer = null;
 
+  const trailLayer = L.layerGroup().addTo(map);
+
+  // ---- Journey playback: a marker walks the stops in order with a floating years label ----
+  const journey = {
+    stops: [], idx: 0, phase: "dwell", elapsed: 0, travelMs: 1500,
+    raf: null, last: 0, playing: false, finished: false,
+    marker: null, trail: null, onState: null,
+  };
+
+  function emitJourney() {
+    if (journey.onState) {
+      journey.onState({
+        playable: journey.stops.length > 1,
+        playing: journey.playing,
+        finished: journey.finished,
+      });
+    }
+  }
+
+  function journeyLabel(years, city) {
+    const el = journey.marker && journey.marker.getElement();
+    if (!el) return;
+    const y = el.querySelector(".jm-years"), c = el.querySelector(".jm-city");
+    if (y) y.textContent = years;
+    if (c) c.textContent = city;
+  }
+
+  function journeyReset() {
+    cancelAnimationFrame(journey.raf);
+    journey.raf = null;
+    journey.playing = false;
+    journey.finished = false;
+    journey.idx = 0;
+    journey.phase = "dwell";
+    journey.elapsed = 0;
+    if (journey.marker) { map.removeLayer(journey.marker); journey.marker = null; }
+    trailLayer.clearLayers();
+    journey.trail = null;
+  }
+
+  function journeyStart() {
+    if (journey.stops.length < 2) return;
+    if (journey.finished) journeyReset();
+    if (!journey.marker) {
+      const s = journey.stops[journey.idx];
+      const icon = L.divIcon({
+        className: "jm-icon",
+        html: '<div class="jm-label"><span class="jm-years"></span><span class="jm-city"></span></div><div class="jm-dot"></div>',
+        iconSize: [16, 16],
+        iconAnchor: [8, 8],
+      });
+      journey.marker = L.marker([s.lat, s.lng], { icon, interactive: false, keyboard: false, zIndexOffset: 5000 }).addTo(map);
+      journey.trail = L.polyline([[s.lat, s.lng]], { color: "#f0ede8", weight: 2.5, opacity: 0.85, lineJoin: "round" }).addTo(trailLayer);
+      journeyLabel(s.years, s.city);
+    }
+    journey.playing = true;
+    journey.last = performance.now();
+    journey.raf = requestAnimationFrame(journeyFrame);
+    emitJourney();
+  }
+
+  function journeyPause() {
+    cancelAnimationFrame(journey.raf);
+    journey.raf = null;
+    if (journey.playing) { journey.playing = false; emitJourney(); }
+  }
+
+  function journeyFrame(now) {
+    if (!journey.playing) return;
+    const dt = Math.min(now - journey.last, 60);
+    journey.last = now;
+    journey.elapsed += dt;
+    const here = journey.stops[journey.idx];
+    const next = journey.stops[journey.idx + 1];
+
+    if (journey.phase === "dwell") {
+      if (journey.elapsed >= JM_DWELL_MS) {
+        if (!next) {
+          journey.playing = false;
+          journey.finished = true;
+          emitJourney();
+          return;
+        }
+        journey.phase = "travel";
+        journey.elapsed = 0;
+        const km = map.distance([here.lat, here.lng], [next.lat, next.lng]) / 1000;
+        journey.travelMs = Math.max(1000, Math.min(2800, 900 + km * 0.7));
+      }
+    } else {
+      const p = Math.min(1, journey.elapsed / journey.travelMs);
+      const e = jmEase(p);
+      const lat = here.lat + (next.lat - here.lat) * e;
+      const lng = here.lng + (next.lng - here.lng) * e;
+      journey.marker.setLatLng([lat, lng]);
+      const done = journey.stops.slice(0, journey.idx + 1).map(s => [s.lat, s.lng]);
+      journey.trail.setLatLngs([...done, [lat, lng]]);
+      // The year ticks forward from the end of the last stay to the start of the next.
+      const y0 = here.bounds.end, y1 = next.bounds.start;
+      const year = (y0 != null && y1 != null) ? Math.round(y0 + (y1 - y0) * p) : "";
+      journeyLabel(String(year), p < 0.5 ? `leaving ${here.city}` : `towards ${next.city}`);
+      if (p >= 1) {
+        journey.idx += 1;
+        journey.phase = "dwell";
+        journey.elapsed = 0;
+        journeyLabel(next.years, next.city);
+      }
+    }
+    journey.raf = requestAnimationFrame(journeyFrame);
+  }
+
   function clear() {
+    journeyReset();
     Object.values(layers).forEach(l => l.clearLayers());
     routeLayer.clearLayers();
   }
@@ -2602,6 +2854,8 @@ function createMap(mapHostEl) {
   function showComposer(composer) {
     currentComposer = composer;
     clear();
+    journey.stops = jmBuildStops(composer);
+    emitJourney();
     if (!composer || !composer.locations || composer.locations.length === 0) return;
 
     const points = [];
@@ -2645,7 +2899,7 @@ function createMap(mapHostEl) {
 
     if (points.length > 0) {
       const bounds = L.latLngBounds(points).pad(0.25);
-      map.fitBounds(bounds, { animate: false, maxZoom: 6 });
+      map.fitBounds(bounds, { animate: false, maxZoom: 6, paddingTopLeft: [24, 78], paddingBottomRight: [24, 56] });
     }
   }
 
@@ -2655,6 +2909,10 @@ function createMap(mapHostEl) {
 
   return {
     showComposer,
+    playJourney: journeyStart,
+    pauseJourney: journeyPause,
+    toggleJourney() { if (journey.playing) journeyPause(); else journeyStart(); },
+    onJourneyState(cb) { journey.onState = cb; emitJourney(); },
     setLayer,
     invalidateSize,
     isVisible: (type) => visible[type],
@@ -2678,6 +2936,16 @@ const WM_FIRST_BRACKET = 1050;
 const WM_LAST_BRACKET = 2000;
 const WM_STEP = 50;
 const WM_TYPES = ["birth", "lived", "death"];
+// Conventional period boundaries, used for the ribbon and the colour under each bracket.
+const WM_PERIODS = [
+  { era: "Medieval", from: 1050, to: 1400 },
+  { era: "Renaissance", from: 1400, to: 1600 },
+  { era: "Baroque", from: 1600, to: 1750 },
+  { era: "Classical", from: 1750, to: 1820 },
+  { era: "Romantic", from: 1820, to: 1900 },
+  { era: "Modern", from: 1900, to: 1975 },
+  { era: "Contemporary", from: 1975, to: 2050 },
+];
 const WM_TYPE_LABEL = { birth: "Born", lived: "Lived", death: "Died" };
 
 // ---- year parsing -------------------------------------------------------------
@@ -2739,7 +3007,12 @@ function createWorldMap(hostEl, composers, opts = {}) {
           <svg class="wm-icon-play" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"></path></svg>
           <svg class="wm-icon-pause" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"></path></svg>
         </button>
-        <div class="wm-brackets" id="wm-brackets" role="group" aria-label="Time period"></div>
+        <div class="wm-timeline">
+          <div class="wm-timeline-inner">
+            <div class="wm-ribbon" id="wm-ribbon" aria-label="Classical periods"></div>
+            <div class="wm-brackets" id="wm-brackets" role="group" aria-label="Time period"></div>
+          </div>
+        </div>
       </div>
       <div class="wm-types" id="wm-types">
         ${WM_TYPES.map(t => `<button class="layer-btn on" data-type="${t}"><span class="dot ${t}"></span>${WM_TYPE_LABEL[t]}</button>`).join("")}
@@ -2750,6 +3023,7 @@ function createWorldMap(hostEl, composers, opts = {}) {
   `;
 
   const bracketsEl = hostEl.querySelector("#wm-brackets");
+  const ribbonEl = hostEl.querySelector("#wm-ribbon");
   const summaryEl = hostEl.querySelector("#wm-summary");
   const playBtn = hostEl.querySelector("#wm-play");
   const mapEl = hostEl.querySelector("#wm-map");
@@ -2884,19 +3158,47 @@ function createWorldMap(hostEl, composers, opts = {}) {
     summaryEl.textContent = `${label} · ${composerCount} composer${composerCount === 1 ? "" : "s"} · ${places.length} place${places.length === 1 ? "" : "s"}`;
   }
 
+  // Hard-stop gradient showing which periods a 50-year bracket covers.
+  function periodGradient(b) {
+    const lo = b, hi = b + WM_STEP;
+    const stops = [];
+    WM_PERIODS.forEach(p => {
+      const from = Math.max(lo, p.from), to = Math.min(hi, p.to);
+      if (to <= from) return;
+      const x0 = ((from - lo) / WM_STEP) * 100, x1 = ((to - lo) / WM_STEP) * 100;
+      const c = eraColor(p.era);
+      stops.push(`${c} ${x0.toFixed(1)}%`, `${c} ${x1.toFixed(1)}%`);
+    });
+    return `linear-gradient(90deg, ${stops.join(", ")})`;
+  }
+
+  function renderRibbon() {
+    const span = WM_LAST_BRACKET + WM_STEP - WM_FIRST_BRACKET;
+    const bLo = state.bracket, bHi = state.bracket == null ? null : state.bracket + WM_STEP;
+    ribbonEl.innerHTML = WM_PERIODS.map(p => {
+      const left = ((p.from - WM_FIRST_BRACKET) / span) * 100;
+      const width = ((p.to - p.from) / span) * 100;
+      const on = bLo != null && p.from < bHi && p.to > bLo;
+      return `<button class="wm-period${on ? " on" : ""}" data-from="${p.from}" style="left:${left}%;width:${width}%;--era:${eraColor(p.era)}" title="${p.era} · c. ${p.from}–${p.to}">
+        <span>${p.era}</span></button>`;
+    }).join("");
+  }
+
   function renderBrackets() {
     const counts = brackets.map(b => new Set(activeRecords(b).map(r => r.composer.id)).size);
     const max = Math.max(1, ...counts);
     const allCount = new Set(activeRecords(null).map(r => r.composer.id)).size;
     bracketsEl.innerHTML =
-      `<button class="wm-bracket${state.bracket == null ? " active" : ""}" data-b="">
+      `<button class="wm-bracket wm-bracket-all${state.bracket == null ? " active" : ""}" data-b="">
          <span class="wm-bar" style="height:100%"></span><span class="wm-blabel">All time</span><span class="wm-bcount">${allCount}</span>
        </button>` +
       brackets.map((b, i) => `
         <button class="wm-bracket${state.bracket === b ? " active" : ""}${counts[i] === 0 ? " empty" : ""}" data-b="${b}" title="${b}–${b + WM_STEP}: ${counts[i]} composers">
           <span class="wm-bar" style="height:${Math.max(6, Math.round((counts[i] / max) * 100))}%"></span>
           <span class="wm-blabel">${b}</span><span class="wm-bcount">${counts[i]}</span>
+          <span class="wm-period-line" style="background:${periodGradient(b)}"></span>
         </button>`).join("");
+    renderRibbon();
   }
 
   function refresh() {
@@ -2907,12 +3209,6 @@ function createWorldMap(hostEl, composers, opts = {}) {
   function setBracket(b) {
     state.bracket = b;
     refresh();
-    // Scroll the strip itself; scrollIntoView would also scroll the page layout sideways.
-    const active = bracketsEl.querySelector(".wm-bracket.active");
-    if (active) {
-      const target = active.offsetLeft - (bracketsEl.clientWidth - active.offsetWidth) / 2;
-      bracketsEl.scrollTo({ left: Math.max(0, target), behavior: "smooth" });
-    }
     if (opts.onChange) opts.onChange(state);
   }
 
@@ -2922,6 +3218,15 @@ function createWorldMap(hostEl, composers, opts = {}) {
     stopPlay();
     const v = btn.getAttribute("data-b");
     setBracket(v === "" ? null : parseInt(v, 10));
+  });
+
+  ribbonEl.addEventListener("click", (e) => {
+    const seg = e.target.closest(".wm-period");
+    if (!seg) return;
+    const from = parseInt(seg.getAttribute("data-from"), 10);
+    const b = WM_FIRST_BRACKET + Math.floor((from - WM_FIRST_BRACKET) / WM_STEP) * WM_STEP;
+    stopPlay();
+    setBracket(b);
   });
 
   hostEl.querySelector("#wm-types").addEventListener("click", (e) => {
@@ -4164,6 +4469,11 @@ async function main() {
         <button class="layer-btn on" data-layer="death"><span class="dot death"></span>Death</button>
       </div>
       <div class="map-host" id="map-host"></div>
+      <button class="journey-btn" id="journey-play" type="button" hidden>
+        <svg class="ji-play" viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"></path></svg>
+        <svg class="ji-pause" viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"></path></svg>
+        <span class="ji-text">Play journey</span>
+      </button>
     </section>
     <div id="detail-target"></div>
   `;
@@ -4171,6 +4481,14 @@ async function main() {
   const mapHost = document.getElementById("map-host");
   const detailTarget = document.getElementById("detail-target");
   const mapApi = createMap(mapHost);
+
+  const journeyBtn = document.getElementById("journey-play");
+  journeyBtn.addEventListener("click", () => mapApi.toggleJourney());
+  mapApi.onJourneyState((st) => {
+    journeyBtn.hidden = !st.playable;
+    journeyBtn.classList.toggle("playing", st.playing);
+    journeyBtn.querySelector(".ji-text").textContent = st.playing ? "Pause" : (st.finished ? "Replay journey" : "Play journey");
+  });
 
   document.querySelectorAll(".layer-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -4269,6 +4587,7 @@ async function main() {
     // so a full-page panel doesn't visibly shrink while it leaves.
     panelEl.classList.remove("open");
     panelEl.setAttribute("aria-hidden", "true");
+    mapApi.pauseJourney();
     clearTimeout(collapseTimer);
     collapseTimer = setTimeout(() => {
       if (panelMode === "closed") panelEl.classList.remove("expanded");
