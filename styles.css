@@ -1836,3 +1836,8 @@ body[data-view="home"] .legend { display: none; }
 .lk-tip[hidden] { display: none; }
 .lk-tip strong { display: block; color: var(--text); font-size: 13px; font-weight: 600; }
 .lk-tip em { display: block; font-style: normal; color: var(--text-faint); font-size: 11px; margin-bottom: 5px; }
+
+/* ================= World map: the journey plays on the big map, so the card drops its own map ================= */
+
+body[data-view="map"] .panel .map-section { display: none; }
+.wm-journey-btn { left: 14px; bottom: 30px; }

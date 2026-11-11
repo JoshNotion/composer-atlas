@@ -2,7 +2,7 @@
 // Places are aggregated, so a city shows one pin with a count and a list of composers.
 
 import { eraColor } from "./timeline.js";
-import { TILE_URL, TILE_OPTIONS } from "./map.js";
+import { TILE_URL, TILE_OPTIONS, jmBuildStops, jmCreatePlayer } from "./map.js";
 
 const WM_FIRST_BRACKET = 1050;
 const WM_LAST_BRACKET = 2000;
@@ -102,6 +102,11 @@ export function createWorldMap(hostEl, composers, opts = {}) {
       </div>
     </div>
     <div class="wm-map" id="wm-map"></div>
+    <button class="journey-btn wm-journey-btn" id="wm-journey" type="button" hidden>
+      <svg class="ji-play" viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"></path></svg>
+      <svg class="ji-pause" viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"></path></svg>
+      <span class="ji-text">Play journey</span>
+    </button>
   `;
 
   const bracketsEl = hostEl.querySelector("#wm-brackets");
@@ -115,6 +120,18 @@ export function createWorldMap(hostEl, composers, opts = {}) {
   const lineLayer = L.layerGroup().addTo(map);
   const pinLayer = L.layerGroup().addTo(map);
   const focusEl = hostEl.querySelector("#wm-focus");
+
+  // Journey playback for the focused composer (same player as the composer card used to have).
+  const trailLayer = L.layerGroup().addTo(map);
+  const journey = jmCreatePlayer(map, trailLayer);
+  const journeyBtn = hostEl.querySelector("#wm-journey");
+  let journeyLoaded = false;
+  journey.onState((st) => {
+    journeyBtn.hidden = !st.playable;
+    journeyBtn.classList.toggle("playing", st.playing);
+    journeyBtn.querySelector(".ji-text").textContent = st.playing ? "Pause" : (st.finished ? "Replay journey" : "Play journey");
+  });
+  journeyBtn.addEventListener("click", () => journey.toggle());
 
   // ---- filtering ----------------------------------------------------------------
 
@@ -209,6 +226,9 @@ export function createWorldMap(hostEl, composers, opts = {}) {
   function focusComposer(id) {
     state.focus = id;
     map.closePopup();
+    const comp = composers.find(c => c.id === id);
+    journey.setStops(comp ? jmBuildStops(comp) : []);
+    journeyLoaded = true;
     render();
     fitToActive();
   }
@@ -220,23 +240,10 @@ export function createWorldMap(hostEl, composers, opts = {}) {
     fitToActive();
   }
 
-  function joinYearsWm(a, b) {
-    if (!a) return b;
-    if (!b || a === b) return a;
-    return `${a}, ${b}`;
-  }
-
   function renderFocus(recs) {
-    const list = recs.slice().sort((x, y) => x.spans[0][0] - y.spans[0][0]);
-    const c = list[0].composer;
+    const c = recs[0].composer;
     const color = eraColor(c.era);
-    const stops = [];
-    list.forEach(r => {
-      const key = placeKey(r.loc);
-      const last = stops[stops.length - 1];
-      if (last && last.key === key) { last.years = joinYearsWm(last.years, r.loc.years); return; }
-      stops.push({ key, city: r.loc.city, lat: r.loc.lat, lng: r.loc.lng, years: r.loc.years || "" });
-    });
+    const stops = jmBuildStops(c);
     pinLayer.clearLayers();
     lineLayer.clearLayers();
     if (stops.length > 1) {
@@ -251,7 +258,7 @@ export function createWorldMap(hostEl, composers, opts = {}) {
         iconAnchor: [size / 2, size / 2],
       });
       const marker = L.marker([st.lat, st.lng], { icon, zIndexOffset: 1000 + i });
-      marker.bindTooltip(`<strong>${escapeWm(st.city)}</strong><br>${escapeWm(st.years)}`, { direction: "top", offset: [0, -8], className: "wm-tip" });
+      marker.bindTooltip(`<strong>${escapeWm(st.city)}</strong><br>${escapeWm(st.stay)}`, { direction: "top", offset: [0, -8], className: "wm-tip" });
       marker.on("click", () => opts.onSelect && opts.onSelect(c.id));
       pinLayer.addLayer(marker);
     });
@@ -269,6 +276,7 @@ export function createWorldMap(hostEl, composers, opts = {}) {
       state.focus = null; // nothing left to show for them with the current filters
     }
     focusEl.hidden = true;
+    if (journeyLoaded) { journey.setStops([]); journeyLoaded = false; }
     lineLayer.clearLayers();
     const places = groupByPlace(recs);
     pinLayer.clearLayers();
@@ -440,6 +448,7 @@ export function createWorldMap(hostEl, composers, opts = {}) {
     const btn = e.target.closest(".wm-speed-btn");
     if (!btn) return;
     speed = parseFloat(btn.dataset.speed);
+    journey.setSpeed(speed);
     speedEl.querySelectorAll(".wm-speed-btn").forEach(b => {
       const on = b === btn;
       b.classList.toggle("on", on);
@@ -461,6 +470,8 @@ export function createWorldMap(hostEl, composers, opts = {}) {
     getBracket: () => state.bracket,
     stop: stopPlay,
     clearFocus,
+    // Re-centre on the focused composer (used once the side card has finished sliding in).
+    refit() { if (state.focus) fitToActive(); },
     invalidateSize() { map.invalidateSize(); },
   };
 }

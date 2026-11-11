@@ -373,7 +373,10 @@ async function main() {
       expandBtnEl.setAttribute("aria-label", label);
       expandBtnEl.setAttribute("title", label);
     }
-    const refit = () => { mapApi.invalidateSize(); if (worldMap) worldMap.invalidateSize(); };
+    const refit = () => {
+      mapApi.invalidateSize();
+      if (worldMap) { worldMap.invalidateSize(); if (currentView === "map") worldMap.refit(); }
+    };
     requestAnimationFrame(refit);
     setTimeout(refit, panelDurMs() + 20);
   }
@@ -407,7 +410,8 @@ async function main() {
       onConnectionClick: (nextId) => selectComposer(nextId),
       onPortraitClick: (comp) => openLightbox(comp),
     });
-    mapApi.showComposer(c);
+    // On the world map the journey plays on the big map itself, so the card skips its own map.
+    if (currentView !== "map") mapApi.showComposer(c);
     openPanel();
     panelInner.scrollTop = 0;
   }

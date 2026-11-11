@@ -44,23 +44,171 @@ function jmJoinYears(a, b) {
 }
 
 // One stop per place visited, in order. Consecutive entries at the same place (for example
-// "lived 1712–1759" then "died 1759") merge into a single stop.
-function jmBuildStops(composer) {
+// "lived 1712–1759" then "died 1759") merge into a single stop. Each stop also gets a
+// `stay` label with the whole interval spent there: a place noted with a single year
+// (like a birth) lasts until the next stop begins, and the last one until the composer died.
+export function jmBuildStops(composer) {
   const stops = [];
-  ((composer && composer.locations) || []).forEach(loc => {
+  // Chronological by first year mentioned (stable; entries without a year keep their place).
+  const ordered = ((composer && composer.locations) || [])
+    .map((loc, i) => ({ loc, i, y: jmBounds(loc.years).start }))
+    .sort((a, b) => (a.y != null && b.y != null && a.y !== b.y) ? a.y - b.y : a.i - b.i)
+    .map(o => o.loc);
+  ordered.forEach(loc => {
     if (!Number.isFinite(loc.lat) || !Number.isFinite(loc.lng)) return;
     const prev = stops[stops.length - 1];
     if (prev && Math.abs(prev.lat - loc.lat) < 0.01 && Math.abs(prev.lng - loc.lng) < 0.01) {
       prev.years = jmJoinYears(prev.years, String(loc.years || ""));
+      if (loc.type === "death") prev.type = "death";
       return;
     }
-    stops.push({ city: loc.city, lat: loc.lat, lng: loc.lng, years: String(loc.years || "") });
+    stops.push({ city: loc.city, lat: loc.lat, lng: loc.lng, type: loc.type, years: String(loc.years || "") });
   });
-  stops.forEach(s => { s.bounds = jmBounds(s.years); });
+  stops.forEach((s, i) => {
+    s.bounds = jmBounds(s.years);
+    const single = /^\s*(c\.\s*)?\d{3,4}\s*$/.test(s.years);
+    const next = stops[i + 1];
+    let label = s.years;
+    if (single && s.bounds.start != null) {
+      let end = null;
+      if (next) {
+        const ns = jmBounds(next.years).start;
+        if (ns != null && ns > s.bounds.start) end = ns;
+      } else if (s.type !== "death" && composer) {
+        if (composer.died == null) end = JM_CURRENT_YEAR;
+        else if (composer.died > s.bounds.start) end = composer.died;
+      }
+      if (end != null) {
+        label = `${s.bounds.start}–${end === JM_CURRENT_YEAR && composer && composer.died == null ? "present" : end}`;
+        s.bounds = { start: s.bounds.start, end };
+      }
+    }
+    s.stay = label;
+  });
   return stops;
 }
 
 function jmEase(p) { return p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; }
+
+// Reusable journey player: walks a marker through `stops` on `map`, drawing a trail into
+// `trailLayer`. Used by the composer card's map and by the world map's focus mode.
+export function jmCreatePlayer(map, trailLayer) {
+  const j = {
+    stops: [], idx: 0, phase: "dwell", elapsed: 0, travelMs: 1500,
+    raf: null, last: 0, playing: false, finished: false, speed: 1,
+    marker: null, trail: null, cb: null,
+  };
+
+  function emit() {
+    if (j.cb) j.cb({ playable: j.stops.length > 1, playing: j.playing, finished: j.finished });
+  }
+
+  function label(years, city) {
+    const el = j.marker && j.marker.getElement();
+    if (!el) return;
+    const y = el.querySelector(".jm-years"), c = el.querySelector(".jm-city");
+    if (y) y.textContent = years;
+    if (c) c.textContent = city;
+  }
+
+  function reset() {
+    cancelAnimationFrame(j.raf);
+    j.raf = null;
+    j.playing = false;
+    j.finished = false;
+    j.idx = 0;
+    j.phase = "dwell";
+    j.elapsed = 0;
+    if (j.marker) { map.removeLayer(j.marker); j.marker = null; }
+    trailLayer.clearLayers();
+    j.trail = null;
+  }
+
+  function setStops(stops) {
+    reset();
+    j.stops = stops || [];
+    emit();
+  }
+
+  function start() {
+    if (j.stops.length < 2) return;
+    if (j.finished) reset();
+    if (!j.marker) {
+      const s = j.stops[j.idx];
+      const icon = L.divIcon({
+        className: "jm-icon",
+        html: '<div class="jm-label"><span class="jm-years"></span><span class="jm-city"></span></div><div class="jm-dot"></div>',
+        iconSize: [16, 16],
+        iconAnchor: [8, 8],
+      });
+      j.marker = L.marker([s.lat, s.lng], { icon, interactive: false, keyboard: false, zIndexOffset: 5000 }).addTo(map);
+      j.trail = L.polyline([[s.lat, s.lng]], { color: "#f0ede8", weight: 2.5, opacity: 0.85, lineJoin: "round" }).addTo(trailLayer);
+      label(s.stay, s.city);
+    }
+    j.playing = true;
+    j.last = performance.now();
+    j.raf = requestAnimationFrame(frame);
+    emit();
+  }
+
+  function pause() {
+    cancelAnimationFrame(j.raf);
+    j.raf = null;
+    if (j.playing) { j.playing = false; emit(); }
+  }
+
+  function frame(now) {
+    if (!j.playing) return;
+    const dt = Math.min(now - j.last, 60) * j.speed;
+    j.last = now;
+    j.elapsed += dt;
+    const here = j.stops[j.idx];
+    const next = j.stops[j.idx + 1];
+
+    if (j.phase === "dwell") {
+      if (j.elapsed >= JM_DWELL_MS) {
+        if (!next) {
+          j.playing = false;
+          j.finished = true;
+          emit();
+          return;
+        }
+        j.phase = "travel";
+        j.elapsed = 0;
+        const km = map.distance([here.lat, here.lng], [next.lat, next.lng]) / 1000;
+        j.travelMs = Math.max(1000, Math.min(2800, 900 + km * 0.7));
+      }
+    } else {
+      const p = Math.min(1, j.elapsed / j.travelMs);
+      const e = jmEase(p);
+      const lat = here.lat + (next.lat - here.lat) * e;
+      const lng = here.lng + (next.lng - here.lng) * e;
+      j.marker.setLatLng([lat, lng]);
+      const done = j.stops.slice(0, j.idx + 1).map(s => [s.lat, s.lng]);
+      j.trail.setLatLngs([...done, [lat, lng]]);
+      // The year ticks forward from the end of the last stay to the start of the next.
+      const y1 = next.bounds.start;
+      const y0 = (here.bounds.end != null && y1 != null) ? Math.min(here.bounds.end, y1) : here.bounds.end;
+      const year = (y0 != null && y1 != null) ? Math.round(y0 + (y1 - y0) * p) : "";
+      label(String(year), p < 0.5 ? `leaving ${here.city}` : `towards ${next.city}`);
+      if (p >= 1) {
+        j.idx += 1;
+        j.phase = "dwell";
+        j.elapsed = 0;
+        label(next.stay, next.city);
+      }
+    }
+    j.raf = requestAnimationFrame(frame);
+  }
+
+  return {
+    setStops, reset, start, pause,
+    toggle() { if (j.playing) pause(); else start(); },
+    setSpeed(v) { j.speed = v > 0 ? v : 1; },
+    onState(cb) { j.cb = cb; emit(); },
+    isPlaying: () => j.playing,
+  };
+}
 
 export function createMap(mapHostEl) {
   const map = L.map(mapHostEl, {
@@ -84,115 +232,10 @@ export function createMap(mapHostEl) {
   const trailLayer = L.layerGroup().addTo(map);
 
   // ---- Journey playback: a marker walks the stops in order with a floating years label ----
-  const journey = {
-    stops: [], idx: 0, phase: "dwell", elapsed: 0, travelMs: 1500,
-    raf: null, last: 0, playing: false, finished: false,
-    marker: null, trail: null, onState: null,
-  };
-
-  function emitJourney() {
-    if (journey.onState) {
-      journey.onState({
-        playable: journey.stops.length > 1,
-        playing: journey.playing,
-        finished: journey.finished,
-      });
-    }
-  }
-
-  function journeyLabel(years, city) {
-    const el = journey.marker && journey.marker.getElement();
-    if (!el) return;
-    const y = el.querySelector(".jm-years"), c = el.querySelector(".jm-city");
-    if (y) y.textContent = years;
-    if (c) c.textContent = city;
-  }
-
-  function journeyReset() {
-    cancelAnimationFrame(journey.raf);
-    journey.raf = null;
-    journey.playing = false;
-    journey.finished = false;
-    journey.idx = 0;
-    journey.phase = "dwell";
-    journey.elapsed = 0;
-    if (journey.marker) { map.removeLayer(journey.marker); journey.marker = null; }
-    trailLayer.clearLayers();
-    journey.trail = null;
-  }
-
-  function journeyStart() {
-    if (journey.stops.length < 2) return;
-    if (journey.finished) journeyReset();
-    if (!journey.marker) {
-      const s = journey.stops[journey.idx];
-      const icon = L.divIcon({
-        className: "jm-icon",
-        html: '<div class="jm-label"><span class="jm-years"></span><span class="jm-city"></span></div><div class="jm-dot"></div>',
-        iconSize: [16, 16],
-        iconAnchor: [8, 8],
-      });
-      journey.marker = L.marker([s.lat, s.lng], { icon, interactive: false, keyboard: false, zIndexOffset: 5000 }).addTo(map);
-      journey.trail = L.polyline([[s.lat, s.lng]], { color: "#f0ede8", weight: 2.5, opacity: 0.85, lineJoin: "round" }).addTo(trailLayer);
-      journeyLabel(s.years, s.city);
-    }
-    journey.playing = true;
-    journey.last = performance.now();
-    journey.raf = requestAnimationFrame(journeyFrame);
-    emitJourney();
-  }
-
-  function journeyPause() {
-    cancelAnimationFrame(journey.raf);
-    journey.raf = null;
-    if (journey.playing) { journey.playing = false; emitJourney(); }
-  }
-
-  function journeyFrame(now) {
-    if (!journey.playing) return;
-    const dt = Math.min(now - journey.last, 60);
-    journey.last = now;
-    journey.elapsed += dt;
-    const here = journey.stops[journey.idx];
-    const next = journey.stops[journey.idx + 1];
-
-    if (journey.phase === "dwell") {
-      if (journey.elapsed >= JM_DWELL_MS) {
-        if (!next) {
-          journey.playing = false;
-          journey.finished = true;
-          emitJourney();
-          return;
-        }
-        journey.phase = "travel";
-        journey.elapsed = 0;
-        const km = map.distance([here.lat, here.lng], [next.lat, next.lng]) / 1000;
-        journey.travelMs = Math.max(1000, Math.min(2800, 900 + km * 0.7));
-      }
-    } else {
-      const p = Math.min(1, journey.elapsed / journey.travelMs);
-      const e = jmEase(p);
-      const lat = here.lat + (next.lat - here.lat) * e;
-      const lng = here.lng + (next.lng - here.lng) * e;
-      journey.marker.setLatLng([lat, lng]);
-      const done = journey.stops.slice(0, journey.idx + 1).map(s => [s.lat, s.lng]);
-      journey.trail.setLatLngs([...done, [lat, lng]]);
-      // The year ticks forward from the end of the last stay to the start of the next.
-      const y0 = here.bounds.end, y1 = next.bounds.start;
-      const year = (y0 != null && y1 != null) ? Math.round(y0 + (y1 - y0) * p) : "";
-      journeyLabel(String(year), p < 0.5 ? `leaving ${here.city}` : `towards ${next.city}`);
-      if (p >= 1) {
-        journey.idx += 1;
-        journey.phase = "dwell";
-        journey.elapsed = 0;
-        journeyLabel(next.years, next.city);
-      }
-    }
-    journey.raf = requestAnimationFrame(journeyFrame);
-  }
+  const journey = jmCreatePlayer(map, trailLayer);
 
   function clear() {
-    journeyReset();
+    journey.reset();
     Object.values(layers).forEach(l => l.clearLayers());
     routeLayer.clearLayers();
   }
@@ -206,8 +249,7 @@ export function createMap(mapHostEl) {
   function showComposer(composer) {
     currentComposer = composer;
     clear();
-    journey.stops = jmBuildStops(composer);
-    emitJourney();
+    journey.setStops(jmBuildStops(composer));
     if (!composer || !composer.locations || composer.locations.length === 0) return;
 
     const points = [];
@@ -261,10 +303,10 @@ export function createMap(mapHostEl) {
 
   return {
     showComposer,
-    playJourney: journeyStart,
-    pauseJourney: journeyPause,
-    toggleJourney() { if (journey.playing) journeyPause(); else journeyStart(); },
-    onJourneyState(cb) { journey.onState = cb; emitJourney(); },
+    playJourney: journey.start,
+    pauseJourney: journey.pause,
+    toggleJourney: journey.toggle,
+    onJourneyState: journey.onState,
     setLayer,
     invalidateSize,
     isVisible: (type) => visible[type],
