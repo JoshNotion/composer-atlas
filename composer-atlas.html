@@ -2481,62 +2481,47 @@ body[data-view="home"] .legend { display: none; }
   .home-feature-art { border-left: 0; border-top: 1px solid var(--border); }
 }
 
-/* ================= Connections: hover card (docked, subtle) ================= */
+/* ================= Connections: notes on the lines, small open dot ================= */
 
 .lk-hint { max-width: 420px; }
-.lk-dock { position: sticky; bottom: 0; left: 0; width: 100%; height: 0; z-index: 25; pointer-events: none; }
-.lk-card {
-  position: absolute; right: 20px; bottom: 20px;
-  width: 330px; max-height: min(58vh, 470px);
-  display: flex; flex-direction: column;
-  background: rgba(30, 30, 30, .94);
-  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
-  border: 1px solid #3c3c3c;
-  border-top: 2px solid var(--era);
-  border-radius: 12px;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, .45);
-  opacity: 0; transform: translateY(6px);
-  transition: opacity .18s ease, transform .18s ease;
-  pointer-events: auto;
-}
-.lk-card.show { opacity: 1; transform: none; }
-.lk-card[hidden] { display: none; }
-.lk-card-head { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px 0; }
-.lk-card-title { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1 1 auto; }
-.lk-card-title strong { font-family: var(--font-serif); font-weight: 500; font-size: 16.5px; line-height: 1.2; }
-.lk-card-title span { color: var(--text-faint); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.wm-focus-hint { color: var(--text-faint); font-size: 11.5px; }
+.lk-node { outline: none; }
+.lk-pwrap { position: relative; display: block; width: 56px; height: 56px; }
 .lk-open {
-  flex: 0 0 auto;
-  display: inline-flex; align-items: center; gap: 4px;
-  font: inherit; font-size: 11.5px; color: var(--text-dim);
-  background: none; border: 1px solid var(--border); border-radius: 999px;
-  padding: 3px 10px 3px 11px; cursor: pointer;
-  transition: color .15s ease, border-color .15s ease, background .15s ease;
+  position: absolute; right: -5px; top: -5px;
+  width: 19px; height: 19px;
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0;
+  color: var(--text-dim);
+  background: rgba(30, 30, 30, .96);
+  border: 1px solid #555; border-radius: 50%;
+  cursor: pointer;
+  opacity: 0; transform: scale(.85);
+  transition: opacity .15s ease, transform .15s ease, color .15s ease, border-color .15s ease;
 }
-.lk-open:hover { color: var(--text); border-color: #666; background: var(--surface-2); }
-.lk-card-sub { padding: 6px 14px 8px; color: var(--text-faint); font-size: 11px; letter-spacing: .05em; text-transform: uppercase; border-bottom: 1px solid #333; }
-.lk-rows { overflow: auto; padding: 4px 6px 8px; scrollbar-width: thin; scrollbar-color: #444 transparent; }
-.lk-row {
-  display: flex; flex-direction: column; gap: 2px; width: 100%;
-  font: inherit; text-align: left; color: var(--text);
-  background: none; border: 0; border-radius: 8px;
-  padding: 7px 8px; cursor: pointer;
-}
-.lk-row:hover { background: rgba(255, 255, 255, .05); }
-.lk-row-head { display: flex; align-items: center; gap: 8px; }
-.lk-row-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--era); flex: 0 0 auto; }
-.lk-row-name { font-size: 12.5px; font-weight: 500; }
-.lk-row-years { margin-left: auto; color: var(--text-faint); font-size: 11px; font-variant-numeric: tabular-nums; }
-.lk-row-note { color: var(--text-dim); font-size: 11.5px; line-height: 1.42; padding-left: 15px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.lk-peek .lk-portrait { border-color: var(--text); box-shadow: 0 0 0 4px rgba(26, 26, 26, .92), 0 0 0 6px color-mix(in srgb, var(--era) 70%, transparent); }
-.lk-peek { opacity: 1 !important; }
-@media (max-width: 760px) { .lk-card { right: 10px; left: 10px; width: auto; } }
+.lk-node:hover .lk-open, .lk-node:focus-within .lk-open, .lk-focus .lk-open { opacity: 1; transform: none; }
+.lk-open:hover { color: var(--text); border-color: var(--era); }
+.lk-open:focus-visible { outline: 2px solid var(--text-dim); outline-offset: 1px; }
 
-.home-features { display: flex; flex-direction: column; gap: 16px; margin-bottom: 52px; }
-.home-how { list-style: none; margin: 2px 0 2px; padding: 0; display: flex; flex-direction: column; gap: 6px; max-width: 480px; }
-.home-how li { position: relative; padding-left: 16px; color: var(--text-dim); font-size: 13px; line-height: 1.45; }
-.home-how li::before { content: ""; position: absolute; left: 1px; top: .62em; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); opacity: .85; }
-.home-feature-go { align-self: flex-start; }
+.lk-labels { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+.lk-label {
+  position: absolute;
+  padding: 7px 10px 8px;
+  background: rgba(30, 30, 30, .96);
+  border: 1px solid #3c3c3c;
+  border-left: 2px solid var(--era);
+  border-radius: 8px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .42);
+  font-size: 11px; line-height: 1.4; color: var(--text-dim);
+  animation: lk-label-in .16s ease both;
+}
+.lk-label strong { display: block; color: var(--text); font-size: 11.5px; font-weight: 600; margin-bottom: 1px; }
+.lk-label span { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.lk-labels-many .lk-label { display: none; }
+.lk-labels-many .lk-label-peek { display: block; z-index: 2; }
+.lk-label-peek { z-index: 2; border-color: #666; }
+.lk-label-peek span { -webkit-line-clamp: unset; }
+@keyframes lk-label-in { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
 
 </style>
 </head>
@@ -4188,11 +4173,10 @@ function createLinks(hostEl, composers, opts = {}) {
         </label>
         <button class="wm-focus-chip" id="lk-focus" type="button" hidden></button>
         <span class="lk-count" id="lk-count"></span>
-        <span class="lk-hint" id="lk-hint">Hover a composer to see their connections · click to hold</span>
+        <span class="lk-hint" id="lk-hint">Hover a composer to see how they connect · click to hold</span>
       </div>
     </div>
     <div class="lk-inner" id="lk-inner"></div>
-    <div class="lk-dock"><aside class="lk-card" id="lk-card" aria-live="polite" hidden></aside></div>
   `;
   const innerEl = hostEl.querySelector("#lk-inner");
   const searchEl = hostEl.querySelector("#lk-search");
@@ -4200,7 +4184,6 @@ function createLinks(hostEl, composers, opts = {}) {
   const focusEl = hostEl.querySelector("#lk-focus");
   const countEl = hostEl.querySelector("#lk-count");
   const hintEl = hostEl.querySelector("#lk-hint");
-  const cardEl = hostEl.querySelector("#lk-card");
 
   const observer = typeof IntersectionObserver !== "undefined"
     ? new IntersectionObserver((entries) => {
@@ -4254,6 +4237,7 @@ function createLinks(hostEl, composers, opts = {}) {
   let layoutW = 0;
   let nodeEls = new Map();
   let edgeEls = [];
+  let labelsEl = null;
 
   // ---- Layout: y follows birth year (compressed where it's sparse), x is chosen lane by lane
   //      so a composer lands near the people they're connected to, with a gentle west-to-east
@@ -4400,9 +4384,11 @@ function createLinks(hostEl, composers, opts = {}) {
       </div>
       <svg class="lk-edges" width="${W}" height="${height}" viewBox="0 0 ${W} ${height}" aria-hidden="true"></svg>
       <div class="lk-nodes"></div>
+      <div class="lk-labels"></div>
     `;
     const svg = innerEl.querySelector(".lk-edges");
     const nodesEl = innerEl.querySelector(".lk-nodes");
+    labelsEl = innerEl.querySelector(".lk-labels");
     const NS = "http://www.w3.org/2000/svg";
     const cy = LK_PORTRAIT / 2;
 
@@ -4413,42 +4399,53 @@ function createLinks(hostEl, composers, opts = {}) {
       const ya = pa.y + cy;
       const yb = pb.y + cy;
       let d;
+      let mid;
       if (yb - ya < 36) {
         const mx = (pa.x + pb.x) / 2;
         d = `M${pa.x},${ya} Q${mx},${Math.min(ya, yb) - 46} ${pb.x},${yb}`;
+        mid = { x: mx, y: (ya + 2 * (Math.min(ya, yb) - 46) + yb) / 4 };
       } else {
         const ym = ya + (yb - ya) * 0.55;
         d = `M${pa.x},${ya} C${pa.x},${ym} ${pb.x},${ym} ${pb.x},${yb}`;
+        mid = { x: (pa.x + pb.x) / 2, y: (ya + yb + 6 * ym) / 8 };
       }
       const path = document.createElementNS(NS, "path");
       path.setAttribute("d", d);
       path.setAttribute("class", "lk-edge");
       path.setAttribute("stroke", eraColor(byId.get(e.a).era));
       svg.appendChild(path);
-      edgeEls.push({ el: path, e });
+      edgeEls.push({ el: path, e, mid });
     });
 
     linked.forEach(c => {
       const p = pos.get(c.id);
       if (!p) return;
-      const btn = document.createElement("button");
-      btn.type = "button";
+      const btn = document.createElement("div");
+      btn.setAttribute("role", "button");
+      btn.tabIndex = 0;
       btn.className = "lk-node";
       btn.dataset.id = c.id;
       btn.style.left = (p.x - LK_NODE_W / 2) + "px";
       btn.style.top = p.y + "px";
       btn.style.setProperty("--era", eraColor(c.era));
       btn.innerHTML = `
-        <span class="lk-portrait" data-composer-id="${lkEsc(c.id)}"><span class="initials">${lkEsc(initialsFor(c.name))}</span></span>
+        <span class="lk-pwrap">
+          <span class="lk-portrait" data-composer-id="${lkEsc(c.id)}"><span class="initials">${lkEsc(initialsFor(c.name))}</span></span>
+          <button type="button" class="lk-open" title="Open ${lkEsc(c.name)} in full" aria-label="Open ${lkEsc(c.name)} in full"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"></path></svg></button>
+        </span>
         <span class="lk-name">${lkEsc(c.name)}</span>
         <span class="lk-years">${c.born}–${c.died ?? ""}</span>`;
       btn.addEventListener("click", (ev) => {
         ev.stopPropagation();
+        if (ev.target.closest(".lk-open")) { if (opts.onSelect) opts.onSelect(c.id); return; }
         pin(c.id);
       });
-      btn.addEventListener("mouseenter", () => hoverIn(c.id));
-      btn.addEventListener("mouseleave", hoverOut);
-      btn.addEventListener("focus", () => hoverIn(c.id, true));
+      btn.addEventListener("keydown", (ev) => {
+        if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); pin(c.id); }
+      });
+      btn.addEventListener("mouseenter", () => { hoverIn(c.id); peekLabel(c.id); });
+      btn.addEventListener("mouseleave", () => { hoverOut(); peekLabel(null); });
+      btn.addEventListener("focus", () => hoverIn(c.id));
       btn.addEventListener("blur", hoverOut);
       nodesEl.appendChild(btn);
       nodeEls.set(c.id, btn);
@@ -4471,7 +4468,6 @@ function createLinks(hostEl, composers, opts = {}) {
       el.classList.toggle("lk-dim", f ? !related : !inEra);
       el.classList.toggle("lk-focus", id === f);
       el.classList.toggle("lk-nb", !!(f && nb.has(id)));
-      el.classList.remove("lk-peek");
     });
     edgeEls.forEach(({ el, e }) => {
       const on = !!(f && (e.a === f || e.b === f));
@@ -4486,7 +4482,7 @@ function createLinks(hostEl, composers, opts = {}) {
     if (state.pin) {
       const c = byId.get(state.pin);
       focusEl.hidden = false;
-      focusEl.innerHTML = `<span class="wm-focus-dot" style="background:${eraColor(c.era)}"></span><span>Holding <strong>${lkEsc(c.name)}</strong></span><span class="wm-focus-x">Show everyone &times;</span>`;
+      focusEl.innerHTML = `<span class="wm-focus-dot" style="background:${eraColor(c.era)}"></span><span>Holding <strong>${lkEsc(c.name)}</strong></span><span class="wm-focus-hint">click empty space to release</span><span class="wm-focus-x">&times;</span>`;
     } else {
       focusEl.hidden = true;
     }
@@ -4497,7 +4493,7 @@ function createLinks(hostEl, composers, opts = {}) {
       countEl.textContent = `${linked.length} composers · ${edges.length} connections`;
       hintEl.hidden = false;
     }
-    renderCard(f);
+    renderLabels(f);
   }
 
   function relationText(from, to) {
@@ -4510,54 +4506,54 @@ function createLinks(hostEl, composers, opts = {}) {
     return e.by[from] || e.by[to] || e.notes[0] || "";
   }
 
-  // The docked card lists who the composer is connected to and how, without covering the web.
-  let cardId = null;
-  function renderCard(id) {
-    if (!id) {
-      cardId = null;
-      cardEl.classList.remove("show");
-      setTimeout(() => { if (!cardId) cardEl.hidden = true; }, 180);
-      return;
-    }
-    if (cardId === id && !cardEl.hidden) return;
-    cardId = id;
-    const c = byId.get(id);
-    const rows = [...adj.get(id)].map(n => byId.get(n)).sort((a, b) => a.born - b.born).map(n => {
-      const note = relationText(id, n.id);
-      return `
-        <button type="button" class="lk-row" data-id="${lkEsc(n.id)}" style="--era:${eraColor(n.era)}">
-          <span class="lk-row-head"><span class="lk-row-dot"></span><span class="lk-row-name">${lkEsc(n.name)}</span><span class="lk-row-years">${n.born}–${n.died ?? ""}</span></span>
-          ${note ? `<span class="lk-row-note">${lkEsc(note)}</span>` : ""}
-        </button>`;
-    }).join("");
-    cardEl.hidden = false;
-    cardEl.style.setProperty("--era", eraColor(c.era));
-    cardEl.innerHTML = `
-      <header class="lk-card-head">
-        <span class="lk-card-title"><strong>${lkEsc(c.name)}</strong><span>${c.born}–${c.died ?? ""} · ${lkEsc(c.era)}</span></span>
-        <button type="button" class="lk-open" data-id="${lkEsc(id)}" title="Open ${lkEsc(c.name)} in full">Open <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"></path></svg></button>
-      </header>
-      <div class="lk-card-sub">${adj.get(id).size} connection${adj.get(id).size === 1 ? "" : "s"}</div>
-      <div class="lk-rows">${rows}</div>`;
-    requestAnimationFrame(() => cardEl.classList.add("show"));
+  // Each connection of the active composer gets a small note sitting on its line.
+  // A hub with many connections shows its notes one at a time, as you point at each person.
+  const LK_LABEL_W = 208;
+  const LK_MANY = 6;
+  let labelRects = new Map();
+
+  function renderLabels(f) {
+    labelsEl.innerHTML = "";
+    labelRects = new Map();
+    labelsEl.classList.remove("lk-labels-many");
+    if (!f) return;
+    const items = [];
+    edgeEls.forEach(({ e, mid }) => {
+      if (e.a !== f && e.b !== f) return;
+      const other = byId.get(e.a === f ? e.b : e.a);
+      const note = relationText(f, other.id);
+      if (!note) return;
+      const lines = Math.min(3, Math.ceil(note.length / 36));
+      items.push({ other, note, mid, h: 34 + lines * 14 });
+    });
+    items.sort((a, b) => a.mid.y - b.mid.y);
+    const placed = [];
+    const maxX = layoutW - LK_LABEL_W - 12;
+    items.forEach(it => {
+      let x = Math.max(LK_RIBBON_W + 12, Math.min(maxX, it.mid.x - LK_LABEL_W / 2));
+      let y = it.mid.y - it.h / 2;
+      for (let guard = 0; guard < 40; guard++) {
+        const hit = placed.find(r => x < r.x + LK_LABEL_W + 6 && x + LK_LABEL_W + 6 > r.x && y < r.y + r.h + 6 && y + it.h + 6 > r.y);
+        if (!hit) break;
+        y = hit.y + hit.h + 6;
+      }
+      placed.push({ x, y, h: it.h });
+      const el = document.createElement("div");
+      el.className = "lk-label";
+      el.style.left = x + "px";
+      el.style.top = y + "px";
+      el.style.width = LK_LABEL_W + "px";
+      el.style.setProperty("--era", eraColor(it.other.era));
+      el.innerHTML = `<strong>${lkEsc(it.other.name)}</strong><span>${lkEsc(it.note)}</span>`;
+      labelsEl.appendChild(el);
+      labelRects.set(it.other.id, el);
+    });
+    if (items.length > LK_MANY) labelsEl.classList.add("lk-labels-many");
   }
 
-  cardEl.addEventListener("mouseenter", () => { clearTimeout(hoverTimer); });
-  cardEl.addEventListener("mouseleave", () => hoverOut());
-  cardEl.addEventListener("click", (e) => {
-    e.stopPropagation();
-    const open = e.target.closest(".lk-open");
-    if (open) { if (opts.onSelect) opts.onSelect(open.dataset.id); return; }
-    const row = e.target.closest(".lk-row");
-    if (row) pin(row.dataset.id, true);
-  });
-  // Hovering a row marks that composer in the web so it's easy to spot.
-  cardEl.addEventListener("mouseover", (e) => {
-    const row = e.target.closest(".lk-row");
-    nodeEls.forEach(el => el.classList.remove("lk-peek"));
-    if (row && nodeEls.get(row.dataset.id)) nodeEls.get(row.dataset.id).classList.add("lk-peek");
-  });
-  cardEl.addEventListener("mouseleave", () => nodeEls.forEach(el => el.classList.remove("lk-peek")));
+  function peekLabel(id) {
+    labelRects.forEach((el, nid) => el.classList.toggle("lk-label-peek", nid === id));
+  }
 
   // Hover intent: a short dwell before the web reacts, and a grace period before it lets go,
   // so crossing other composers on the way to the card doesn't flicker the view.

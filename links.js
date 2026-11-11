@@ -70,11 +70,10 @@ export function createLinks(hostEl, composers, opts = {}) {
         </label>
         <button class="wm-focus-chip" id="lk-focus" type="button" hidden></button>
         <span class="lk-count" id="lk-count"></span>
-        <span class="lk-hint" id="lk-hint">Hover a composer to see their connections · click to hold</span>
+        <span class="lk-hint" id="lk-hint">Hover a composer to see how they connect · click to hold</span>
       </div>
     </div>
     <div class="lk-inner" id="lk-inner"></div>
-    <div class="lk-dock"><aside class="lk-card" id="lk-card" aria-live="polite" hidden></aside></div>
   `;
   const innerEl = hostEl.querySelector("#lk-inner");
   const searchEl = hostEl.querySelector("#lk-search");
@@ -82,7 +81,6 @@ export function createLinks(hostEl, composers, opts = {}) {
   const focusEl = hostEl.querySelector("#lk-focus");
   const countEl = hostEl.querySelector("#lk-count");
   const hintEl = hostEl.querySelector("#lk-hint");
-  const cardEl = hostEl.querySelector("#lk-card");
 
   const observer = typeof IntersectionObserver !== "undefined"
     ? new IntersectionObserver((entries) => {
@@ -136,6 +134,7 @@ export function createLinks(hostEl, composers, opts = {}) {
   let layoutW = 0;
   let nodeEls = new Map();
   let edgeEls = [];
+  let labelsEl = null;
 
   // ---- Layout: y follows birth year (compressed where it's sparse), x is chosen lane by lane
   //      so a composer lands near the people they're connected to, with a gentle west-to-east
@@ -282,9 +281,11 @@ export function createLinks(hostEl, composers, opts = {}) {
       </div>
       <svg class="lk-edges" width="${W}" height="${height}" viewBox="0 0 ${W} ${height}" aria-hidden="true"></svg>
       <div class="lk-nodes"></div>
+      <div class="lk-labels"></div>
     `;
     const svg = innerEl.querySelector(".lk-edges");
     const nodesEl = innerEl.querySelector(".lk-nodes");
+    labelsEl = innerEl.querySelector(".lk-labels");
     const NS = "http://www.w3.org/2000/svg";
     const cy = LK_PORTRAIT / 2;
 
@@ -295,42 +296,53 @@ export function createLinks(hostEl, composers, opts = {}) {
       const ya = pa.y + cy;
       const yb = pb.y + cy;
       let d;
+      let mid;
       if (yb - ya < 36) {
         const mx = (pa.x + pb.x) / 2;
         d = `M${pa.x},${ya} Q${mx},${Math.min(ya, yb) - 46} ${pb.x},${yb}`;
+        mid = { x: mx, y: (ya + 2 * (Math.min(ya, yb) - 46) + yb) / 4 };
       } else {
         const ym = ya + (yb - ya) * 0.55;
         d = `M${pa.x},${ya} C${pa.x},${ym} ${pb.x},${ym} ${pb.x},${yb}`;
+        mid = { x: (pa.x + pb.x) / 2, y: (ya + yb + 6 * ym) / 8 };
       }
       const path = document.createElementNS(NS, "path");
       path.setAttribute("d", d);
       path.setAttribute("class", "lk-edge");
       path.setAttribute("stroke", eraColor(byId.get(e.a).era));
       svg.appendChild(path);
-      edgeEls.push({ el: path, e });
+      edgeEls.push({ el: path, e, mid });
     });
 
     linked.forEach(c => {
       const p = pos.get(c.id);
       if (!p) return;
-      const btn = document.createElement("button");
-      btn.type = "button";
+      const btn = document.createElement("div");
+      btn.setAttribute("role", "button");
+      btn.tabIndex = 0;
       btn.className = "lk-node";
       btn.dataset.id = c.id;
       btn.style.left = (p.x - LK_NODE_W / 2) + "px";
       btn.style.top = p.y + "px";
       btn.style.setProperty("--era", eraColor(c.era));
       btn.innerHTML = `
-        <span class="lk-portrait" data-composer-id="${lkEsc(c.id)}"><span class="initials">${lkEsc(initialsFor(c.name))}</span></span>
+        <span class="lk-pwrap">
+          <span class="lk-portrait" data-composer-id="${lkEsc(c.id)}"><span class="initials">${lkEsc(initialsFor(c.name))}</span></span>
+          <button type="button" class="lk-open" title="Open ${lkEsc(c.name)} in full" aria-label="Open ${lkEsc(c.name)} in full"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"></path></svg></button>
+        </span>
         <span class="lk-name">${lkEsc(c.name)}</span>
         <span class="lk-years">${c.born}–${c.died ?? ""}</span>`;
       btn.addEventListener("click", (ev) => {
         ev.stopPropagation();
+        if (ev.target.closest(".lk-open")) { if (opts.onSelect) opts.onSelect(c.id); return; }
         pin(c.id);
       });
-      btn.addEventListener("mouseenter", () => hoverIn(c.id));
-      btn.addEventListener("mouseleave", hoverOut);
-      btn.addEventListener("focus", () => hoverIn(c.id, true));
+      btn.addEventListener("keydown", (ev) => {
+        if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); pin(c.id); }
+      });
+      btn.addEventListener("mouseenter", () => { hoverIn(c.id); peekLabel(c.id); });
+      btn.addEventListener("mouseleave", () => { hoverOut(); peekLabel(null); });
+      btn.addEventListener("focus", () => hoverIn(c.id));
       btn.addEventListener("blur", hoverOut);
       nodesEl.appendChild(btn);
       nodeEls.set(c.id, btn);
@@ -353,7 +365,6 @@ export function createLinks(hostEl, composers, opts = {}) {
       el.classList.toggle("lk-dim", f ? !related : !inEra);
       el.classList.toggle("lk-focus", id === f);
       el.classList.toggle("lk-nb", !!(f && nb.has(id)));
-      el.classList.remove("lk-peek");
     });
     edgeEls.forEach(({ el, e }) => {
       const on = !!(f && (e.a === f || e.b === f));
@@ -368,7 +379,7 @@ export function createLinks(hostEl, composers, opts = {}) {
     if (state.pin) {
       const c = byId.get(state.pin);
       focusEl.hidden = false;
-      focusEl.innerHTML = `<span class="wm-focus-dot" style="background:${eraColor(c.era)}"></span><span>Holding <strong>${lkEsc(c.name)}</strong></span><span class="wm-focus-x">Show everyone &times;</span>`;
+      focusEl.innerHTML = `<span class="wm-focus-dot" style="background:${eraColor(c.era)}"></span><span>Holding <strong>${lkEsc(c.name)}</strong></span><span class="wm-focus-hint">click empty space to release</span><span class="wm-focus-x">&times;</span>`;
     } else {
       focusEl.hidden = true;
     }
@@ -379,7 +390,7 @@ export function createLinks(hostEl, composers, opts = {}) {
       countEl.textContent = `${linked.length} composers · ${edges.length} connections`;
       hintEl.hidden = false;
     }
-    renderCard(f);
+    renderLabels(f);
   }
 
   function relationText(from, to) {
@@ -392,54 +403,54 @@ export function createLinks(hostEl, composers, opts = {}) {
     return e.by[from] || e.by[to] || e.notes[0] || "";
   }
 
-  // The docked card lists who the composer is connected to and how, without covering the web.
-  let cardId = null;
-  function renderCard(id) {
-    if (!id) {
-      cardId = null;
-      cardEl.classList.remove("show");
-      setTimeout(() => { if (!cardId) cardEl.hidden = true; }, 180);
-      return;
-    }
-    if (cardId === id && !cardEl.hidden) return;
-    cardId = id;
-    const c = byId.get(id);
-    const rows = [...adj.get(id)].map(n => byId.get(n)).sort((a, b) => a.born - b.born).map(n => {
-      const note = relationText(id, n.id);
-      return `
-        <button type="button" class="lk-row" data-id="${lkEsc(n.id)}" style="--era:${eraColor(n.era)}">
-          <span class="lk-row-head"><span class="lk-row-dot"></span><span class="lk-row-name">${lkEsc(n.name)}</span><span class="lk-row-years">${n.born}–${n.died ?? ""}</span></span>
-          ${note ? `<span class="lk-row-note">${lkEsc(note)}</span>` : ""}
-        </button>`;
-    }).join("");
-    cardEl.hidden = false;
-    cardEl.style.setProperty("--era", eraColor(c.era));
-    cardEl.innerHTML = `
-      <header class="lk-card-head">
-        <span class="lk-card-title"><strong>${lkEsc(c.name)}</strong><span>${c.born}–${c.died ?? ""} · ${lkEsc(c.era)}</span></span>
-        <button type="button" class="lk-open" data-id="${lkEsc(id)}" title="Open ${lkEsc(c.name)} in full">Open <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"></path></svg></button>
-      </header>
-      <div class="lk-card-sub">${adj.get(id).size} connection${adj.get(id).size === 1 ? "" : "s"}</div>
-      <div class="lk-rows">${rows}</div>`;
-    requestAnimationFrame(() => cardEl.classList.add("show"));
+  // Each connection of the active composer gets a small note sitting on its line.
+  // A hub with many connections shows its notes one at a time, as you point at each person.
+  const LK_LABEL_W = 208;
+  const LK_MANY = 6;
+  let labelRects = new Map();
+
+  function renderLabels(f) {
+    labelsEl.innerHTML = "";
+    labelRects = new Map();
+    labelsEl.classList.remove("lk-labels-many");
+    if (!f) return;
+    const items = [];
+    edgeEls.forEach(({ e, mid }) => {
+      if (e.a !== f && e.b !== f) return;
+      const other = byId.get(e.a === f ? e.b : e.a);
+      const note = relationText(f, other.id);
+      if (!note) return;
+      const lines = Math.min(3, Math.ceil(note.length / 36));
+      items.push({ other, note, mid, h: 34 + lines * 14 });
+    });
+    items.sort((a, b) => a.mid.y - b.mid.y);
+    const placed = [];
+    const maxX = layoutW - LK_LABEL_W - 12;
+    items.forEach(it => {
+      let x = Math.max(LK_RIBBON_W + 12, Math.min(maxX, it.mid.x - LK_LABEL_W / 2));
+      let y = it.mid.y - it.h / 2;
+      for (let guard = 0; guard < 40; guard++) {
+        const hit = placed.find(r => x < r.x + LK_LABEL_W + 6 && x + LK_LABEL_W + 6 > r.x && y < r.y + r.h + 6 && y + it.h + 6 > r.y);
+        if (!hit) break;
+        y = hit.y + hit.h + 6;
+      }
+      placed.push({ x, y, h: it.h });
+      const el = document.createElement("div");
+      el.className = "lk-label";
+      el.style.left = x + "px";
+      el.style.top = y + "px";
+      el.style.width = LK_LABEL_W + "px";
+      el.style.setProperty("--era", eraColor(it.other.era));
+      el.innerHTML = `<strong>${lkEsc(it.other.name)}</strong><span>${lkEsc(it.note)}</span>`;
+      labelsEl.appendChild(el);
+      labelRects.set(it.other.id, el);
+    });
+    if (items.length > LK_MANY) labelsEl.classList.add("lk-labels-many");
   }
 
-  cardEl.addEventListener("mouseenter", () => { clearTimeout(hoverTimer); });
-  cardEl.addEventListener("mouseleave", () => hoverOut());
-  cardEl.addEventListener("click", (e) => {
-    e.stopPropagation();
-    const open = e.target.closest(".lk-open");
-    if (open) { if (opts.onSelect) opts.onSelect(open.dataset.id); return; }
-    const row = e.target.closest(".lk-row");
-    if (row) pin(row.dataset.id, true);
-  });
-  // Hovering a row marks that composer in the web so it's easy to spot.
-  cardEl.addEventListener("mouseover", (e) => {
-    const row = e.target.closest(".lk-row");
-    nodeEls.forEach(el => el.classList.remove("lk-peek"));
-    if (row && nodeEls.get(row.dataset.id)) nodeEls.get(row.dataset.id).classList.add("lk-peek");
-  });
-  cardEl.addEventListener("mouseleave", () => nodeEls.forEach(el => el.classList.remove("lk-peek")));
+  function peekLabel(id) {
+    labelRects.forEach((el, nid) => el.classList.toggle("lk-label-peek", nid === id));
+  }
 
   // Hover intent: a short dwell before the web reacts, and a grace period before it lets go,
   // so crossing other composers on the way to the card doesn't flicker the view.
