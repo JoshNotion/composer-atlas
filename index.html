@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Composer Atlas</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=20261111c" />
+  <link rel="stylesheet" href="styles.css?v=20261111e" />
 </head>
 <body>
   <header class="topbar">
@@ -19,6 +19,7 @@
       <a href="#/timeline" data-view="timeline">Timeline</a>
       <a href="#/map" data-view="map">World map</a>
       <a href="#/composers" data-view="composers">Composers</a>
+      <a href="#/links" data-view="links">Connections</a>
     </nav>
     <div class="legend" id="legend"></div>
   </header>
@@ -29,6 +30,8 @@
     <section class="view view-map" id="view-map" hidden></section>
 
     <section class="view view-composers" id="view-composers" hidden></section>
+
+    <section class="view view-links" id="view-links" hidden></section>
 
     <section class="view timeline-wrap" id="timeline-wrap" hidden>
       <div class="timeline-controls">
@@ -74,6 +77,6 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
-  <script type="module" src="app.js?v=20261111c"></script>
+  <script type="module" src="app.js?v=20261111e"></script>
 </body>
 </html>

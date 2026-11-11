@@ -6,6 +6,7 @@ import { createMap } from "./map.js";
 import { createWorldMap } from "./worldmap.js";
 import { createHome } from "./home.js";
 import { createBrowse } from "./browse.js";
+import { createLinks } from "./links.js";
 import { renderDetail, renderEmpty } from "./panel.js";
 import { initialsFor, mountPortrait, resolvePortraitUrl } from "./portraits.js";
 
@@ -73,14 +74,16 @@ async function main() {
     timeline: document.getElementById("timeline-wrap"),
     map: document.getElementById("view-map"),
     composers: document.getElementById("view-composers"),
+    links: document.getElementById("view-links"),
   };
-  const VIEW_TITLES = { home: "Composer Atlas", timeline: "Timeline", map: "World map", composers: "Composers" };
+  const VIEW_TITLES = { home: "Composer Atlas", timeline: "Timeline", map: "World map", composers: "Composers", links: "Connections" };
 
   let currentView = null;
   let currentEra = null;
   let timeline = null;
   let worldMap = null;
   let browse = null;
+  let linksView = null;
   let homeBuilt = false;
 
   const zoomReadout = document.getElementById("zoom-readout");
@@ -126,6 +129,15 @@ async function main() {
     browse.setEra(currentEra);
   }
 
+  function ensureLinks() {
+    if (!linksView) {
+      linksView = createLinks(views.links, composers, { onSelect: (id) => selectComposer(id) });
+      linksView.setEra(currentEra);
+    } else {
+      linksView.refresh();
+    }
+  }
+
   function ensureHome() {
     if (homeBuilt) return;
     homeBuilt = true;
@@ -160,6 +172,7 @@ async function main() {
     if (timeline) timeline.setFilter(normalized);
     if (worldMap) worldMap.setEra(normalized);
     if (browse) browse.setEra(normalized);
+    if (linksView) linksView.setEra(normalized);
     highlightLegend(document.getElementById("legend"), normalized);
     updateBrandSub(normalized ? composers.filter(c => c.era === normalized) : composers, normalized);
     if (!opts.skipHash) writeHash();
@@ -213,6 +226,7 @@ async function main() {
     if (name === "timeline") ensureTimeline();
     if (name === "map") ensureWorldMap(route ? route.bracket : undefined);
     if (name === "composers") ensureBrowse();
+    if (name === "links") ensureLinks();
     if (name === "map" && worldMap) requestAnimationFrame(() => worldMap.invalidateSize());
   }
 
@@ -360,6 +374,7 @@ async function main() {
     panelEl.setAttribute("aria-hidden", "true");
     mapApi.pauseJourney();
     if (worldMap) worldMap.clearFocus();
+    if (linksView) linksView.clearFocus();
     clearTimeout(collapseTimer);
     collapseTimer = setTimeout(() => {
       if (panelMode === "closed") panelEl.classList.remove("expanded");
@@ -377,6 +392,7 @@ async function main() {
     const c = byId.get(id);
     if (!c) return;
     if (timeline) timeline.select(id);
+    if (linksView && currentView === "links" && linksView.getFocus() !== id) linksView.focus(id);
     renderDetail(detailTarget, c, byId, {
       onConnectionClick: (nextId) => selectComposer(nextId),
       onPortraitClick: (comp) => openLightbox(comp),
