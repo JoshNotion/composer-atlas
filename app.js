@@ -215,6 +215,13 @@ async function main() {
     }
     currentView = name;
     Object.entries(views).forEach(([key, el]) => { el.hidden = key !== name; });
+    if (changed) {
+      // Fade the incoming view in (re-trigger the CSS animation each time).
+      const incoming = views[name];
+      incoming.classList.remove("view-enter");
+      void incoming.offsetWidth;
+      incoming.classList.add("view-enter");
+    }
     document.body.dataset.view = name;
     document.title = name === "home" ? "Composer Atlas" : `${VIEW_TITLES[name]} · Composer Atlas`;
     document.querySelectorAll("#nav a").forEach(a => {
