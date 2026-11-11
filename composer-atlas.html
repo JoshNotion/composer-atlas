@@ -2748,6 +2748,9 @@ const TILE_OPTIONS = {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
   subdomains: "abcd",
   maxZoom: 19,
+  // Always request the @2x tiles: CARTO's 1x tile 4/7/5 is rendered with a grey sea (a visible
+  // rectangle over the Atlantic/Europe at zoom 4); the @2x version is correct and sharper.
+  r: "@2x",
 };
 
 const JM_CURRENT_YEAR = new Date().getFullYear();
