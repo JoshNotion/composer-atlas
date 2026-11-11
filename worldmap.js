@@ -272,7 +272,7 @@ export function createWorldMap(hostEl, composers, opts = {}) {
     let recs = activeRecords(state.bracket);
     if (state.focus) {
       const mine = focusRecords();
-      if (mine.length) { renderFocus(mine); return; }
+      if (mine.length) { renderFocus(mine); applyLife(); return; }
       state.focus = null; // nothing left to show for them with the current filters
     }
     focusEl.hidden = true;
@@ -317,6 +317,7 @@ export function createWorldMap(hostEl, composers, opts = {}) {
     const composerCount = new Set(recs.map(r => r.composer.id)).size;
     const label = state.bracket == null ? "All time" : `${state.bracket}–${state.bracket + WM_STEP}`;
     summaryEl.textContent = `${label} · ${composerCount} composer${composerCount === 1 ? "" : "s"} · ${places.length} place${places.length === 1 ? "" : "s"}`;
+    applyLife();
   }
 
   // Hard-stop gradient showing which periods a 50-year bracket covers.
@@ -360,6 +361,42 @@ export function createWorldMap(hostEl, composers, opts = {}) {
           <span class="wm-period-line" style="background:${periodGradient(b)}"></span>
         </button>`).join("");
     renderRibbon();
+  }
+
+  // When a composer is focused, light up only the periods their life spans in the bar above
+  // (the 50-year buttons, the period ribbon, and an exact born-to-died line); dim the rest.
+  function applyLife() {
+    const timelineEl = hostEl.querySelector(".wm-timeline");
+    ribbonEl.querySelectorAll(".wm-life-bar").forEach(n => n.remove());
+    const c = state.focus ? composers.find(x => x.id === state.focus) : null;
+    timelineEl.classList.toggle("has-life", !!c);
+    if (!c || !Number.isFinite(c.born)) {
+      timelineEl.classList.remove("has-life");
+      bracketsEl.querySelectorAll(".in-life").forEach(n => n.classList.remove("in-life"));
+      ribbonEl.querySelectorAll(".in-life").forEach(n => n.classList.remove("in-life"));
+      return;
+    }
+    const from = c.born, to = c.died ?? currentYear;
+    timelineEl.style.setProperty("--life", eraColor(c.era));
+    bracketsEl.querySelectorAll(".wm-bracket[data-b]").forEach(btn => {
+      const v = btn.getAttribute("data-b");
+      const b = v === "" ? null : parseInt(v, 10);
+      btn.classList.toggle("in-life", b != null && b <= to && b + WM_STEP - 1 >= from);
+    });
+    ribbonEl.querySelectorAll(".wm-period").forEach(seg => {
+      const p = WM_PERIODS.find(x => x.from === parseInt(seg.getAttribute("data-from"), 10));
+      seg.classList.toggle("in-life", !!p && p.from <= to && p.to > from);
+    });
+    const span = WM_LAST_BRACKET + WM_STEP - WM_FIRST_BRACKET;
+    const lo = Math.max(from, WM_FIRST_BRACKET), hi = Math.min(to, WM_LAST_BRACKET + WM_STEP);
+    if (hi > lo) {
+      const bar = document.createElement("div");
+      bar.className = "wm-life-bar";
+      bar.style.left = `${((lo - WM_FIRST_BRACKET) / span) * 100}%`;
+      bar.style.width = `${((hi - lo) / span) * 100}%`;
+      bar.title = `${c.name} · ${from}–${c.died ?? "present"}`;
+      ribbonEl.appendChild(bar);
+    }
   }
 
   function refresh() {

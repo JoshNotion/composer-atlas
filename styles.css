@@ -1841,3 +1841,20 @@ body[data-view="home"] .legend { display: none; }
 
 body[data-view="map"] .panel .map-section { display: none; }
 .wm-journey-btn { left: 14px; bottom: 30px; }
+
+/* World map: highlight a focused composer's years in the period bar above */
+.wm-ribbon .wm-life-bar {
+  position: absolute; bottom: -3px; height: 3px; z-index: 2;
+  background: var(--life, var(--text)); border-radius: 2px; pointer-events: none;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--life, #fff) 60%, transparent);
+}
+.wm-timeline.has-life .wm-bracket,
+.wm-timeline.has-life .wm-period { opacity: .28; transition: opacity .3s var(--ease), background .15s var(--ease), border-color .15s var(--ease); }
+.wm-timeline.has-life .wm-bracket.in-life,
+.wm-timeline.has-life .wm-period.in-life { opacity: 1; }
+.wm-timeline.has-life .wm-bracket.in-life {
+  border-color: var(--life);
+  background: color-mix(in srgb, var(--life) 16%, var(--surface));
+  color: var(--text);
+}
+.wm-timeline.has-life .wm-bracket.in-life .wm-bar { background: color-mix(in srgb, var(--life) 38%, transparent); }
