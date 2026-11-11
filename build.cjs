@@ -40,7 +40,7 @@ function safeJson(obj) {
   });
 
   // --- 2. Concatenate our JS modules, stripping import/export
-  const modules = ['portraits.js', 'timeline.js', 'map.js', 'worldmap.js', 'home.js', 'browse.js', 'links.js', 'openopus.js', 'panel.js', 'app.js'];
+  const modules = ['portraits.js', 'timeline.js', 'map.js', 'worldmap.js', 'periodbar.js', 'home.js', 'browse.js', 'links.js', 'openopus.js', 'panel.js', 'app.js'];
   let scripts = modules.map(f => {
     let code = read(f);
     code = code.replace(/^\s*import\s[^;]*;?\s*$/gm, '');

@@ -1858,3 +1858,10 @@ body[data-view="map"] .panel .map-section { display: none; }
   color: var(--text);
 }
 .wm-timeline.has-life .wm-bracket.in-life .wm-bar { background: color-mix(in srgb, var(--life) 38%, transparent); }
+
+/* ================= Timeline tab: period strip on top (same as the world map) ================= */
+
+.tl-periodbar { flex: 0 0 auto; }
+.timeline-wrap .timeline-controls { top: calc(var(--tl-bar-h, 0px) + 10px); }
+.wm-timeline.has-life .wm-bracket.in-life.in-view { box-shadow: 0 0 0 1px var(--life); }
+.tl-periodbar .wm-bracket.in-view:not(.active) { border-color: #6a6660; }

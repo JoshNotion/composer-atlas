@@ -4,12 +4,12 @@
 import { eraColor } from "./timeline.js";
 import { TILE_URL, TILE_OPTIONS, jmBuildStops, jmCreatePlayer } from "./map.js";
 
-const WM_FIRST_BRACKET = 1050;
-const WM_LAST_BRACKET = 2000;
-const WM_STEP = 50;
+export const WM_FIRST_BRACKET = 1050;
+export const WM_LAST_BRACKET = 2000;
+export const WM_STEP = 50;
 const WM_TYPES = ["birth", "lived", "death"];
 // Conventional period boundaries, used for the ribbon and the colour under each bracket.
-const WM_PERIODS = [
+export const WM_PERIODS = [
   { era: "Medieval", from: 1050, to: 1400 },
   { era: "Renaissance", from: 1400, to: 1600 },
   { era: "Baroque", from: 1600, to: 1750 },
@@ -51,6 +51,20 @@ function wmBrackets() {
   const out = [];
   for (let b = WM_FIRST_BRACKET; b <= WM_LAST_BRACKET; b += WM_STEP) out.push(b);
   return out;
+}
+
+// Hard-stop gradient showing which periods a 50-year bracket covers.
+export function wmPeriodGradient(b) {
+  const lo = b, hi = b + WM_STEP;
+  const stops = [];
+  WM_PERIODS.forEach(p => {
+    const from = Math.max(lo, p.from), to = Math.min(hi, p.to);
+    if (to <= from) return;
+    const x0 = ((from - lo) / WM_STEP) * 100, x1 = ((to - lo) / WM_STEP) * 100;
+    const c = eraColor(p.era);
+    stops.push(`${c} ${x0.toFixed(1)}%`, `${c} ${x1.toFixed(1)}%`);
+  });
+  return `linear-gradient(90deg, ${stops.join(", ")})`;
 }
 
 const WM_SPEEDS = [0.5, 1, 2, 4];
@@ -320,20 +334,6 @@ export function createWorldMap(hostEl, composers, opts = {}) {
     applyLife();
   }
 
-  // Hard-stop gradient showing which periods a 50-year bracket covers.
-  function periodGradient(b) {
-    const lo = b, hi = b + WM_STEP;
-    const stops = [];
-    WM_PERIODS.forEach(p => {
-      const from = Math.max(lo, p.from), to = Math.min(hi, p.to);
-      if (to <= from) return;
-      const x0 = ((from - lo) / WM_STEP) * 100, x1 = ((to - lo) / WM_STEP) * 100;
-      const c = eraColor(p.era);
-      stops.push(`${c} ${x0.toFixed(1)}%`, `${c} ${x1.toFixed(1)}%`);
-    });
-    return `linear-gradient(90deg, ${stops.join(", ")})`;
-  }
-
   function renderRibbon() {
     const span = WM_LAST_BRACKET + WM_STEP - WM_FIRST_BRACKET;
     const bLo = state.bracket, bHi = state.bracket == null ? null : state.bracket + WM_STEP;
@@ -358,7 +358,7 @@ export function createWorldMap(hostEl, composers, opts = {}) {
         <button class="wm-bracket${state.bracket === b ? " active" : ""}${counts[i] === 0 ? " empty" : ""}" data-b="${b}" title="${b}–${b + WM_STEP}: ${counts[i]} composers">
           <span class="wm-bar" style="height:${Math.max(6, Math.round((counts[i] / max) * 100))}%"></span>
           <span class="wm-blabel">${b}</span><span class="wm-bcount">${counts[i]}</span>
-          <span class="wm-period-line" style="background:${periodGradient(b)}"></span>
+          <span class="wm-period-line" style="background:${wmPeriodGradient(b)}"></span>
         </button>`).join("");
     renderRibbon();
   }

@@ -61,6 +61,7 @@ export function createTimeline(rootEl, composers, opts = {}) {
   const onHoverCb = opts.onHover || (() => {});
   const onHoverEndCb = opts.onHoverEnd || (() => {});
   const onZoomChange = opts.onZoomChange || (() => {});
+  const onViewCb = opts.onView || (() => {});
 
   let svgWidth = 0;
   let xScale = d3.scaleLinear().domain(X_DOMAIN);
@@ -241,7 +242,21 @@ export function createTimeline(rootEl, composers, opts = {}) {
     drawRelationships();
     applySelection();
     onZoomChange(zoom);
+    notifyView();
   }
+
+  // Which years are currently on screen (reported to the period bar above the timeline).
+  function viewYears() {
+    const lo = xScale.invert(rootEl.scrollLeft);
+    const hi = xScale.invert(rootEl.scrollLeft + rootEl.clientWidth);
+    return [Math.max(X_DOMAIN[0], lo), Math.min(X_DOMAIN[1], hi)];
+  }
+  let viewRaf = null;
+  function notifyView() {
+    if (viewRaf) return;
+    viewRaf = requestAnimationFrame(() => { viewRaf = null; onViewCb(viewYears()); });
+  }
+  rootEl.addEventListener("scroll", notifyView, { passive: true });
 
   rebuild();
 
@@ -294,6 +309,23 @@ export function createTimeline(rootEl, composers, opts = {}) {
       scroller.scrollLeft = Math.max(0, newCenter - scroller.clientWidth / 2);
     },
     getZoom: () => zoom,
+    getViewYears: viewYears,
+    // Bring a span of years into view: zoom in so it fills a good part of the screen,
+    // centre on it, and scroll down to the first composer born in it. (null = zoom out.)
+    focusYears(y0, y1) {
+      if (y0 == null) { this.setZoom(1); rootEl.scrollTo({ left: 0, top: 0, behavior: "smooth" }); return; }
+      const total = X_DOMAIN[1] - X_DOMAIN[0];
+      const fit = ZOOM_LEVELS.filter(z => total / z >= (y1 - y0) * 2.5);
+      this.setZoom(fit.length ? fit[fit.length - 1] : ZOOM_LEVELS[0]);
+      const first = data.findIndex(c => c.born >= y0);
+      const idx = first < 0 ? data.length - 1 : first;
+      const x = (xScale(y0) + xScale(y1)) / 2;
+      rootEl.scrollTo({
+        left: Math.max(0, x - rootEl.clientWidth / 2),
+        top: Math.max(0, idx * ROW_STRIDE),
+        behavior: "smooth",
+      });
+    },
     scrollToComposer(id) {
       const idx = data.findIndex(c => c.id === id);
       if (idx < 0) return;

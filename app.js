@@ -4,6 +4,7 @@
 import { createTimeline, eraColor, ZOOM_LEVELS } from "./timeline.js";
 import { createMap } from "./map.js";
 import { createWorldMap } from "./worldmap.js";
+import { createPeriodBar } from "./periodbar.js";
 import { createHome } from "./home.js";
 import { createBrowse } from "./browse.js";
 import { createLinks } from "./links.js";
@@ -81,6 +82,7 @@ async function main() {
   let currentView = null;
   let currentEra = null;
   let timeline = null;
+  let periodBar = null;
   let worldMap = null;
   let browse = null;
   let linksView = null;
@@ -100,8 +102,21 @@ async function main() {
         onHover: (c, ev) => showTooltip(c, ev),
         onHoverEnd: () => hideTooltip(),
         onZoomChange: (z) => updateZoomUi(z),
+        onView: (range) => { if (periodBar) periodBar.setView(range); },
       }
     );
+    // The same period strip as the world map: jump the timeline to a 50-year bracket or period.
+    const barHost = document.getElementById("tl-periodbar");
+    const nowYear = new Date().getFullYear();
+    periodBar = createPeriodBar(barHost, {
+      countFor: (lo, hi) => timeline.getFilteredData().filter(c => c.born <= hi && (c.died ?? nowYear) >= lo).length,
+      onPick: (range) => timeline.focusYears(range ? range.from : null, range ? range.to : null),
+    });
+    // The zoom buttons float over the timeline; keep them just below the bar.
+    const timelineWrap = document.getElementById("timeline-wrap");
+    const syncBarHeight = () => timelineWrap.style.setProperty("--tl-bar-h", barHost.offsetHeight + "px");
+    syncBarHeight();
+    if (typeof ResizeObserver !== "undefined") new ResizeObserver(syncBarHeight).observe(barHost);
     // Ctrl/Cmd + wheel zooms the timeline
     document.getElementById("timeline-scroll").addEventListener("wheel", (e) => {
       if (!(e.ctrlKey || e.metaKey)) return;
@@ -169,7 +184,7 @@ async function main() {
   function setEraFilter(era, opts = {}) {
     const normalized = era && ERA_ORDER.includes(era) ? era : null;
     currentEra = normalized;
-    if (timeline) timeline.setFilter(normalized);
+    if (timeline) { timeline.setFilter(normalized); if (periodBar) periodBar.render(); }
     if (worldMap) worldMap.setEra(normalized);
     if (browse) browse.setEra(normalized);
     if (linksView) linksView.setEra(normalized);
@@ -393,6 +408,7 @@ async function main() {
       if (panelMode === "closed") panelEl.classList.remove("expanded");
     }, panelDurMs() + 40);
     if (timeline) timeline.clear();
+    if (periodBar) periodBar.setLife(null);
     if (worldMap) setTimeout(() => worldMap.invalidateSize(), panelDurMs() + 20);
   }
 
@@ -405,6 +421,7 @@ async function main() {
     const c = byId.get(id);
     if (!c) return;
     if (timeline) timeline.select(id);
+    if (periodBar) periodBar.setLife(c);
     if (linksView && currentView === "links" && linksView.getFocus() !== id) linksView.focus(id);
     renderDetail(detailTarget, c, byId, {
       onConnectionClick: (nextId) => selectComposer(nextId),

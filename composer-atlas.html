@@ -2532,6 +2532,13 @@ body[data-view="map"] .panel .map-section { display: none; }
 }
 .wm-timeline.has-life .wm-bracket.in-life .wm-bar { background: color-mix(in srgb, var(--life) 38%, transparent); }
 
+/* ================= Timeline tab: period strip on top (same as the world map) ================= */
+
+.tl-periodbar { flex: 0 0 auto; }
+.timeline-wrap .timeline-controls { top: calc(var(--tl-bar-h, 0px) + 10px); }
+.wm-timeline.has-life .wm-bracket.in-life.in-view { box-shadow: 0 0 0 1px var(--life); }
+.tl-periodbar .wm-bracket.in-view:not(.active) { border-color: #6a6660; }
+
 </style>
 </head>
 <body>
@@ -2566,6 +2573,7 @@ body[data-view="map"] .panel .map-section { display: none; }
         <span class="zoom-readout" id="zoom-readout">1×</span>
         <button class="zoom-btn" id="zoom-in" title="Zoom in (+)" aria-label="Zoom in">+</button>
       </div>
+      <div class="tl-periodbar wm-toolbar" id="tl-periodbar"></div>
       <div class="timeline-scroll" id="timeline-scroll"></div>
       <div class="tooltip" id="tooltip" hidden></div>
     </section>
@@ -2755,6 +2763,7 @@ function createTimeline(rootEl, composers, opts = {}) {
   const onHoverCb = opts.onHover || (() => {});
   const onHoverEndCb = opts.onHoverEnd || (() => {});
   const onZoomChange = opts.onZoomChange || (() => {});
+  const onViewCb = opts.onView || (() => {});
 
   let svgWidth = 0;
   let xScale = d3.scaleLinear().domain(X_DOMAIN);
@@ -2935,7 +2944,21 @@ function createTimeline(rootEl, composers, opts = {}) {
     drawRelationships();
     applySelection();
     onZoomChange(zoom);
+    notifyView();
   }
+
+  // Which years are currently on screen (reported to the period bar above the timeline).
+  function viewYears() {
+    const lo = xScale.invert(rootEl.scrollLeft);
+    const hi = xScale.invert(rootEl.scrollLeft + rootEl.clientWidth);
+    return [Math.max(X_DOMAIN[0], lo), Math.min(X_DOMAIN[1], hi)];
+  }
+  let viewRaf = null;
+  function notifyView() {
+    if (viewRaf) return;
+    viewRaf = requestAnimationFrame(() => { viewRaf = null; onViewCb(viewYears()); });
+  }
+  rootEl.addEventListener("scroll", notifyView, { passive: true });
 
   rebuild();
 
@@ -2988,6 +3011,23 @@ function createTimeline(rootEl, composers, opts = {}) {
       scroller.scrollLeft = Math.max(0, newCenter - scroller.clientWidth / 2);
     },
     getZoom: () => zoom,
+    getViewYears: viewYears,
+    // Bring a span of years into view: zoom in so it fills a good part of the screen,
+    // centre on it, and scroll down to the first composer born in it. (null = zoom out.)
+    focusYears(y0, y1) {
+      if (y0 == null) { this.setZoom(1); rootEl.scrollTo({ left: 0, top: 0, behavior: "smooth" }); return; }
+      const total = X_DOMAIN[1] - X_DOMAIN[0];
+      const fit = ZOOM_LEVELS.filter(z => total / z >= (y1 - y0) * 2.5);
+      this.setZoom(fit.length ? fit[fit.length - 1] : ZOOM_LEVELS[0]);
+      const first = data.findIndex(c => c.born >= y0);
+      const idx = first < 0 ? data.length - 1 : first;
+      const x = (xScale(y0) + xScale(y1)) / 2;
+      rootEl.scrollTo({
+        left: Math.max(0, x - rootEl.clientWidth / 2),
+        top: Math.max(0, idx * ROW_STRIDE),
+        behavior: "smooth",
+      });
+    },
     scrollToComposer(id) {
       const idx = data.findIndex(c => c.id === id);
       if (idx < 0) return;
@@ -3332,8 +3372,6 @@ function escapeHtml(s) {
 // ===== worldmap.js =====
 // World map view: where composers lived, filtered by 50-year bracket, era and place type.
 // Places are aggregated, so a city shows one pin with a count and a list of composers.
-
-
 const WM_FIRST_BRACKET = 1050;
 const WM_LAST_BRACKET = 2000;
 const WM_STEP = 50;
@@ -3381,6 +3419,20 @@ function wmBrackets() {
   const out = [];
   for (let b = WM_FIRST_BRACKET; b <= WM_LAST_BRACKET; b += WM_STEP) out.push(b);
   return out;
+}
+
+// Hard-stop gradient showing which periods a 50-year bracket covers.
+function wmPeriodGradient(b) {
+  const lo = b, hi = b + WM_STEP;
+  const stops = [];
+  WM_PERIODS.forEach(p => {
+    const from = Math.max(lo, p.from), to = Math.min(hi, p.to);
+    if (to <= from) return;
+    const x0 = ((from - lo) / WM_STEP) * 100, x1 = ((to - lo) / WM_STEP) * 100;
+    const c = eraColor(p.era);
+    stops.push(`${c} ${x0.toFixed(1)}%`, `${c} ${x1.toFixed(1)}%`);
+  });
+  return `linear-gradient(90deg, ${stops.join(", ")})`;
 }
 
 const WM_SPEEDS = [0.5, 1, 2, 4];
@@ -3649,20 +3701,6 @@ function createWorldMap(hostEl, composers, opts = {}) {
     applyLife();
   }
 
-  // Hard-stop gradient showing which periods a 50-year bracket covers.
-  function periodGradient(b) {
-    const lo = b, hi = b + WM_STEP;
-    const stops = [];
-    WM_PERIODS.forEach(p => {
-      const from = Math.max(lo, p.from), to = Math.min(hi, p.to);
-      if (to <= from) return;
-      const x0 = ((from - lo) / WM_STEP) * 100, x1 = ((to - lo) / WM_STEP) * 100;
-      const c = eraColor(p.era);
-      stops.push(`${c} ${x0.toFixed(1)}%`, `${c} ${x1.toFixed(1)}%`);
-    });
-    return `linear-gradient(90deg, ${stops.join(", ")})`;
-  }
-
   function renderRibbon() {
     const span = WM_LAST_BRACKET + WM_STEP - WM_FIRST_BRACKET;
     const bLo = state.bracket, bHi = state.bracket == null ? null : state.bracket + WM_STEP;
@@ -3687,7 +3725,7 @@ function createWorldMap(hostEl, composers, opts = {}) {
         <button class="wm-bracket${state.bracket === b ? " active" : ""}${counts[i] === 0 ? " empty" : ""}" data-b="${b}" title="${b}–${b + WM_STEP}: ${counts[i]} composers">
           <span class="wm-bar" style="height:${Math.max(6, Math.round((counts[i] / max) * 100))}%"></span>
           <span class="wm-blabel">${b}</span><span class="wm-bcount">${counts[i]}</span>
-          <span class="wm-period-line" style="background:${periodGradient(b)}"></span>
+          <span class="wm-period-line" style="background:${wmPeriodGradient(b)}"></span>
         </button>`).join("");
     renderRibbon();
   }
@@ -3846,6 +3884,117 @@ function escapeWm(s) {
   return String(s ?? "")
     .replace(/&/g, "&amp;").replace(/</g, "&lt;")
     .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+
+// ===== periodbar.js =====
+// Period bar for the Timeline tab: the same ribbon + 50-year buttons the World map uses.
+// Clicking a button (or a period) zooms the timeline to those years; the buttons for the
+// years currently on screen are outlined, and a selected composer's life is lit up.
+function createPeriodBar(hostEl, opts = {}) {
+  const countFor = opts.countFor || (() => 0);
+  const onPick = opts.onPick || (() => {});
+  const currentYear = new Date().getFullYear();
+  const span = WM_LAST_BRACKET + WM_STEP - WM_FIRST_BRACKET;
+  const brackets = [];
+  for (let b = WM_FIRST_BRACKET; b <= WM_LAST_BRACKET; b += WM_STEP) brackets.push(b);
+
+  let active = null; // "b:1700" | "p:1600" | null
+  let life = null;   // selected composer
+  let view = null;   // [from, to] years on screen
+
+  hostEl.innerHTML = `
+    <div class="wm-timeline">
+      <div class="wm-timeline-inner">
+        <div class="wm-ribbon" aria-label="Classical periods"></div>
+        <div class="wm-brackets" role="group" aria-label="Jump to a time period"></div>
+      </div>
+    </div>`;
+  const wrapEl = hostEl.querySelector(".wm-timeline");
+  const ribbonEl = hostEl.querySelector(".wm-ribbon");
+  const bracketsEl = hostEl.querySelector(".wm-brackets");
+
+  function render() {
+    const counts = brackets.map(b => countFor(b, b + WM_STEP - 1));
+    const max = Math.max(1, ...counts);
+    const total = countFor(-Infinity, Infinity);
+    bracketsEl.innerHTML =
+      `<button class="wm-bracket wm-bracket-all${active == null ? " active" : ""}" data-b="" title="Show the whole timeline">
+         <span class="wm-bar" style="height:100%"></span><span class="wm-blabel">All time</span><span class="wm-bcount">${total}</span>
+       </button>` +
+      brackets.map((b, i) => `
+        <button class="wm-bracket${active === "b:" + b ? " active" : ""}${counts[i] === 0 ? " empty" : ""}" data-b="${b}" title="${b}–${b + WM_STEP}: ${counts[i]} lives overlap">
+          <span class="wm-bar" style="height:${Math.max(6, Math.round((counts[i] / max) * 100))}%"></span>
+          <span class="wm-blabel">${b}</span><span class="wm-bcount">${counts[i]}</span>
+          <span class="wm-period-line" style="background:${wmPeriodGradient(b)}"></span>
+        </button>`).join("");
+    ribbonEl.innerHTML = WM_PERIODS.map(p => {
+      const left = ((p.from - WM_FIRST_BRACKET) / span) * 100;
+      const width = ((p.to - p.from) / span) * 100;
+      return `<button class="wm-period${active === "p:" + p.from ? " on" : ""}" data-from="${p.from}" style="left:${left}%;width:${width}%;--era:${eraColor(p.era)}" title="${p.era} · c. ${p.from}–${p.to}"><span>${p.era}</span></button>`;
+    }).join("");
+    paint();
+  }
+
+  // Outline what is on screen; light up a selected composer's years.
+  function paint() {
+    wrapEl.classList.toggle("has-life", !!life);
+    ribbonEl.querySelectorAll(".wm-life-bar").forEach(n => n.remove());
+    const showView = view && (view[1] - view[0]) < span * 0.85;
+    const from = life ? life.born : null, to = life ? (life.died ?? currentYear) : null;
+    if (life) wrapEl.style.setProperty("--life", eraColor(life.era));
+    bracketsEl.querySelectorAll(".wm-bracket[data-b]").forEach(btn => {
+      const v = btn.getAttribute("data-b");
+      if (v === "") { btn.classList.remove("in-view", "in-life"); return; }
+      const b = parseInt(v, 10);
+      btn.classList.toggle("in-view", !!showView && b <= view[1] && b + WM_STEP - 1 >= view[0]);
+      btn.classList.toggle("in-life", !!life && b <= to && b + WM_STEP - 1 >= from);
+    });
+    ribbonEl.querySelectorAll(".wm-period").forEach(seg => {
+      const p = WM_PERIODS.find(x => x.from === parseInt(seg.getAttribute("data-from"), 10));
+      seg.classList.toggle("in-life", !!life && !!p && p.from <= to && p.to > from);
+    });
+    if (life) {
+      const lo = Math.max(from, WM_FIRST_BRACKET), hi = Math.min(to, WM_LAST_BRACKET + WM_STEP);
+      if (hi > lo) {
+        const bar = document.createElement("div");
+        bar.className = "wm-life-bar";
+        bar.style.left = `${((lo - WM_FIRST_BRACKET) / span) * 100}%`;
+        bar.style.width = `${((hi - lo) / span) * 100}%`;
+        bar.title = `${life.name} · ${from}–${life.died ?? "present"}`;
+        ribbonEl.appendChild(bar);
+      }
+    }
+  }
+
+  bracketsEl.addEventListener("click", (e) => {
+    const btn = e.target.closest(".wm-bracket");
+    if (!btn) return;
+    const v = btn.getAttribute("data-b");
+    if (v === "" || active === "b:" + v) { active = null; render(); onPick(null); return; }
+    const b = parseInt(v, 10);
+    active = "b:" + b;
+    render();
+    onPick({ from: b, to: b + WM_STEP - 1 });
+  });
+  ribbonEl.addEventListener("click", (e) => {
+    const seg = e.target.closest(".wm-period");
+    if (!seg) return;
+    const p = WM_PERIODS.find(x => x.from === parseInt(seg.getAttribute("data-from"), 10));
+    if (!p) return;
+    if (active === "p:" + p.from) { active = null; render(); onPick(null); return; }
+    active = "p:" + p.from;
+    render();
+    onPick({ from: p.from, to: p.to });
+  });
+
+  render();
+
+  return {
+    render,
+    setLife(c) { life = c && Number.isFinite(c.born) ? c : null; paint(); },
+    setView(range) { view = range; paint(); },
+  };
 }
 
 
@@ -5481,6 +5630,7 @@ function escapeAttr(s) { return escapeHtml(s); }
 
 
 
+
 const ERA_ORDER = ["Medieval", "Renaissance", "Baroque", "Classical", "Romantic", "Modern", "Contemporary"];
 
 async function main() {
@@ -5552,6 +5702,7 @@ async function main() {
   let currentView = null;
   let currentEra = null;
   let timeline = null;
+  let periodBar = null;
   let worldMap = null;
   let browse = null;
   let linksView = null;
@@ -5571,8 +5722,21 @@ async function main() {
         onHover: (c, ev) => showTooltip(c, ev),
         onHoverEnd: () => hideTooltip(),
         onZoomChange: (z) => updateZoomUi(z),
+        onView: (range) => { if (periodBar) periodBar.setView(range); },
       }
     );
+    // The same period strip as the world map: jump the timeline to a 50-year bracket or period.
+    const barHost = document.getElementById("tl-periodbar");
+    const nowYear = new Date().getFullYear();
+    periodBar = createPeriodBar(barHost, {
+      countFor: (lo, hi) => timeline.getFilteredData().filter(c => c.born <= hi && (c.died ?? nowYear) >= lo).length,
+      onPick: (range) => timeline.focusYears(range ? range.from : null, range ? range.to : null),
+    });
+    // The zoom buttons float over the timeline; keep them just below the bar.
+    const timelineWrap = document.getElementById("timeline-wrap");
+    const syncBarHeight = () => timelineWrap.style.setProperty("--tl-bar-h", barHost.offsetHeight + "px");
+    syncBarHeight();
+    if (typeof ResizeObserver !== "undefined") new ResizeObserver(syncBarHeight).observe(barHost);
     // Ctrl/Cmd + wheel zooms the timeline
     document.getElementById("timeline-scroll").addEventListener("wheel", (e) => {
       if (!(e.ctrlKey || e.metaKey)) return;
@@ -5640,7 +5804,7 @@ async function main() {
   function setEraFilter(era, opts = {}) {
     const normalized = era && ERA_ORDER.includes(era) ? era : null;
     currentEra = normalized;
-    if (timeline) timeline.setFilter(normalized);
+    if (timeline) { timeline.setFilter(normalized); if (periodBar) periodBar.render(); }
     if (worldMap) worldMap.setEra(normalized);
     if (browse) browse.setEra(normalized);
     if (linksView) linksView.setEra(normalized);
@@ -5864,6 +6028,7 @@ async function main() {
       if (panelMode === "closed") panelEl.classList.remove("expanded");
     }, panelDurMs() + 40);
     if (timeline) timeline.clear();
+    if (periodBar) periodBar.setLife(null);
     if (worldMap) setTimeout(() => worldMap.invalidateSize(), panelDurMs() + 20);
   }
 
@@ -5876,6 +6041,7 @@ async function main() {
     const c = byId.get(id);
     if (!c) return;
     if (timeline) timeline.select(id);
+    if (periodBar) periodBar.setLife(c);
     if (linksView && currentView === "links" && linksView.getFocus() !== id) linksView.focus(id);
     renderDetail(detailTarget, c, byId, {
       onConnectionClick: (nextId) => selectComposer(nextId),
