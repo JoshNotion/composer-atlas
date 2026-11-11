@@ -29,9 +29,9 @@ function lkEsc(s) {
 
 export function createLinks(hostEl, composers, opts = {}) {
   const byId = new Map(composers.map(c => [c.id, c]));
-  // pin = set by a click (stays until cleared); hover = transient while the pointer rests on a composer
-  const state = { era: null, pin: null, hover: null };
-  const current = () => state.hover || state.pin;
+  // pin = the composer whose connections are locked in (set by a click, cleared by clicking empty space)
+  const state = { era: null, pin: null };
+  const current = () => state.pin;
 
   // ---- Graph: one undirected edge per pair, drawn from the older composer to the younger ----
   const edgeMap = new Map();
@@ -70,7 +70,7 @@ export function createLinks(hostEl, composers, opts = {}) {
         </label>
         <button class="wm-focus-chip" id="lk-focus" type="button" hidden></button>
         <span class="lk-count" id="lk-count"></span>
-        <span class="lk-hint" id="lk-hint">Hover a composer to see how they connect · click to hold</span>
+        <span class="lk-hint" id="lk-hint">Click a composer to see their connections</span>
       </div>
     </div>
     <div class="lk-inner" id="lk-inner"></div>
@@ -134,7 +134,7 @@ export function createLinks(hostEl, composers, opts = {}) {
   let layoutW = 0;
   let nodeEls = new Map();
   let edgeEls = [];
-  let labelsEl = null;
+  let tipEl = null;
 
   // ---- Layout: y follows birth year (compressed where it's sparse), x is chosen lane by lane
   //      so a composer lands near the people they're connected to, with a gentle west-to-east
@@ -281,11 +281,11 @@ export function createLinks(hostEl, composers, opts = {}) {
       </div>
       <svg class="lk-edges" width="${W}" height="${height}" viewBox="0 0 ${W} ${height}" aria-hidden="true"></svg>
       <div class="lk-nodes"></div>
-      <div class="lk-labels"></div>
+      <div class="lk-tip" hidden></div>
     `;
     const svg = innerEl.querySelector(".lk-edges");
     const nodesEl = innerEl.querySelector(".lk-nodes");
-    labelsEl = innerEl.querySelector(".lk-labels");
+    tipEl = innerEl.querySelector(".lk-tip");
     const NS = "http://www.w3.org/2000/svg";
     const cy = LK_PORTRAIT / 2;
 
@@ -340,10 +340,10 @@ export function createLinks(hostEl, composers, opts = {}) {
       btn.addEventListener("keydown", (ev) => {
         if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); pin(c.id); }
       });
-      btn.addEventListener("mouseenter", () => { hoverIn(c.id); peekLabel(c.id); });
-      btn.addEventListener("mouseleave", () => { hoverOut(); peekLabel(null); });
-      btn.addEventListener("focus", () => hoverIn(c.id));
-      btn.addEventListener("blur", hoverOut);
+      btn.addEventListener("mouseenter", () => showTip(c.id));
+      btn.addEventListener("mouseleave", hideTip);
+      btn.addEventListener("focus", () => showTip(c.id));
+      btn.addEventListener("blur", hideTip);
       nodesEl.appendChild(btn);
       nodeEls.set(c.id, btn);
       const portrait = btn.querySelector(".lk-portrait");
@@ -379,7 +379,7 @@ export function createLinks(hostEl, composers, opts = {}) {
     if (state.pin) {
       const c = byId.get(state.pin);
       focusEl.hidden = false;
-      focusEl.innerHTML = `<span class="wm-focus-dot" style="background:${eraColor(c.era)}"></span><span>Holding <strong>${lkEsc(c.name)}</strong></span><span class="wm-focus-hint">click empty space to release</span><span class="wm-focus-x">&times;</span>`;
+      focusEl.innerHTML = `<span class="wm-focus-dot" style="background:${eraColor(c.era)}"></span><span>Showing <strong>${lkEsc(c.name)}</strong></span><span class="wm-focus-hint">click empty space to clear</span><span class="wm-focus-x">&times;</span>`;
     } else {
       focusEl.hidden = true;
     }
@@ -390,7 +390,7 @@ export function createLinks(hostEl, composers, opts = {}) {
       countEl.textContent = `${linked.length} composers · ${edges.length} connections`;
       hintEl.hidden = false;
     }
-    renderLabels(f);
+    hideTip();
   }
 
   function relationText(from, to) {
@@ -403,75 +403,31 @@ export function createLinks(hostEl, composers, opts = {}) {
     return e.by[from] || e.by[to] || e.notes[0] || "";
   }
 
-  // Each connection of the active composer gets a small note sitting on its line.
-  // A hub with many connections shows its notes one at a time, as you point at each person.
-  const LK_LABEL_W = 208;
-  const LK_MANY = 6;
-  let labelRects = new Map();
-
-  function renderLabels(f) {
-    labelsEl.innerHTML = "";
-    labelRects = new Map();
-    labelsEl.classList.remove("lk-labels-many");
-    if (!f) return;
-    const items = [];
-    edgeEls.forEach(({ e, mid }) => {
-      if (e.a !== f && e.b !== f) return;
-      const other = byId.get(e.a === f ? e.b : e.a);
-      const note = relationText(f, other.id);
-      if (!note) return;
-      const lines = Math.min(3, Math.ceil(note.length / 36));
-      items.push({ other, note, mid, h: 34 + lines * 14 });
-    });
-    items.sort((a, b) => a.mid.y - b.mid.y);
-    const placed = [];
-    const maxX = layoutW - LK_LABEL_W - 12;
-    items.forEach(it => {
-      let x = Math.max(LK_RIBBON_W + 12, Math.min(maxX, it.mid.x - LK_LABEL_W / 2));
-      let y = it.mid.y - it.h / 2;
-      for (let guard = 0; guard < 40; guard++) {
-        const hit = placed.find(r => x < r.x + LK_LABEL_W + 6 && x + LK_LABEL_W + 6 > r.x && y < r.y + r.h + 6 && y + it.h + 6 > r.y);
-        if (!hit) break;
-        y = hit.y + hit.h + 6;
-      }
-      placed.push({ x, y, h: it.h });
-      const el = document.createElement("div");
-      el.className = "lk-label";
-      el.style.left = x + "px";
-      el.style.top = y + "px";
-      el.style.width = LK_LABEL_W + "px";
-      el.style.setProperty("--era", eraColor(it.other.era));
-      el.innerHTML = `<strong>${lkEsc(it.other.name)}</strong><span>${lkEsc(it.note)}</span>`;
-      labelsEl.appendChild(el);
-      labelRects.set(it.other.id, el);
-    });
-    if (items.length > LK_MANY) labelsEl.classList.add("lk-labels-many");
+  // With a composer locked in, pointing at one of their connections shows how the two are related.
+  const LK_TIP_W = 272;
+  function showTip(id) {
+    const f = state.pin;
+    if (!f || id === f || !adj.get(f).has(id) || !tipEl) return;
+    const other = byId.get(id);
+    const me = byId.get(f);
+    const note = relationText(f, id) || `Connected with ${me.name}.`;
+    const p = layout.pos.get(id);
+    tipEl.style.setProperty("--era", eraColor(other.era));
+    tipEl.innerHTML = `<strong>${lkEsc(other.name)}</strong><em>with ${lkEsc(me.name)}</em><span>${lkEsc(note)}</span>`;
+    tipEl.hidden = false;
+    const right = p.x + LK_NODE_W / 2 + LK_TIP_W + 14 < layoutW;
+    let x = right ? p.x + LK_NODE_W / 2 - 2 : p.x - LK_NODE_W / 2 - LK_TIP_W + 2;
+    x = Math.max(LK_RIBBON_W + 8, x);
+    tipEl.style.width = LK_TIP_W + "px";
+    tipEl.style.left = x + "px";
+    // Keep the whole card on screen: slide it up if the person sits near the bottom edge.
+    const h = tipEl.offsetHeight;
+    const bottom = hostEl.scrollTop + hostEl.clientHeight - 14;
+    let y = p.y - 4;
+    if (y + h > bottom) y = Math.max(hostEl.scrollTop + 96, bottom - h);
+    tipEl.style.top = Math.max(8, y) + "px";
   }
-
-  function peekLabel(id) {
-    labelRects.forEach((el, nid) => el.classList.toggle("lk-label-peek", nid === id));
-  }
-
-  // Hover intent: a short dwell before the web reacts, and a grace period before it lets go,
-  // so crossing other composers on the way to the card doesn't flicker the view.
-  let hoverTimer = null;
-  function hoverIn(id) {
-    if (!adj.has(id)) return;
-    clearTimeout(hoverTimer);
-    hoverTimer = setTimeout(() => {
-      if (state.hover === id) return;
-      state.hover = id;
-      applyState();
-    }, state.hover || state.pin ? 70 : 40);
-  }
-  function hoverOut() {
-    clearTimeout(hoverTimer);
-    hoverTimer = setTimeout(() => {
-      if (!state.hover) return;
-      state.hover = null;
-      applyState();
-    }, 320);
-  }
+  function hideTip() { if (tipEl) tipEl.hidden = true; }
 
   function scrollToFocus() {
     const f = state.pin;
@@ -502,18 +458,14 @@ export function createLinks(hostEl, composers, opts = {}) {
   // (used by search and the card's rows, not by clicking a node that's already visible).
   function pin(id, scroll) {
     if (!adj.has(id)) { clearFocus(); return; }
-    clearTimeout(hoverTimer);
     state.pin = id;
-    state.hover = null;
     applyState();
     if (scroll) scrollToFocus();
   }
 
   function clearFocus() {
-    clearTimeout(hoverTimer);
-    if (!state.pin && !state.hover) return;
+    if (!state.pin) return;
     state.pin = null;
-    state.hover = null;
     applyState();
   }
 

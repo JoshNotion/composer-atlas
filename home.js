@@ -99,8 +99,8 @@ export function createHome(hostEl, composers, opts = {}) {
       title: "Who taught whom, and who followed whom",
       lede: `${linkPairs.size} documented connections between ${linkedIds.size} composers, from the Middle Ages at the top to today at the bottom.`,
       how: [
-        "Hover a composer to light up their circle and read how each person is related",
-        "Click to hold their connections in view, or use Open to read their full profile",
+        "Click a composer to light up their circle, then hover each connection to read how they are related",
+        "Use the small arrow on a portrait to open their full profile",
         "Search for a name to jump straight to them",
       ],
       chips: `<div class="home-links-chips">
