@@ -193,6 +193,7 @@ async function main() {
       view,
       era: params.get("era"),
       bracket: view === "map" ? (b && /^\d+$/.test(b) ? parseInt(b, 10) : null) : undefined,
+      focus: view === "links" ? params.get("f") : null,
     };
   }
 
@@ -226,7 +227,10 @@ async function main() {
     if (name === "timeline") ensureTimeline();
     if (name === "map") ensureWorldMap(route ? route.bracket : undefined);
     if (name === "composers") ensureBrowse();
-    if (name === "links") ensureLinks();
+    if (name === "links") {
+      ensureLinks();
+      if (route && route.focus) linksView.focus(route.focus);
+    }
     if (name === "map" && worldMap) requestAnimationFrame(() => worldMap.invalidateSize());
   }
 
@@ -374,7 +378,6 @@ async function main() {
     panelEl.setAttribute("aria-hidden", "true");
     mapApi.pauseJourney();
     if (worldMap) worldMap.clearFocus();
-    if (linksView) linksView.clearFocus();
     clearTimeout(collapseTimer);
     collapseTimer = setTimeout(() => {
       if (panelMode === "closed") panelEl.classList.remove("expanded");

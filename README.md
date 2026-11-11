@@ -38,7 +38,7 @@ This produces `composer-atlas.html` (~1.4 MB) with **everything inlined** — CS
 - `home.js` — landing page.
 - `worldmap.js` — world map view: places aggregated into count pins, 50-year bracket strip with play button, era and place-type filters.
 - `browse.js` — composers grid with search and sort.
-- `links.js` — Connections view: every documented composer link on one vertical, time-ordered page (older at the top), with a period ribbon on the left. Click a composer, or search for one, to follow just their connections; layout is computed from `relationships` in `composers.json`.
+- `links.js` — Connections view: every documented composer link on one vertical, time-ordered page (older at the top), with a period ribbon on the left. Hover a composer to light up their connections (a docked card lists how each is related), click to hold, or search; layout is computed from `relationships` in `composers.json`.
 - `portraits/` — local portrait images (set `"portrait": "portraits/<id>.jpg"`); the build inlines them.
 - `styles.css` — dark theme, panel transitions, Leaflet overrides, the Clair-de-lune sheet-paper background baked in as a filtered SVG data URI.
 - `timeline.js` — D3 timeline: sticky-top axis, vertical bar list, horizontal-scroll at zoom > 1, six zoom levels, world-event markers, dashed relationship lines, era filter.
