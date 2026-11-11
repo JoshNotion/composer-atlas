@@ -11764,7 +11764,7 @@
     "born": 1932,
     "died": null,
     "era": "Contemporary",
-    "portrait": "https://sofiaphilharmonic.com/wp-content/uploads/2024/10/williams.jpg",
+    "portrait": "portraits/john-williams.jpg",
     "wiki": "John Williams",
     "birthPlace": {
       "city": "New York (Floral Park)",
@@ -20397,7 +20397,7 @@
     "born": 1944,
     "died": 2013,
     "era": "Contemporary",
-    "portrait": "https://collectionimages.npg.org.uk/large/mw56494/Sir-John-Kenneth-Tavener.jpg",
+    "portrait": "portraits/tavener.jpg",
     "wiki": "John Tavener",
     "birthPlace": {
       "city": "London",
@@ -29827,7 +29827,7 @@
     "born": 1934,
     "died": 2022,
     "era": "Contemporary",
-    "portrait": "https://collectionimages.npg.org.uk/large/mw241775/Sir-Harrison-Birtwistle.jpg",
+    "portrait": "portraits/birtwistle.jpg",
     "wiki": "Harrison Birtwistle",
     "birthPlace": {
       "city": "Accrington",
@@ -29914,7 +29914,7 @@
     "born": 1934,
     "died": 1998,
     "era": "Contemporary",
-    "portrait": "https://sofiaphilharmonic.com/wp-content/uploads/2024/10/schnitke.webp",
+    "portrait": "portraits/schnittke.jpg",
     "wiki": "Alfred Schnittke",
     "birthPlace": {
       "city": "Engels (Volga German ASSR)",

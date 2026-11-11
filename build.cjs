@@ -31,6 +31,13 @@ function safeJson(obj) {
 (async () => {
   // --- 1. Data
   const composers = JSON.parse(read('composers.json'));
+  // Local portraits (portraits/*.jpg) are inlined as data URIs so the single HTML file stays self-contained.
+  composers.forEach(c => {
+    if (c.portrait && /^portraits\//.test(c.portrait)) {
+      const buf = fs.readFileSync(path.join(__dirname, c.portrait));
+      c.portrait = 'data:image/jpeg;base64,' + buf.toString('base64');
+    }
+  });
 
   // --- 2. Concatenate our JS modules, stripping import/export
   const modules = ['portraits.js', 'timeline.js', 'map.js', 'worldmap.js', 'home.js', 'browse.js', 'openopus.js', 'panel.js', 'app.js'];
