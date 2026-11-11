@@ -53,6 +53,9 @@ function wmBrackets() {
   return out;
 }
 
+const WM_SPEEDS = [0.5, 1, 2, 4];
+const WM_PLAY_MS = 1500; // time per 50-year bracket at 1×
+
 export function createWorldMap(hostEl, composers, opts = {}) {
   const currentYear = new Date().getFullYear();
   const brackets = wmBrackets();
@@ -90,6 +93,10 @@ export function createWorldMap(hostEl, composers, opts = {}) {
       </div>
       <div class="wm-types" id="wm-types">
         ${WM_TYPES.map(t => `<button class="layer-btn on" data-type="${t}"><span class="dot ${t}"></span>${WM_TYPE_LABEL[t]}</button>`).join("")}
+        <div class="wm-speed" id="wm-speed" role="group" aria-label="Playback speed">
+          <span class="wm-speed-label">Speed</span>
+          ${WM_SPEEDS.map(v => `<button type="button" class="wm-speed-btn${v === 1 ? " on" : ""}" data-speed="${v}" aria-pressed="${v === 1}">${v}×</button>`).join("")}
+        </div>
         <button class="wm-focus-chip" id="wm-focus" type="button" hidden></button>
         <span class="wm-summary" id="wm-summary"></span>
       </div>
@@ -408,6 +415,15 @@ export function createWorldMap(hostEl, composers, opts = {}) {
   // ---- play ---------------------------------------------------------------------
 
   let playTimer = null;
+  let playIdx = 0;
+  let speed = 1;
+  const speedEl = hostEl.querySelector("#wm-speed");
+
+  function stepPlay() {
+    playIdx += 1;
+    if (playIdx >= brackets.length) { stopPlay(); return; }
+    setBracket(brackets[playIdx]);
+  }
   function stopPlay() {
     clearInterval(playTimer);
     playTimer = null;
@@ -415,15 +431,26 @@ export function createWorldMap(hostEl, composers, opts = {}) {
   }
   function startPlay() {
     playBtn.classList.add("playing");
-    let idx = state.bracket == null ? 0 : brackets.indexOf(state.bracket) + 1;
-    if (idx >= brackets.length) idx = 0;
-    setBracket(brackets[idx]);
-    playTimer = setInterval(() => {
-      idx += 1;
-      if (idx >= brackets.length) { stopPlay(); return; }
-      setBracket(brackets[idx]);
-    }, 1500);
+    playIdx = state.bracket == null ? 0 : brackets.indexOf(state.bracket) + 1;
+    if (playIdx >= brackets.length) playIdx = 0;
+    setBracket(brackets[playIdx]);
+    playTimer = setInterval(stepPlay, WM_PLAY_MS / speed);
   }
+  speedEl.addEventListener("click", (e) => {
+    const btn = e.target.closest(".wm-speed-btn");
+    if (!btn) return;
+    speed = parseFloat(btn.dataset.speed);
+    speedEl.querySelectorAll(".wm-speed-btn").forEach(b => {
+      const on = b === btn;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", String(on));
+    });
+    // Changing speed mid-play keeps the current position and just re-times the steps.
+    if (playTimer) {
+      clearInterval(playTimer);
+      playTimer = setInterval(stepPlay, WM_PLAY_MS / speed);
+    }
+  });
   playBtn.addEventListener("click", () => (playTimer ? stopPlay() : startPlay()));
 
   refresh();

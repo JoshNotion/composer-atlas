@@ -2436,6 +2436,13 @@ body[data-view="home"] .legend { display: none; }
 .lk-tip[hidden] { display: none; }
 .lk-tip strong { display: block; color: var(--text); font-size: 12.5px; margin-bottom: 2px; }
 
+/* World map: playback speed */
+.wm-speed { display: inline-flex; align-items: center; gap: 2px; margin-left: 6px; padding: 2px; border: 1px solid var(--border); border-radius: 999px; background: rgba(36, 36, 36, .7); }
+.wm-speed-label { color: var(--text-faint); font-size: 11px; padding: 0 6px 0 9px; letter-spacing: .02em; }
+.wm-speed-btn { font: inherit; font-size: 11.5px; font-variant-numeric: tabular-nums; color: var(--text-dim); background: none; border: 0; border-radius: 999px; padding: 3px 9px; cursor: pointer; }
+.wm-speed-btn:hover { color: var(--text); }
+.wm-speed-btn.on { color: var(--text); background: var(--surface-2); box-shadow: inset 0 0 0 1px #555; }
+
 </style>
 </head>
 <body>
@@ -2545,7 +2552,7 @@ function fetchWikiSummary(composer) {
   const promise = fetch(url, { headers: { accept: "application/json" } })
     .then(r => {
       if (r.ok) return r.json();
-      if (r.status >= 500) cache.delete(key);
+      if (r.status >= 500 || r.status === 429) cache.delete(key);
       return null;
     })
     .catch(() => {
@@ -2577,23 +2584,24 @@ function resolvePortraitUrl(composer) {
 // Mounts an img into `hostEl` once the URL resolves. Bails out if the host
 // element has been detached (e.g. the panel re-rendered with a new composer).
 function mountPortrait(hostEl, composer, altText) {
-  if (!hostEl) return;
-  resolvePortraitUrl(composer).then(url => {
-    if (!url) return;
-    if (!hostEl.isConnected) return;
-    if (hostEl.dataset.composerId !== composer.id) return;
+  if (!hostEl) return Promise.resolve();
+  return resolvePortraitUrl(composer).then(url => new Promise(resolve => {
+    if (!url) return resolve();
+    if (!hostEl.isConnected) return resolve();
+    if (hostEl.dataset.composerId !== composer.id) return resolve();
     const img = new Image();
     img.alt = altText || composer.name;
     img.referrerPolicy = "no-referrer";
     img.onload = () => {
-      if (!hostEl.isConnected) return;
-      if (hostEl.dataset.composerId !== composer.id) return;
+      if (!hostEl.isConnected) return resolve();
+      if (hostEl.dataset.composerId !== composer.id) return resolve();
       hostEl.prepend(img);
       hostEl.classList.add("has-img");
+      resolve();
     };
-    img.onerror = () => {};
+    img.onerror = () => resolve();
     img.src = url;
-  });
+  }));
 }
 
 
@@ -3243,6 +3251,9 @@ function wmBrackets() {
   for (let b = WM_FIRST_BRACKET; b <= WM_LAST_BRACKET; b += WM_STEP) out.push(b);
   return out;
 }
+
+const WM_SPEEDS = [0.5, 1, 2, 4];
+const WM_PLAY_MS = 1500; // time per 50-year bracket at 1×
 function createWorldMap(hostEl, composers, opts = {}) {
   const currentYear = new Date().getFullYear();
   const brackets = wmBrackets();
@@ -3280,6 +3291,10 @@ function createWorldMap(hostEl, composers, opts = {}) {
       </div>
       <div class="wm-types" id="wm-types">
         ${WM_TYPES.map(t => `<button class="layer-btn on" data-type="${t}"><span class="dot ${t}"></span>${WM_TYPE_LABEL[t]}</button>`).join("")}
+        <div class="wm-speed" id="wm-speed" role="group" aria-label="Playback speed">
+          <span class="wm-speed-label">Speed</span>
+          ${WM_SPEEDS.map(v => `<button type="button" class="wm-speed-btn${v === 1 ? " on" : ""}" data-speed="${v}" aria-pressed="${v === 1}">${v}×</button>`).join("")}
+        </div>
         <button class="wm-focus-chip" id="wm-focus" type="button" hidden></button>
         <span class="wm-summary" id="wm-summary"></span>
       </div>
@@ -3598,6 +3613,15 @@ function createWorldMap(hostEl, composers, opts = {}) {
   // ---- play ---------------------------------------------------------------------
 
   let playTimer = null;
+  let playIdx = 0;
+  let speed = 1;
+  const speedEl = hostEl.querySelector("#wm-speed");
+
+  function stepPlay() {
+    playIdx += 1;
+    if (playIdx >= brackets.length) { stopPlay(); return; }
+    setBracket(brackets[playIdx]);
+  }
   function stopPlay() {
     clearInterval(playTimer);
     playTimer = null;
@@ -3605,15 +3629,26 @@ function createWorldMap(hostEl, composers, opts = {}) {
   }
   function startPlay() {
     playBtn.classList.add("playing");
-    let idx = state.bracket == null ? 0 : brackets.indexOf(state.bracket) + 1;
-    if (idx >= brackets.length) idx = 0;
-    setBracket(brackets[idx]);
-    playTimer = setInterval(() => {
-      idx += 1;
-      if (idx >= brackets.length) { stopPlay(); return; }
-      setBracket(brackets[idx]);
-    }, 1500);
+    playIdx = state.bracket == null ? 0 : brackets.indexOf(state.bracket) + 1;
+    if (playIdx >= brackets.length) playIdx = 0;
+    setBracket(brackets[playIdx]);
+    playTimer = setInterval(stepPlay, WM_PLAY_MS / speed);
   }
+  speedEl.addEventListener("click", (e) => {
+    const btn = e.target.closest(".wm-speed-btn");
+    if (!btn) return;
+    speed = parseFloat(btn.dataset.speed);
+    speedEl.querySelectorAll(".wm-speed-btn").forEach(b => {
+      const on = b === btn;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", String(on));
+    });
+    // Changing speed mid-play keeps the current position and just re-times the steps.
+    if (playTimer) {
+      clearInterval(playTimer);
+      playTimer = setInterval(stepPlay, WM_PLAY_MS / speed);
+    }
+  });
   playBtn.addEventListener("click", () => (playTimer ? stopPlay() : startPlay()));
 
   refresh();
@@ -3962,11 +3997,48 @@ function createLinks(hostEl, composers, opts = {}) {
         entries.forEach(en => {
           if (!en.isIntersecting) return;
           observer.unobserve(en.target);
-          const c = byId.get(en.target.dataset.composerId);
-          if (c) mountPortrait(en.target, c);
+          mountNode(en.target.dataset.composerId);
         });
       }, { root: hostEl, rootMargin: "400px" })
     : null;
+
+  // Portraits: the ones near the viewport load first (IntersectionObserver); a throttled
+  // background pass then fetches the rest, so scrolling or jumping to a far-away composer
+  // finds the images already there. A second pass retries any that were rate-limited.
+  let mounted = new Set();
+  let preloadToken = 0;
+  function mountNode(id) {
+    if (mounted.has(id)) return Promise.resolve();
+    const el = nodeEls.get(id);
+    const c = byId.get(id);
+    if (!el || !c) return Promise.resolve();
+    mounted.add(id);
+    return mountPortrait(el.querySelector(".lk-portrait"), c);
+  }
+  async function preload() {
+    const token = ++preloadToken;
+    const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+    for (let pass = 0; pass < 2; pass++) {
+      const ids = [...nodeEls.keys()].filter(id => {
+        const el = nodeEls.get(id).querySelector(".lk-portrait");
+        return !el.classList.contains("has-img") && byId.get(id).wiki !== undefined && !(pass === 0 && mounted.has(id));
+      });
+      const top = hostEl.scrollTop;
+      ids.sort((a, b) => Math.abs(layout.pos.get(a).y - top) - Math.abs(layout.pos.get(b).y - top));
+      let next = 0;
+      const worker = async () => {
+        while (token === preloadToken && next < ids.length) {
+          const id = ids[next++];
+          if (pass === 1) mounted.delete(id);
+          await mountNode(id);
+          await sleep(60);
+        }
+      };
+      await Promise.all([worker(), worker(), worker(), worker()]);
+      if (token !== preloadToken) return;
+      await sleep(1500);
+    }
+  }
 
   let layout = null;
   let layoutW = 0;
@@ -4083,6 +4155,7 @@ function createLinks(hostEl, composers, opts = {}) {
     if (observer) observer.disconnect();
     nodeEls = new Map();
     edgeEls = [];
+    mounted = new Set();
 
     innerEl.style.width = W + "px";
     innerEl.style.height = height + "px";
@@ -4172,10 +4245,11 @@ function createLinks(hostEl, composers, opts = {}) {
       nodesEl.appendChild(btn);
       nodeEls.set(c.id, btn);
       const portrait = btn.querySelector(".lk-portrait");
-      if (observer) observer.observe(portrait); else mountPortrait(portrait, c);
+      if (observer) observer.observe(portrait);
     });
 
     applyState();
+    setTimeout(preload, 400);
   }
 
   // ---- Focus + dimming ----

@@ -84,11 +84,48 @@ export function createLinks(hostEl, composers, opts = {}) {
         entries.forEach(en => {
           if (!en.isIntersecting) return;
           observer.unobserve(en.target);
-          const c = byId.get(en.target.dataset.composerId);
-          if (c) mountPortrait(en.target, c);
+          mountNode(en.target.dataset.composerId);
         });
       }, { root: hostEl, rootMargin: "400px" })
     : null;
+
+  // Portraits: the ones near the viewport load first (IntersectionObserver); a throttled
+  // background pass then fetches the rest, so scrolling or jumping to a far-away composer
+  // finds the images already there. A second pass retries any that were rate-limited.
+  let mounted = new Set();
+  let preloadToken = 0;
+  function mountNode(id) {
+    if (mounted.has(id)) return Promise.resolve();
+    const el = nodeEls.get(id);
+    const c = byId.get(id);
+    if (!el || !c) return Promise.resolve();
+    mounted.add(id);
+    return mountPortrait(el.querySelector(".lk-portrait"), c);
+  }
+  async function preload() {
+    const token = ++preloadToken;
+    const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+    for (let pass = 0; pass < 2; pass++) {
+      const ids = [...nodeEls.keys()].filter(id => {
+        const el = nodeEls.get(id).querySelector(".lk-portrait");
+        return !el.classList.contains("has-img") && byId.get(id).wiki !== undefined && !(pass === 0 && mounted.has(id));
+      });
+      const top = hostEl.scrollTop;
+      ids.sort((a, b) => Math.abs(layout.pos.get(a).y - top) - Math.abs(layout.pos.get(b).y - top));
+      let next = 0;
+      const worker = async () => {
+        while (token === preloadToken && next < ids.length) {
+          const id = ids[next++];
+          if (pass === 1) mounted.delete(id);
+          await mountNode(id);
+          await sleep(60);
+        }
+      };
+      await Promise.all([worker(), worker(), worker(), worker()]);
+      if (token !== preloadToken) return;
+      await sleep(1500);
+    }
+  }
 
   let layout = null;
   let layoutW = 0;
@@ -205,6 +242,7 @@ export function createLinks(hostEl, composers, opts = {}) {
     if (observer) observer.disconnect();
     nodeEls = new Map();
     edgeEls = [];
+    mounted = new Set();
 
     innerEl.style.width = W + "px";
     innerEl.style.height = height + "px";
@@ -294,10 +332,11 @@ export function createLinks(hostEl, composers, opts = {}) {
       nodesEl.appendChild(btn);
       nodeEls.set(c.id, btn);
       const portrait = btn.querySelector(".lk-portrait");
-      if (observer) observer.observe(portrait); else mountPortrait(portrait, c);
+      if (observer) observer.observe(portrait);
     });
 
     applyState();
+    setTimeout(preload, 400);
   }
 
   // ---- Focus + dimming ----

@@ -20,7 +20,7 @@ export function fetchWikiSummary(composer) {
   const promise = fetch(url, { headers: { accept: "application/json" } })
     .then(r => {
       if (r.ok) return r.json();
-      if (r.status >= 500) cache.delete(key);
+      if (r.status >= 500 || r.status === 429) cache.delete(key);
       return null;
     })
     .catch(() => {
@@ -54,21 +54,22 @@ export function resolvePortraitUrl(composer) {
 // Mounts an img into `hostEl` once the URL resolves. Bails out if the host
 // element has been detached (e.g. the panel re-rendered with a new composer).
 export function mountPortrait(hostEl, composer, altText) {
-  if (!hostEl) return;
-  resolvePortraitUrl(composer).then(url => {
-    if (!url) return;
-    if (!hostEl.isConnected) return;
-    if (hostEl.dataset.composerId !== composer.id) return;
+  if (!hostEl) return Promise.resolve();
+  return resolvePortraitUrl(composer).then(url => new Promise(resolve => {
+    if (!url) return resolve();
+    if (!hostEl.isConnected) return resolve();
+    if (hostEl.dataset.composerId !== composer.id) return resolve();
     const img = new Image();
     img.alt = altText || composer.name;
     img.referrerPolicy = "no-referrer";
     img.onload = () => {
-      if (!hostEl.isConnected) return;
-      if (hostEl.dataset.composerId !== composer.id) return;
+      if (!hostEl.isConnected) return resolve();
+      if (hostEl.dataset.composerId !== composer.id) return resolve();
       hostEl.prepend(img);
       hostEl.classList.add("has-img");
+      resolve();
     };
-    img.onerror = () => {};
+    img.onerror = () => resolve();
     img.src = url;
-  });
+  }));
 }
