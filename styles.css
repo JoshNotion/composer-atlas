@@ -797,7 +797,7 @@ body { display: flex; flex-direction: column; }
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,.78);
-  z-index: 100;
+  z-index: 5000; /* above the side panel (2000), Leaflet and every view */
   display: flex;
   align-items: center;
   justify-content: center;
