@@ -19724,6 +19724,10 @@
       {
         "id": "dukas",
         "note": "Becomes professor of composition at the Paris Conservatoire, teaching Rodrigo and Messiaen"
+      },
+      {
+        "id": "goehr",
+        "note": "Goehr came to Paris in 1955–56 to study with Messiaen, one of several young British composers drawn to his teaching after the war."
       }
     ],
     "lifeEvents": [
@@ -30343,6 +30347,10 @@
       {
         "id": "schoenberg",
         "note": "Born in Berlin on 10 August 1932 to Walter Goehr, a Schoenberg pupil and later BBC-orchestra conductor, and Laelia Baumgartner; the family flees to England in 1933 to escape the Nazi seizure of power"
+      },
+      {
+        "id": "messiaen",
+        "note": "Studied with Messiaen in Paris in 1955–56, after the Manchester years; the encounter opened him to French modernism and a freer, more rhythmically alive post-war idiom."
       }
     ],
     "lifeEvents": [
@@ -30353,6 +30361,10 @@
       {
         "year": 1952,
         "event": "Enters the Royal Manchester College of Music; forms the 'Manchester School' with Peter Maxwell Davies and Harrison Birtwistle"
+      },
+      {
+        "year": 1955,
+        "event": "Moves to Paris to study with Olivier Messiaen (1955–56)"
       },
       {
         "year": 1967,
