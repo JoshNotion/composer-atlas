@@ -541,6 +541,9 @@ function pvScore(r, composer, wantTokens, wantText) {
   return score;
 }
 
+// Recognised classical labels: a preview only plays if the album's ℗ line names one of these.
+const PV_LABELS = /deutsche grammophon|decca|philips|emi classics|emi records|warner classics|erato|teldec|apex|sony classical|rca red seal|rca victor|columbia masterworks|harmonia mundi|naxos|marco polo|chandos|hyperion|\bbis\b|ecm|alpha classics|alpha\b.*outhere|linn records|onyx|pentatone|channel classics|accent|supraphon|capriccio|\bcpo\b|orfeo|ondine|nimbus|lyrita|mercury living presence|melodiya|berlin classics|universal music classics|universal classics|avie|signum|challenge classics|virgin classics|archiv|l'oiseau-lyre|lso live|bbc music|opus arte|paladino|glossa|musica omnia|dacapo|aeon|mirare|ricercar|naïve|naive|arcana|sono luminus|cedille|telarc|reference recordings|bridge records|harmonia|dg\b|testament|pristine|sony classical|hänssler|haenssler|oehms|brilliant classics|mdg|ars produktion|coviello|ambroisie|calliope|ligia|hortus|zig-zag|fuga libera|fra bernardo|passacaille|musiques suisses|bis records/i;
+
 // Up to five distinct recordings, best first.
 async function findPreview(composer, workTitle) {
   const key = composer.id + "|" + workTitle;
@@ -563,6 +566,19 @@ async function findPreview(composer, workTitle) {
       if (s >= 0.5) scored.push({ s, r });
     });
     scored.sort((a, b) => b.s - a.s);
+    // Look up the album labels (℗ line) in one batch and keep only recognised classical labels.
+    const ids = [...new Set(scored.slice(0, 30).map(({ r }) => r.collectionId).filter(Boolean))];
+    const label = {};
+    if (ids.length) {
+      try {
+        const lr = await fetch("https://itunes.apple.com/lookup?entity=album&id=" + ids.join(","));
+        const ld = await lr.json();
+        (ld.results || []).forEach((a) => { label[a.collectionId] = a.copyright || ""; });
+      } catch (e) { /* no label info: nothing qualifies */ }
+    }
+    for (let k = scored.length - 1; k >= 0; k--) {
+      if (!PV_LABELS.test(label[scored[k].r.collectionId] || "")) scored.splice(k, 1);
+    }
     const seen = new Set();
     scored.forEach(({ r }) => {
       const who = pvNorm(r.artistName);
