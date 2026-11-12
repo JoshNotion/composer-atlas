@@ -1865,3 +1865,6 @@ body[data-view="map"] .panel .map-section { display: none; }
 .timeline-wrap .timeline-controls { top: calc(var(--tl-bar-h, 0px) + 10px); }
 .wm-timeline.has-life .wm-bracket.in-life.in-view { box-shadow: 0 0 0 1px var(--life); }
 .tl-periodbar .wm-bracket.in-view:not(.active) { border-color: #6a6660; }
+
+/* Play journey inside the card header (world-map tab, where the card has no map) */
+.journey-btn.journey-inline { position: static; margin-top: 10px; align-self: flex-start; }

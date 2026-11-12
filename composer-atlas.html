@@ -2539,6 +2539,9 @@ body[data-view="map"] .panel .map-section { display: none; }
 .wm-timeline.has-life .wm-bracket.in-life.in-view { box-shadow: 0 0 0 1px var(--life); }
 .tl-periodbar .wm-bracket.in-view:not(.active) { border-color: #6a6660; }
 
+/* Play journey inside the card header (world-map tab, where the card has no map) */
+.journey-btn.journey-inline { position: static; margin-top: 10px; align-self: flex-start; }
+
 </style>
 </head>
 <body>
@@ -3507,7 +3510,11 @@ function createWorldMap(hostEl, composers, opts = {}) {
   const journey = jmCreatePlayer(map, trailLayer);
   const journeyBtn = hostEl.querySelector("#wm-journey");
   let journeyLoaded = false;
+  const journeyListeners = [];
+  let journeyState = { playable: false, playing: false, finished: false };
   journey.onState((st) => {
+    journeyState = st;
+    journeyListeners.forEach(fn => fn(st));
     journeyBtn.hidden = !st.playable;
     journeyBtn.classList.toggle("playing", st.playing);
     journeyBtn.querySelector(".ji-text").textContent = st.playing ? "Pause" : (st.finished ? "Replay journey" : "Play journey");
@@ -3874,6 +3881,11 @@ function createWorldMap(hostEl, composers, opts = {}) {
     getBracket: () => state.bracket,
     stop: stopPlay,
     clearFocus,
+    // Journey controls, so the composer card can drive the same playback.
+    focus(id) { if (state.focus !== id) focusComposer(id); },
+    toggleJourney() { journey.toggle(); },
+    getJourneyState: () => journeyState,
+    onJourney(fn) { journeyListeners.push(fn); },
     // Re-centre on the focused composer (used once the side card has finished sliding in).
     refit() { if (state.focus) fitToActive(); },
     invalidateSize() { map.invalidateSize(); },
@@ -5754,6 +5766,10 @@ async function main() {
         onChange: () => writeHash(),
       });
       worldMap.setEra(currentEra);
+      // The card's own Play journey button mirrors the world map's playback state.
+      worldMap.onJourney((st) => {
+        document.querySelectorAll(".journey-inline").forEach(btn => paintJourneyBtn(btn, st));
+      });
     }
     if (bracket !== undefined && worldMap.getBracket() !== bracket) worldMap.setBracket(bracket);
   }
@@ -5913,6 +5929,29 @@ async function main() {
   const detailTarget = document.getElementById("detail-target");
   const mapApi = createMap(mapHost);
 
+  const JOURNEY_BTN_HTML = `
+    <svg class="ji-play" viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"></path></svg>
+    <svg class="ji-pause" viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"></path></svg>
+    <span class="ji-text">Play journey</span>`;
+  function paintJourneyBtn(btn, st) {
+    btn.hidden = !st.playable;
+    btn.classList.toggle("playing", st.playing);
+    btn.querySelector(".ji-text").textContent = st.playing ? "Pause" : (st.finished ? "Replay journey" : "Play journey");
+  }
+  // On the world-map tab the card has no map of its own, so it gets a Play journey button
+  // in its header that plays the journey on the big map instead.
+  function addInlineJourney() {
+    const meta = detailTarget.querySelector(".detail-meta");
+    if (!meta || !worldMap) return;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "journey-btn journey-inline";
+    btn.innerHTML = JOURNEY_BTN_HTML;
+    btn.addEventListener("click", () => worldMap.toggleJourney());
+    meta.appendChild(btn);
+    paintJourneyBtn(btn, worldMap.getJourneyState());
+  }
+
   const journeyBtn = document.getElementById("journey-play");
   journeyBtn.addEventListener("click", () => mapApi.toggleJourney());
   mapApi.onJourneyState((st) => {
@@ -6049,6 +6088,7 @@ async function main() {
     });
     // On the world map the journey plays on the big map itself, so the card skips its own map.
     if (currentView !== "map") mapApi.showComposer(c);
+    else if (worldMap) { worldMap.focus(id); addInlineJourney(); }
     openPanel();
     panelInner.scrollTop = 0;
   }

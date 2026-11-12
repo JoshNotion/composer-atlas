@@ -134,6 +134,10 @@ async function main() {
         onChange: () => writeHash(),
       });
       worldMap.setEra(currentEra);
+      // The card's own Play journey button mirrors the world map's playback state.
+      worldMap.onJourney((st) => {
+        document.querySelectorAll(".journey-inline").forEach(btn => paintJourneyBtn(btn, st));
+      });
     }
     if (bracket !== undefined && worldMap.getBracket() !== bracket) worldMap.setBracket(bracket);
   }
@@ -293,6 +297,29 @@ async function main() {
   const detailTarget = document.getElementById("detail-target");
   const mapApi = createMap(mapHost);
 
+  const JOURNEY_BTN_HTML = `
+    <svg class="ji-play" viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"></path></svg>
+    <svg class="ji-pause" viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"></path></svg>
+    <span class="ji-text">Play journey</span>`;
+  function paintJourneyBtn(btn, st) {
+    btn.hidden = !st.playable;
+    btn.classList.toggle("playing", st.playing);
+    btn.querySelector(".ji-text").textContent = st.playing ? "Pause" : (st.finished ? "Replay journey" : "Play journey");
+  }
+  // On the world-map tab the card has no map of its own, so it gets a Play journey button
+  // in its header that plays the journey on the big map instead.
+  function addInlineJourney() {
+    const meta = detailTarget.querySelector(".detail-meta");
+    if (!meta || !worldMap) return;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "journey-btn journey-inline";
+    btn.innerHTML = JOURNEY_BTN_HTML;
+    btn.addEventListener("click", () => worldMap.toggleJourney());
+    meta.appendChild(btn);
+    paintJourneyBtn(btn, worldMap.getJourneyState());
+  }
+
   const journeyBtn = document.getElementById("journey-play");
   journeyBtn.addEventListener("click", () => mapApi.toggleJourney());
   mapApi.onJourneyState((st) => {
@@ -429,6 +456,7 @@ async function main() {
     });
     // On the world map the journey plays on the big map itself, so the card skips its own map.
     if (currentView !== "map") mapApi.showComposer(c);
+    else if (worldMap) { worldMap.focus(id); addInlineJourney(); }
     openPanel();
     panelInner.scrollTop = 0;
   }

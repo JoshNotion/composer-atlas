@@ -140,7 +140,11 @@ export function createWorldMap(hostEl, composers, opts = {}) {
   const journey = jmCreatePlayer(map, trailLayer);
   const journeyBtn = hostEl.querySelector("#wm-journey");
   let journeyLoaded = false;
+  const journeyListeners = [];
+  let journeyState = { playable: false, playing: false, finished: false };
   journey.onState((st) => {
+    journeyState = st;
+    journeyListeners.forEach(fn => fn(st));
     journeyBtn.hidden = !st.playable;
     journeyBtn.classList.toggle("playing", st.playing);
     journeyBtn.querySelector(".ji-text").textContent = st.playing ? "Pause" : (st.finished ? "Replay journey" : "Play journey");
@@ -507,6 +511,11 @@ export function createWorldMap(hostEl, composers, opts = {}) {
     getBracket: () => state.bracket,
     stop: stopPlay,
     clearFocus,
+    // Journey controls, so the composer card can drive the same playback.
+    focus(id) { if (state.focus !== id) focusComposer(id); },
+    toggleJourney() { journey.toggle(); },
+    getJourneyState: () => journeyState,
+    onJourney(fn) { journeyListeners.push(fn); },
     // Re-centre on the focused composer (used once the side card has finished sliding in).
     refit() { if (state.focus) fitToActive(); },
     invalidateSize() { map.invalidateSize(); },
