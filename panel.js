@@ -527,7 +527,7 @@ function pvScore(r, composer, wantTokens, wantText) {
   const hay = pvNorm(`${r.trackName} ${r.collectionName} ${r.artistName}`);
   const surname = pvNorm(composer.name.split(/\s+/).pop());
   if (!hay.includes(surname)) return -1;
-  const body = pvNorm(`${r.trackName} ${r.collectionName}`);
+  const body = pvNorm(r.trackName); // track only: album titles list several works and caused mix-ups
   const hits = wantTokens.filter(t => body.includes(t)).length;
   const match = wantTokens.length ? hits / wantTokens.length : 0;
   if (match < 0.5) return -1;
