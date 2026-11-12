@@ -176,6 +176,15 @@ export function createHome(hostEl, composers, opts = {}) {
         </div>
         <button class="home-random" id="home-random" type="button">Surprise me with a composer</button>
       </section>
+
+      <footer class="home-built">
+        Built with open data: composer biographies and portraits come from
+        <a href="https://www.wikipedia.org" target="_blank" rel="noopener">Wikipedia</a> (CC BY-SA),
+        works catalogues from <a href="https://openopus.org" target="_blank" rel="noopener">Open Opus</a>,
+        and maps from <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>
+        contributors, <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a> and
+        <a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>.
+      </footer>
     </div>
   `;
 

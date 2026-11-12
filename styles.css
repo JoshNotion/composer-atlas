@@ -1868,3 +1868,12 @@ body[data-view="map"] .panel .map-section { display: none; }
 
 /* Play journey inside the card header (world-map tab, where the card has no map) */
 .journey-btn.journey-inline { position: static; margin-top: 10px; align-self: flex-start; }
+
+.home-built {
+  margin: 56px 0 8px; padding-top: 18px;
+  border-top: 1px solid var(--border);
+  font-size: 11.5px; line-height: 1.6; color: var(--text-faint, #6f6a63);
+  max-width: 720px;
+}
+.home-built a { color: inherit; text-decoration: underline; text-decoration-color: #4a4640; text-underline-offset: 2px; }
+.home-built a:hover { color: var(--text-dim); }
