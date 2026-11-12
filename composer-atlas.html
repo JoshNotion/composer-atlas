@@ -2607,6 +2607,8 @@ body[data-view="map"] .panel:not(.expanded) .map-section { display: none; }
 .work-preview.loading { color: var(--text-dim); cursor: progress; }
 .work-preview.none { color: var(--text-faint); border-color: var(--border); cursor: default; }
 .preview-cap { flex: 1 0 100%; margin-top: 4px; font-size: 11.5px; color: var(--text-faint); line-height: 1.4; }
+.preview-next { font: inherit; font-size: 11.5px; color: var(--text-dim); background: none; border: 0; padding: 0; margin-left: 6px; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.preview-next:hover { color: var(--text); }
 
 </style>
 </head>
@@ -5320,6 +5322,7 @@ function renderDetail(targetEl, composer, allComposersById, callbacks = {}) {
   // 30-second previews: one click handler for every Preview button in this card.
   stopPreview();
   targetEl.onclick = (e) => {
+    if (e.target.closest(".preview-next")) { nextVersion(); return; }
     const btn = e.target.closest(".work-preview");
     if (btn) togglePreview(btn, composer);
   };
@@ -5744,41 +5747,58 @@ const PV_STOP = new Set(["the", "in", "of", "for", "and", "op", "no", "nos", "a"
 function pvTokens(s) {
   return pvNorm(s).split(/[^a-z0-9]+/).filter(t => t && !PV_STOP.has(t) && (t.length > 2 || /^\d+$/.test(t)));
 }
-const PV_BAD = /arrang|karaoke|lullaby|tribute|cover|remix|ringtone|piano version|for kids|baby|meditation|relax|8-?bit|rock|electro|church organ|guitar version/;
+const PV_BAD = /arrang|karaoke|lullaby|tribute|cover|remix|ringtone|piano version|piano ver|for piano|for organ|for guitar|for kids|baby|meditation|relax|8-?bit|rock|electro|church organ|guitar version|transcr|sound-?alike|instrumental version|orchestral version|midi|synth/;
 
+// Rank a hit: right composer + right work first, then prefer proper classical releases
+// (genre "Classical", an "Orchestra & Conductor" style credit) over budget "orchestras",
+// arrangements and transcriptions.
 function pvScore(r, composer, wantTokens, wantText) {
   const hay = pvNorm(`${r.trackName} ${r.collectionName} ${r.artistName}`);
   const surname = pvNorm(composer.name.split(/\s+/).pop());
   if (!hay.includes(surname)) return -1;
   const body = pvNorm(`${r.trackName} ${r.collectionName}`);
   const hits = wantTokens.filter(t => body.includes(t)).length;
-  let score = wantTokens.length ? hits / wantTokens.length : 0;
-  const bad = PV_BAD.test(hay) && !PV_BAD.test(wantText);
-  if (bad) score -= 0.6;
+  const match = wantTokens.length ? hits / wantTokens.length : 0;
+  if (match < 0.5) return -1;
+  let score = match;
+  if (PV_BAD.test(hay) && !PV_BAD.test(wantText)) score -= 1;
+  if (r.primaryGenreName === "Classical") score += 0.35;
+  else if (r.primaryGenreName === "Orchestral" || r.primaryGenreName === "Easy Listening" || r.primaryGenreName === "New Age") score -= 0.35;
+  if (/ & |, /.test(r.artistName || "")) score += 0.2; // "Berlin Philharmonic & Karajan"
+  if (/(philharmoni|symphony orchestra|orchestra|quartet|ensemble|consort|choir|chamber)/.test(pvNorm(r.artistName)) && / & |, /.test(r.artistName || "")) score += 0.1;
+  if (/(^|[:\s])I\.\s/.test(r.trackName || "")) score += 0.15; // first movement: the most recognisable opening
   return score;
 }
 
+// Up to five distinct recordings, best first.
 async function findPreview(composer, workTitle) {
   const key = composer.id + "|" + workTitle;
   if (previewCache.has(key)) return previewCache.get(key);
-  let found = null;
+  let found = [];
   try {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 7000);
-    const url = "https://itunes.apple.com/search?media=music&entity=song&limit=25&country=US&term=" +
+    const url = "https://itunes.apple.com/search?media=music&entity=song&limit=50&country=US&term=" +
       encodeURIComponent(`${composer.name} ${workTitle}`);
     const res = await fetch(url, { signal: ctrl.signal });
     clearTimeout(timer);
     const data = await res.json();
     const wantTokens = pvTokens(workTitle);
     const wantText = pvNorm(workTitle);
-    let best = null;
+    const scored = [];
     (data.results || []).forEach((r, i) => {
       if (!r.previewUrl) return;
       const s = pvScore(r, composer, wantTokens, wantText) - i * 0.002;
-      if (s >= 0.5 && (!best || s > best.s)) best = { s, r };
+      if (s >= 0.5) scored.push({ s, r });
     });
-    if (best) found = { url: best.r.previewUrl, label: `${best.r.trackName} — ${best.r.artistName}` };
+    scored.sort((a, b) => b.s - a.s);
+    const seen = new Set();
+    scored.forEach(({ r }) => {
+      const who = pvNorm(r.artistName);
+      if (seen.has(who) || found.length >= 5) return;
+      seen.add(who);
+      found.push({ url: r.previewUrl, label: `${r.trackName} — ${r.artistName}` });
+    });
   } catch (e) { /* offline, blocked or timed out: treated as "no preview" */ }
   previewCache.set(key, found);
   return found;
@@ -5792,18 +5812,43 @@ function pvSet(btn, state, text) {
   if (state !== "playing") btn.style.removeProperty("--pv");
 }
 
-function pvCaption(btn, text) {
+function pvCaption(btn, text, canCycle) {
   const row = btn.closest(".work, .catalogue-work");
   if (!row) return;
   let cap = row.querySelector(".preview-cap");
   if (!text) { if (cap) cap.remove(); return; }
   if (!cap) { cap = document.createElement("div"); cap.className = "preview-cap"; row.appendChild(cap); }
-  cap.textContent = text;
+  cap.innerHTML = `<span class="preview-cap-text"></span>${canCycle ? ' <button type="button" class="preview-next">Another version</button>' : ""}`;
+  cap.querySelector(".preview-cap-text").textContent = text;
 }
 function stopPreview() {
   if (previewAudio) { previewAudio.pause(); previewAudio.removeAttribute("src"); previewAudio.load(); }
   if (previewBtnEl && previewBtnEl.isConnected) { pvSet(previewBtnEl, null); pvCaption(previewBtnEl, ""); }
   previewBtnEl = null;
+}
+
+let previewCur = null; // { btn, cands, idx }
+
+async function playCandidate(btn, cands, idx) {
+  const hit = cands[idx];
+  previewAudio.src = hit.url;
+  try {
+    await previewAudio.play();
+    if (previewBtnEl === btn) {
+      pvSet(btn, "playing", "Pause");
+      pvCaption(btn, `30-second preview${cands.length > 1 ? ` (${idx + 1}/${cands.length})` : ""}: ${hit.label}`, cands.length > 1);
+    }
+  } catch (e) {
+    if (previewBtnEl === btn) { previewBtnEl = null; pvSet(btn, "none"); }
+  }
+}
+
+// "Another version" in the caption: next recording of the same work.
+function nextVersion() {
+  if (!previewCur || previewBtnEl !== previewCur.btn) return;
+  previewCur.idx = (previewCur.idx + 1) % previewCur.cands.length;
+  pvSet(previewCur.btn, "loading", "Loading…");
+  playCandidate(previewCur.btn, previewCur.cands, previewCur.idx);
 }
 
 async function togglePreview(btn, composer) {
@@ -5812,10 +5857,9 @@ async function togglePreview(btn, composer) {
   stopPreview();
   previewBtnEl = btn;
   pvSet(btn, "loading", "Finding…");
-  const title = btn.getAttribute("data-title");
-  const hit = await findPreview(composer, title);
+  const cands = await findPreview(composer, btn.getAttribute("data-title"));
   if (previewBtnEl !== btn) return; // another button was pressed meanwhile
-  if (!hit) {
+  if (!cands.length) {
     previewBtnEl = null;
     pvSet(btn, "none");
     return;
@@ -5829,22 +5873,19 @@ async function togglePreview(btn, composer) {
     previewAudio.addEventListener("ended", () => stopPreview());
     previewAudio.addEventListener("error", () => {
       if (!previewBtnEl) return;
+      if (previewCur && previewCur.btn === previewBtnEl && previewCur.cands.length > 1 && previewCur.tries < previewCur.cands.length) {
+        previewCur.tries += 1;
+        nextVersion(); // a broken clip: quietly try the next recording
+        return;
+      }
       const b = previewBtnEl;
       previewBtnEl = null;
       pvCaption(b, "");
       pvSet(b, "none");
     });
   }
-  previewAudio.src = hit.url;
-  try {
-    await previewAudio.play();
-    if (previewBtnEl === btn) {
-      pvSet(btn, "playing", "Pause");
-      pvCaption(btn, `30-second preview: ${hit.label}`);
-    }
-  } catch (e) {
-    if (previewBtnEl === btn) { previewBtnEl = null; pvSet(btn, "none"); }
-  }
+  previewCur = { btn, cands, idx: 0, tries: 0 };
+  playCandidate(btn, cands, 0);
 }
 
 
