@@ -2,7 +2,7 @@
 // Places are aggregated, so a city shows one pin with a count and a list of composers.
 
 import { eraColor } from "./timeline.js";
-import { TILE_URL, TILE_OPTIONS, jmBuildStops, jmCreatePlayer } from "./map.js";
+import { TILE_URL, TILE_OPTIONS, TYPE_COLOR, jmBuildStops, jmCreatePlayer } from "./map.js";
 
 export const WM_FIRST_BRACKET = 1050;
 export const WM_LAST_BRACKET = 2000;
@@ -197,10 +197,14 @@ export function createWorldMap(hostEl, composers, opts = {}) {
 
   // ---- rendering ----------------------------------------------------------------
 
-  function dominantEra(people) {
+  // Pins are coloured by kind of place (green birth, blue lived, red death), like the
+  // composer card's map; the lines drawn between places carry the era colour instead.
+  function pinType(types) { return types.has("birth") ? "birth" : types.has("death") ? "death" : "lived"; }
+  function dominantType(people) {
     const counts = {};
-    people.forEach(e => { counts[e.composer.era] = (counts[e.composer.era] || 0) + 1; });
-    return Object.keys(counts).sort((a, b) => counts[b] - counts[a])[0];
+    people.forEach(e => { const t = pinType(e.types); counts[t] = (counts[t] || 0) + 1; });
+    const order = ["birth", "lived", "death"];
+    return order.slice().sort((a, b) => (counts[b] || 0) - (counts[a] || 0) || order.indexOf(a) - order.indexOf(b))[0];
   }
 
   function popupFor(place) {
@@ -245,6 +249,7 @@ export function createWorldMap(hostEl, composers, opts = {}) {
     state.focus = id;
     map.closePopup();
     const comp = composers.find(c => c.id === id);
+    if (comp) journey.setColor(eraColor(comp.era));
     journey.setStops(comp ? jmBuildStops(comp) : []);
     journeyLoaded = true;
     render();
@@ -271,7 +276,7 @@ export function createWorldMap(hostEl, composers, opts = {}) {
       const size = 20;
       const icon = L.divIcon({
         className: "wm-pin-wrap",
-        html: `<div class="wm-pin wm-pin-step" style="width:${size}px;height:${size}px;--pin:${color}">${stops.length > 1 ? i + 1 : ""}</div>`,
+        html: `<div class="wm-pin wm-pin-step" style="width:${size}px;height:${size}px;--pin:${TYPE_COLOR[st.type] || color}">${stops.length > 1 ? i + 1 : ""}</div>`,
         iconSize: [size, size],
         iconAnchor: [size / 2, size / 2],
       });
@@ -304,8 +309,7 @@ export function createWorldMap(hostEl, composers, opts = {}) {
     // as the timeline's, drawn translucent so the map stays calm.
     places.forEach(place => {
       const n = place.people.size;
-      const era = dominantEra([...place.people.values()]);
-      const color = eraColor(era);
+      const color = TYPE_COLOR[dominantType([...place.people.values()])];
       const size = n === 1 ? 9 : Math.round(Math.min(34, 15 + Math.sqrt(n) * 3.4));
       const html = n === 1
         ? `<div class="wm-pin wm-pin-one" style="width:${size}px;height:${size}px;--pin:${color}"></div>`

@@ -28,13 +28,11 @@ export function renderDetail(targetEl, composer, allComposersById, callbacks = {
     const note = typeof rel === "string" ? "" : (rel.note || "");
     const c = allComposersById.get(rid);
     if (!c) return "";
-    return `<button class="connection-card" data-id="${escapeAttr(rid)}">
-      <div class="connection-card-head">
-        <span class="chip-dot" style="background:${eraColor(c.era)};width:8px;height:8px;border-radius:50%;display:inline-block;flex:0 0 auto;"></span>
-        <span class="connection-card-name">${escapeHtml(c.name)}</span>
-        <span class="connection-card-years">${c.born}–${c.died ?? "—"}</span>
-      </div>
-      ${note ? `<div class="connection-card-note">${escapeHtml(note)}</div>` : ""}
+    return `<button class="connection-card cc-card" data-id="${escapeAttr(rid)}" style="--era:${eraColor(c.era)}">
+      <span class="cc-portrait" data-composer-id="${escapeAttr(rid)}"><span class="initials">${escapeHtml(initialsFor(c.name))}</span></span>
+      <span class="cc-name">${escapeHtml(c.name)}</span>
+      <span class="cc-years">${c.born}&nbsp;–&nbsp;${c.died ?? "present"}</span>
+      ${note ? `<span class="connection-card-note cc-note">${escapeHtml(note)}</span>` : ""}
     </button>`;
   }).join("");
 
@@ -105,7 +103,11 @@ export function renderDetail(targetEl, composer, allComposersById, callbacks = {
   // Life events + key works on a shared timeline
   drawTimeline(targetEl.querySelector("#life-tl"), composer.lifeEvents || [], composer.keyWorks || [], lifeMin, lifeMax, color);
 
-  // Connection cards
+  // Connection cards (portraits load like everywhere else)
+  targetEl.querySelectorAll(".cc-portrait").forEach(el => {
+    const comp = allComposersById.get(el.getAttribute("data-composer-id"));
+    if (comp) mountPortrait(el, comp);
+  });
   targetEl.querySelectorAll(".connection-card").forEach(btn => {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-id");

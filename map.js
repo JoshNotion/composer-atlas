@@ -1,7 +1,10 @@
 // Leaflet map module — shows a composer's journey with toggleable
 // birth / lived / death layers, polyline route, dark CartoDB tiles.
 
-const TYPE_COLOR = {
+import { eraColor } from "./timeline.js";
+
+// Marker colours by kind of place; shared with the world map so both maps read the same.
+export const TYPE_COLOR = {
   birth: "#2EC090",
   lived: "#50A0E8",
   death: "#E04060",
@@ -95,7 +98,7 @@ function jmEase(p) { return p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 
 export function jmCreatePlayer(map, trailLayer) {
   const j = {
     stops: [], idx: 0, phase: "dwell", elapsed: 0, travelMs: 1500,
-    raf: null, last: 0, playing: false, finished: false, speed: 1,
+    raf: null, last: 0, playing: false, finished: false, speed: 1, color: "#f0ede8",
     marker: null, trail: null, cb: null,
   };
 
@@ -142,7 +145,7 @@ export function jmCreatePlayer(map, trailLayer) {
         iconAnchor: [8, 8],
       });
       j.marker = L.marker([s.lat, s.lng], { icon, interactive: false, keyboard: false, zIndexOffset: 5000 }).addTo(map);
-      j.trail = L.polyline([[s.lat, s.lng]], { color: "#f0ede8", weight: 2.5, opacity: 0.85, lineJoin: "round" }).addTo(trailLayer);
+      j.trail = L.polyline([[s.lat, s.lng]], { color: j.color, weight: 2.5, opacity: 0.95, lineJoin: "round" }).addTo(trailLayer);
       label(s.stay, s.city);
     }
     j.playing = true;
@@ -204,6 +207,7 @@ export function jmCreatePlayer(map, trailLayer) {
   return {
     setStops, reset, start, pause,
     toggle() { if (j.playing) pause(); else start(); },
+    setColor(c) { j.color = c; if (j.trail) j.trail.setStyle({ color: c }); },
     setSpeed(v) { j.speed = v > 0 ? v : 1; },
     onState(cb) { j.cb = cb; emit(); },
     isPlaying: () => j.playing,
@@ -249,6 +253,7 @@ export function createMap(mapHostEl) {
   function showComposer(composer) {
     currentComposer = composer;
     clear();
+    journey.setColor(eraColor(composer && composer.era));
     journey.setStops(jmBuildStops(composer));
     if (!composer || !composer.locations || composer.locations.length === 0) return;
 
@@ -280,15 +285,11 @@ export function createMap(mapHostEl) {
       grp.addLayer(marker);
     });
 
-    if (points.length >= 2) {
-      const route = L.polyline(points, {
-        color: "#f0ede8",
-        weight: 1.5,
-        opacity: 0.45,
-        dashArray: "4 6",
-        lineJoin: "round",
-      });
-      routeLayer.addLayer(route);
+    // Route in the composer's era colour (same as the world map); the dots keep the
+    // green / blue / red of birth / lived / death.
+    const route = jmBuildStops(composer).map(s => [s.lat, s.lng]);
+    if (route.length >= 2) {
+      routeLayer.addLayer(L.polyline(route, { color: eraColor(composer.era), weight: 2, opacity: 0.8, lineJoin: "round" }));
     }
 
     if (points.length > 0) {

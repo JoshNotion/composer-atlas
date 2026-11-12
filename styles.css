@@ -1049,7 +1049,7 @@ body[data-view="home"] .legend { display: none; }
 /* ================= Home ================= */
 
 .view-home { overflow: auto; }
-.home-inner { max-width: 1040px; margin: 0 auto; padding: 56px 28px 72px; }
+.home-inner { max-width: none; margin: 0; padding: 56px clamp(28px, 4vw, 72px) 72px; }
 .home-kicker {
   margin: 0 0 10px;
   font-size: 12px;
@@ -1877,3 +1877,30 @@ body[data-view="map"] .panel .map-section { display: none; }
 }
 .home-built a { color: inherit; text-decoration: underline; text-decoration-color: #4a4640; text-underline-offset: 2px; }
 .home-built a:hover { color: var(--text-dim); }
+
+/* Connections on the composer card: portrait cards side by side, like the Composers tab */
+.detail .connections {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(158px, 1fr));
+  gap: 12px;
+  align-items: stretch;
+}
+.connection-card.cc-card {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 3px;
+  padding: 11px; width: auto;
+  border-top: 2px solid var(--era);
+  border-radius: 10px;
+}
+.connection-card.cc-card:hover { transform: translateY(-1px); }
+.cc-portrait {
+  width: 100%; aspect-ratio: 1 / 1; border-radius: 8px; margin-bottom: 6px;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; position: relative;
+  background: color-mix(in srgb, var(--era) 24%, #202020);
+}
+.cc-portrait img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
+.cc-portrait .initials { font-family: var(--font-serif); font-size: 30px; font-weight: 600; color: color-mix(in srgb, var(--era) 80%, #fff); opacity: .9; }
+.cc-portrait.has-img .initials { display: none; }
+.cc-name { font-weight: 600; font-size: 13.5px; line-height: 1.25; }
+.cc-years { color: var(--text-dim); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.cc-note { margin-top: 4px; color: var(--text-dim); font-size: 12px; line-height: 1.45; }
