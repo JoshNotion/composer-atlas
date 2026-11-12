@@ -89,6 +89,13 @@ export function renderDetail(targetEl, composer, allComposersById, callbacks = {
     </div>
   `;
 
+  // 30-second previews: one click handler for every Preview button in this card.
+  stopPreview();
+  targetEl.onclick = (e) => {
+    const btn = e.target.closest(".work-preview");
+    if (btn) togglePreview(btn, composer);
+  };
+
   // Lazy-load portrait (Wikipedia thumbnail fallback)
   const portraitEl = targetEl.querySelector("#detail-portrait");
   mountPortrait(portraitEl, composer);
@@ -179,9 +186,12 @@ function keyGroupHtml(composer) {
         <div class="work-head">
           <span class="work-title">${escapeHtml(w.title)}</span>
           <span class="work-year">${escapeHtml(w.year)}</span>
-          <a class="work-listen" href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer" title="Listen on ${w.mediaUrl ? "this link" : "YouTube"}">
-            <span class="play-tri">▶</span>Listen
-          </a>
+          <span class="work-actions">
+            ${previewBtn(w.title)}
+            <a class="work-listen" href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer" title="Listen on ${w.mediaUrl ? "this link" : "YouTube"}">
+              <span class="play-tri">▶</span>Listen
+            </a>
+          </span>
         </div>
         <div class="work-context">${escapeHtml(w.context)}</div>
       </li>`;
@@ -270,9 +280,12 @@ function renderCatalogue(host, composer, result) {
       const items = byGenre.get(g).map(w => `
         <li class="catalogue-work">
           <span class="catalogue-title">${escapeHtml(w.title)}${w.subtitle ? ` <span class="catalogue-sub">${escapeHtml(w.subtitle)}</span>` : ""}</span>
-          <a class="work-listen" href="${escapeAttr(youtubeSearch(composer.name, w.title))}" target="_blank" rel="noopener noreferrer" title="Search YouTube for this work">
-            <span class="play-tri">▶</span>Listen
-          </a>
+          <span class="work-actions">
+            ${previewBtn(w.title + (w.subtitle ? " " + w.subtitle : ""))}
+            <a class="work-listen" href="${escapeAttr(youtubeSearch(composer.name, w.title))}" target="_blank" rel="noopener noreferrer" title="Search YouTube for this work">
+              <span class="play-tri">▶</span>Listen
+            </a>
+          </span>
         </li>`).join("");
       return `
         <details class="catalogue-group"${openAll || gi === 0 ? " open" : ""}>
@@ -291,7 +304,7 @@ function renderCatalogue(host, composer, result) {
       </div>
       ${mode === "recommended" ? keyGroupHtml(composer) : ""}
       ${groups}
-      <div class="catalogue-foot">Works data from <a href="https://openopus.org" target="_blank" rel="noopener noreferrer">Open Opus</a> (open data). “Listen” searches YouTube.</div>
+      <div class="catalogue-foot">Works data from <a href="https://openopus.org" target="_blank" rel="noopener noreferrer">Open Opus</a> (open data). “Listen” searches YouTube; “Preview” plays a 30-second clip from Apple Music.</div>
     `;
 
     host.querySelectorAll(".catalogue-filter").forEach(btn => {
@@ -482,3 +495,128 @@ function escapeHtml(s) {
     .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 function escapeAttr(s) { return escapeHtml(s); }
+
+
+// ---- 30-second previews (Apple's free iTunes Search API) ------------------------------
+// One shared <audio>; pressing Preview finds a matching clip for the work (looked up only on
+// click), plays it, and shows what is actually playing. No clip found -> the button says so
+// and the Listen link (YouTube) is still there.
+
+function previewBtn(title) {
+  return `<button type="button" class="work-preview" data-title="${escapeAttr(title)}" title="Play a 30-second preview"><span class="pv-icon" aria-hidden="true">▶</span><span class="pv-text">Preview</span></button>`;
+}
+
+const previewCache = new Map(); // "composer|work" -> { url, label } | null
+let previewAudio = null;
+let previewBtnEl = null;
+
+function pvNorm(s) {
+  return String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+const PV_STOP = new Set(["the", "in", "of", "for", "and", "op", "no", "nos", "a", "an", "from", "to", "with", "on", "bwv", "major", "minor"]);
+function pvTokens(s) {
+  return pvNorm(s).split(/[^a-z0-9]+/).filter(t => t && !PV_STOP.has(t) && (t.length > 2 || /^\d+$/.test(t)));
+}
+const PV_BAD = /arrang|karaoke|lullaby|tribute|cover|remix|ringtone|piano version|for kids|baby|meditation|relax|8-?bit|rock|electro|church organ|guitar version/;
+
+function pvScore(r, composer, wantTokens, wantText) {
+  const hay = pvNorm(`${r.trackName} ${r.collectionName} ${r.artistName}`);
+  const surname = pvNorm(composer.name.split(/\s+/).pop());
+  if (!hay.includes(surname)) return -1;
+  const body = pvNorm(`${r.trackName} ${r.collectionName}`);
+  const hits = wantTokens.filter(t => body.includes(t)).length;
+  let score = wantTokens.length ? hits / wantTokens.length : 0;
+  const bad = PV_BAD.test(hay) && !PV_BAD.test(wantText);
+  if (bad) score -= 0.6;
+  return score;
+}
+
+async function findPreview(composer, workTitle) {
+  const key = composer.id + "|" + workTitle;
+  if (previewCache.has(key)) return previewCache.get(key);
+  let found = null;
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 7000);
+    const url = "https://itunes.apple.com/search?media=music&entity=song&limit=25&country=US&term=" +
+      encodeURIComponent(`${composer.name} ${workTitle}`);
+    const res = await fetch(url, { signal: ctrl.signal });
+    clearTimeout(timer);
+    const data = await res.json();
+    const wantTokens = pvTokens(workTitle);
+    const wantText = pvNorm(workTitle);
+    let best = null;
+    (data.results || []).forEach((r, i) => {
+      if (!r.previewUrl) return;
+      const s = pvScore(r, composer, wantTokens, wantText) - i * 0.002;
+      if (s >= 0.5 && (!best || s > best.s)) best = { s, r };
+    });
+    if (best) found = { url: best.r.previewUrl, label: `${best.r.trackName} — ${best.r.artistName}` };
+  } catch (e) { /* offline, blocked or timed out: treated as "no preview" */ }
+  previewCache.set(key, found);
+  return found;
+}
+
+function pvSet(btn, state, text) {
+  btn.classList.remove("loading", "playing", "none");
+  if (state) btn.classList.add(state);
+  btn.querySelector(".pv-icon").textContent = state === "playing" ? "❚❚" : state === "loading" ? "…" : "▶";
+  btn.querySelector(".pv-text").textContent = text || (state === "none" ? "No preview" : "Preview");
+  if (state !== "playing") btn.style.removeProperty("--pv");
+}
+
+function pvCaption(btn, text) {
+  const row = btn.closest(".work, .catalogue-work");
+  if (!row) return;
+  let cap = row.querySelector(".preview-cap");
+  if (!text) { if (cap) cap.remove(); return; }
+  if (!cap) { cap = document.createElement("div"); cap.className = "preview-cap"; row.appendChild(cap); }
+  cap.textContent = text;
+}
+
+export function stopPreview() {
+  if (previewAudio) { previewAudio.pause(); previewAudio.removeAttribute("src"); previewAudio.load(); }
+  if (previewBtnEl && previewBtnEl.isConnected) { pvSet(previewBtnEl, null); pvCaption(previewBtnEl, ""); }
+  previewBtnEl = null;
+}
+
+async function togglePreview(btn, composer) {
+  if (btn === previewBtnEl) { stopPreview(); return; } // pressing again stops it
+  if (btn.classList.contains("none") || btn.classList.contains("loading")) return;
+  stopPreview();
+  previewBtnEl = btn;
+  pvSet(btn, "loading", "Finding…");
+  const title = btn.getAttribute("data-title");
+  const hit = await findPreview(composer, title);
+  if (previewBtnEl !== btn) return; // another button was pressed meanwhile
+  if (!hit) {
+    previewBtnEl = null;
+    pvSet(btn, "none");
+    return;
+  }
+  if (!previewAudio) {
+    previewAudio = new Audio();
+    previewAudio.preload = "none";
+    previewAudio.addEventListener("timeupdate", () => {
+      if (previewBtnEl && previewAudio.duration) previewBtnEl.style.setProperty("--pv", (previewAudio.currentTime / previewAudio.duration * 100).toFixed(1) + "%");
+    });
+    previewAudio.addEventListener("ended", () => stopPreview());
+    previewAudio.addEventListener("error", () => {
+      if (!previewBtnEl) return;
+      const b = previewBtnEl;
+      previewBtnEl = null;
+      pvCaption(b, "");
+      pvSet(b, "none");
+    });
+  }
+  previewAudio.src = hit.url;
+  try {
+    await previewAudio.play();
+    if (previewBtnEl === btn) {
+      pvSet(btn, "playing", "Pause");
+      pvCaption(btn, `30-second preview: ${hit.label}`);
+    }
+  } catch (e) {
+    if (previewBtnEl === btn) { previewBtnEl = null; pvSet(btn, "none"); }
+  }
+}

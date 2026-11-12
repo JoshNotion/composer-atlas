@@ -8,7 +8,7 @@ import { createPeriodBar } from "./periodbar.js";
 import { createHome } from "./home.js";
 import { createBrowse } from "./browse.js";
 import { createLinks } from "./links.js";
-import { renderDetail, renderEmpty } from "./panel.js";
+import { renderDetail, renderEmpty, stopPreview } from "./panel.js";
 import { initialsFor, mountPortrait, resolvePortraitUrl } from "./portraits.js";
 
 const ERA_ORDER = ["Medieval", "Renaissance", "Baroque", "Classical", "Romantic", "Modern", "Contemporary"];
@@ -439,6 +439,7 @@ async function main() {
   }
   function closePanel() {
     panelMode = "closed";
+    stopPreview();
     // Slide out first; only drop the full-page width once the slide has finished,
     // so a full-page panel doesn't visibly shrink while it leaves.
     panelEl.classList.remove("open");
