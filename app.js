@@ -403,6 +403,19 @@ async function main() {
     return Math.round((v.endsWith("ms") ? n : n * 1000));
   };
 
+  let shownComposer = null;
+  let cardMapId = null;
+  function syncCardMap(force = false) {
+    if (!shownComposer) return;
+    const wanted = currentView !== "map" || panelMode === "full";
+    if (!wanted) { if (cardMapId) { mapApi.pauseJourney(); cardMapId = null; } return; }
+    if (force || cardMapId !== shownComposer.id) {
+      mapApi.invalidateSize();
+      mapApi.showComposer(shownComposer);
+      cardMapId = shownComposer.id;
+    }
+  }
+
   function openPanel(mode = panelMode === "closed" ? "peek" : panelMode) {
     clearTimeout(collapseTimer);
     panelMode = mode;
@@ -415,12 +428,14 @@ async function main() {
       expandBtnEl.setAttribute("aria-label", label);
       expandBtnEl.setAttribute("title", label);
     }
-    const refit = () => {
+    const refit = (final) => {
       mapApi.invalidateSize();
+      // The card's own map is hidden beside the world map but shows in the full-page view.
+      syncCardMap(final === true && currentView === "map" && panelMode === "full");
       if (worldMap) { worldMap.invalidateSize(); if (currentView === "map") worldMap.refit(); }
     };
-    requestAnimationFrame(refit);
-    setTimeout(refit, panelDurMs() + 20);
+    requestAnimationFrame(() => refit());
+    setTimeout(() => refit(true), panelDurMs() + 20);
   }
   function closePanel() {
     panelMode = "closed";
@@ -455,9 +470,11 @@ async function main() {
       onPortraitClick: (comp) => openLightbox(comp),
     });
     // On the world map the journey plays on the big map itself, so the card skips its own map.
-    if (currentView !== "map") mapApi.showComposer(c);
-    else if (worldMap) { worldMap.focus(id); addInlineJourney(); }
+    shownComposer = c;
+    cardMapId = null;
+    if (currentView === "map" && worldMap) { worldMap.focus(id); addInlineJourney(); }
     openPanel();
+    syncCardMap();
     panelInner.scrollTop = 0;
   }
 
