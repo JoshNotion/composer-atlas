@@ -584,7 +584,7 @@ async function findPreview(composer, workTitle) {
       const who = pvNorm(r.artistName);
       if (seen.has(who) || found.length >= 5) return;
       seen.add(who);
-      found.push({ url: r.previewUrl, label: `${r.trackName} — ${r.artistName}` });
+      found.push({ url: r.previewUrl, label: `${r.trackName} — ${r.artistName}`, link: r.trackViewUrl || "" });
     });
   } catch (e) { /* offline, blocked or timed out: treated as "no preview" */ }
   previewCache.set(key, found);
@@ -599,13 +599,13 @@ function pvSet(btn, state, text) {
   if (state !== "playing") btn.style.removeProperty("--pv");
 }
 
-function pvCaption(btn, text, canCycle) {
+function pvCaption(btn, text, canCycle, link) {
   const row = btn.closest(".work, .catalogue-work");
   if (!row) return;
   let cap = row.querySelector(".preview-cap");
   if (!text) { if (cap) cap.remove(); return; }
   if (!cap) { cap = document.createElement("div"); cap.className = "preview-cap"; row.appendChild(cap); }
-  cap.innerHTML = `<span class="preview-cap-text"></span>${canCycle ? ' <button type="button" class="preview-next">Another version</button>' : ""}`;
+  cap.innerHTML = `<span class="preview-cap-text"></span>${/^https:\/\/(music|itunes)\.apple\.com\//.test(link || "") ? ` <a class="preview-apple" href="${escapeAttr(link)}" target="_blank" rel="noopener">Apple Music</a>` : ""}${canCycle ? ' <button type="button" class="preview-next">Another version</button>' : ""}`;
   cap.querySelector(".preview-cap-text").textContent = text;
 }
 
@@ -624,7 +624,7 @@ async function playCandidate(btn, cands, idx) {
     await previewAudio.play();
     if (previewBtnEl === btn) {
       pvSet(btn, "playing", "Pause");
-      pvCaption(btn, `30-second preview${cands.length > 1 ? ` (${idx + 1}/${cands.length})` : ""}: ${hit.label}`, cands.length > 1);
+      pvCaption(btn, `30-second preview${cands.length > 1 ? ` (${idx + 1}/${cands.length})` : ""}: ${hit.label}`, cands.length > 1, hit.link);
     }
   } catch (e) {
     if (previewBtnEl === btn) { previewBtnEl = null; pvSet(btn, "none"); }

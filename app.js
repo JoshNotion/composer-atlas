@@ -368,7 +368,37 @@ async function main() {
       // Try to swap to higher-res by stripping Wikipedia thumb prefix
       img.src = upgradeWikiThumb(url);
       img.onerror = () => { img.onerror = null; img.src = url; };
+      lbCredit(url);
     });
+  }
+
+  // Image credit for the lightbox: author + licence from Wikimedia, or just the source host.
+  function lbCredit(url) {
+    const cap = lightboxContent.querySelector(".lightbox-caption");
+    if (!cap) return;
+    let fname = "";
+    const fp = url.match(/Special:FilePath\/([^?]+)/);
+    const up = url.match(/upload\.wikimedia\.org\/.*?\/[0-9a-f]\/[0-9a-f]{2}\/([^\/?]+)/);
+    try { fname = decodeURIComponent((fp && fp[1]) || (up && up[1]) || ""); } catch (e) { fname = ""; }
+    const line = document.createElement("div");
+    line.className = "lightbox-credit";
+    cap.appendChild(line);
+    if (!fname) {
+      try { line.textContent = "Image source: " + new URL(url).hostname.replace(/^www\./, ""); } catch (e) { /* no credit */ }
+      return;
+    }
+    const page = "https://commons.wikimedia.org/wiki/File:" + encodeURIComponent(fname.replace(/ /g, "_"));
+    line.innerHTML = `<a href="${page}" target="_blank" rel="noopener noreferrer">Wikimedia image page</a>`;
+    fetch("https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=extmetadata&titles=" + encodeURIComponent("File:" + fname))
+      .then(r => r.json()).then(j => {
+        if (lightbox.hidden || !line.isConnected) return;
+        const pg = Object.values(j.query.pages)[0];
+        const md = (pg.imageinfo && pg.imageinfo[0] && pg.imageinfo[0].extmetadata) || {};
+        const strip = (h) => String(h || "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().slice(0, 90);
+        const who = strip(md.Artist && md.Artist.value), lic = strip(md.LicenseShortName && md.LicenseShortName.value);
+        const parts = [who && who !== "Unknown author" ? who : "", lic].filter(Boolean);
+        line.innerHTML = (parts.length ? escapeHtml(parts.join(" · ")) + " · " : "") + `<a href="${page}" target="_blank" rel="noopener noreferrer">Wikimedia</a>`;
+      }).catch(() => {});
   }
   function closeLightbox() {
     lightbox.hidden = true;

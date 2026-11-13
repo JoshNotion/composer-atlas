@@ -178,12 +178,19 @@ export function createHome(hostEl, composers, opts = {}) {
       </section>
 
       <footer class="home-built">
-        Built with open data: composer biographies and portraits come from
-        <a href="https://www.wikipedia.org" target="_blank" rel="noopener">Wikipedia</a> (CC BY-SA),
-        works catalogues from <a href="https://openopus.org" target="_blank" rel="noopener">Open Opus</a>,
-        and maps from <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>
-        contributors, <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a> and
-        <a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>.
+        <p><strong>Built with open data.</strong> Composer biographies come from
+        <a href="https://www.wikipedia.org" target="_blank" rel="noopener">Wikipedia</a>
+        (text under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA</a>); works catalogues from
+        <a href="https://openopus.org" target="_blank" rel="noopener">Open Opus</a>; maps from
+        <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors,
+        <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a> and
+        <a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>.</p>
+        <p><strong>Portraits</strong> come from Wikipedia and Wikimedia Commons (public domain or freely licensed; each file's page lists its author and licence)
+        and from the sources linked on the image where noted. <strong>Audio previews</strong> are 30-second clips courtesy of
+        <a href="https://www.apple.com/apple-music/" target="_blank" rel="noopener">Apple Music</a>, played from Apple's servers and linked to the full recording; "Listen" links go to YouTube.
+        All recordings and trademarks belong to their respective owners.</p>
+        <p><strong>Privacy.</strong> This site has no accounts, cookies or analytics. Your browser loads map tiles from CARTO, portraits and text from Wikipedia/Wikimedia,
+        works from Open Opus and previews from Apple, so those services see your IP address as with any website.</p>
       </footer>
     </div>
   `;

@@ -829,6 +829,7 @@ body { display: flex; flex-direction: column; }
   font-size: 13px;
   text-align: center;
 }
+.lightbox-credit { margin-top: 4px; font-size: 11px; opacity: 0.7; font-weight: 400; }
 .lightbox-caption a {
   color: var(--text);
   text-decoration: underline;
@@ -1873,8 +1874,11 @@ body[data-view="map"] .panel:not(.expanded) .map-section { display: none; }
   margin: 56px 0 8px; padding-top: 18px;
   border-top: 1px solid var(--border);
   font-size: 11.5px; line-height: 1.6; color: var(--text-faint, #6f6a63);
-  max-width: 720px;
+  max-width: none;
 }
+.home-built p { margin: 0 0 8px; }
+.home-built strong { color: var(--text-dim); font-weight: 600; }
+.preview-apple { color: inherit; text-decoration: underline; text-underline-offset: 2px; margin-left: 6px; }
 .home-built a { color: inherit; text-decoration: underline; text-decoration-color: #4a4640; text-underline-offset: 2px; }
 .home-built a:hover { color: var(--text-dim); }
 
