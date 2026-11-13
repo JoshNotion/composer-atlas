@@ -1951,3 +1951,6 @@ body[data-view="map"] .panel:not(.expanded) .map-section { display: none; }
   object-position: 50% 16%;
 }
 .browse-era-group .browse-portrait { filter: none; }
+
+/* Paintings and engravings (composers born before 1810) keep their colour */
+.pt-art img, img.pt-art { filter: none; }

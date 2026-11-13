@@ -51,6 +51,13 @@ export function resolvePortraitUrl(composer) {
   });
 }
 
+// Composers born before 1810 are shown from paintings and engravings: those keep their colour,
+// the black-and-white treatment is for photographs only.
+export function portraitIsPainting(composer) {
+  const y = parseInt(composer && composer.born, 10);
+  return Number.isFinite(y) && y < 1810;
+}
+
 // Mounts an img into `hostEl` once the URL resolves. Bails out if the host
 // element has been detached (e.g. the panel re-rendered with a new composer).
 export function mountPortrait(hostEl, composer, altText) {
@@ -67,6 +74,7 @@ export function mountPortrait(hostEl, composer, altText) {
       if (hostEl.dataset.composerId !== composer.id) return resolve();
       hostEl.prepend(img);
       hostEl.classList.add("has-img");
+      hostEl.classList.toggle("pt-art", portraitIsPainting(composer));
       resolve();
     };
     img.onerror = () => resolve();

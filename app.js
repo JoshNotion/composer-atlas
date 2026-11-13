@@ -9,7 +9,7 @@ import { createHome } from "./home.js";
 import { createBrowse } from "./browse.js";
 import { createLinks } from "./links.js";
 import { renderDetail, renderEmpty, stopPreview } from "./panel.js";
-import { initialsFor, mountPortrait, resolvePortraitUrl } from "./portraits.js";
+import { initialsFor, mountPortrait, resolvePortraitUrl, portraitIsPainting } from "./portraits.js";
 
 const ERA_ORDER = ["Medieval", "Renaissance", "Baroque", "Classical", "Romantic", "Modern", "Contemporary"];
 
@@ -366,6 +366,7 @@ async function main() {
         return;
       }
       // Try to swap to higher-res by stripping Wikipedia thumb prefix
+      img.classList.toggle("pt-art", portraitIsPainting(composer));
       img.src = upgradeWikiThumb(url);
       img.onerror = () => { img.onerror = null; img.src = url; };
       lbCredit(url);

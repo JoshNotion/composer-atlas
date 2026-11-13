@@ -2625,6 +2625,9 @@ body[data-view="map"] .panel:not(.expanded) .map-section { display: none; }
 }
 .browse-era-group .browse-portrait { filter: none; }
 
+/* Paintings and engravings (composers born before 1810) keep their colour */
+.pt-art img, img.pt-art { filter: none; }
+
 </style>
 </head>
 <body>
@@ -2764,6 +2767,13 @@ function resolvePortraitUrl(composer) {
   });
 }
 
+// Composers born before 1810 are shown from paintings and engravings: those keep their colour,
+// the black-and-white treatment is for photographs only.
+function portraitIsPainting(composer) {
+  const y = parseInt(composer && composer.born, 10);
+  return Number.isFinite(y) && y < 1810;
+}
+
 // Mounts an img into `hostEl` once the URL resolves. Bails out if the host
 // element has been detached (e.g. the panel re-rendered with a new composer).
 function mountPortrait(hostEl, composer, altText) {
@@ -2780,6 +2790,7 @@ function mountPortrait(hostEl, composer, altText) {
       if (hostEl.dataset.composerId !== composer.id) return resolve();
       hostEl.prepend(img);
       hostEl.classList.add("has-img");
+      hostEl.classList.toggle("pt-art", portraitIsPainting(composer));
       resolve();
     };
     img.onerror = () => resolve();
@@ -6294,6 +6305,7 @@ async function main() {
         return;
       }
       // Try to swap to higher-res by stripping Wikipedia thumb prefix
+      img.classList.toggle("pt-art", portraitIsPainting(composer));
       img.src = upgradeWikiThumb(url);
       img.onerror = () => { img.onerror = null; img.src = url; };
       lbCredit(url);
