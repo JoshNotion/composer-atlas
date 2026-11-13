@@ -2774,6 +2774,12 @@ function portraitIsPainting(composer) {
   return Number.isFinite(y) && y < 1810;
 }
 
+// Hand-tuned framing for source images that are not portrait-shaped (e.g. a wide group shot
+// where the composer sits at the left). pos = object-position, zoom/origin = enlarge the face.
+const PORTRAIT_TWEAK = {
+  corigliano: { pos: "10% 30%", zoom: 1.8, origin: "50% 29%" },
+};
+
 // Mounts an img into `hostEl` once the URL resolves. Bails out if the host
 // element has been detached (e.g. the panel re-rendered with a new composer).
 function mountPortrait(hostEl, composer, altText) {
@@ -2785,6 +2791,12 @@ function mountPortrait(hostEl, composer, altText) {
     const img = new Image();
     img.alt = altText || composer.name;
     img.referrerPolicy = "no-referrer";
+    const tw = PORTRAIT_TWEAK[composer.id];
+    if (tw) {
+      img.style.objectPosition = tw.pos;
+      img.style.transformOrigin = tw.origin;
+      img.style.transform = `scale(${tw.zoom})`;
+    }
     img.onload = () => {
       if (!hostEl.isConnected) return resolve();
       if (hostEl.dataset.composerId !== composer.id) return resolve();
