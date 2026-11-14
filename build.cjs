@@ -48,6 +48,10 @@ function safeJson(obj) {
     return `\n// ===== ${f} =====\n` + code;
   }).join('\n');
 
+  // Home-page screenshots (shots/*.jpg) are inlined too, so the single file stays self-contained.
+  scripts = scripts.replace(/shots\/([a-z]+)\.jpg/g, (m, n) =>
+    'data:image/jpeg;base64,' + fs.readFileSync(path.join(__dirname, 'shots', n + '.jpg')).toString('base64'));
+
   // Point loadComposers at the inline global instead of fetching a file.
   scripts = scripts.replace(
     /async function loadComposers\(\)\s*{[\s\S]*?\n\}/m,
