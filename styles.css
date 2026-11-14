@@ -1765,7 +1765,7 @@ body[data-view="home"] .legend { display: none; }
 /* ================= Home: connections feature ================= */
 
 .home-feature {
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+  display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
   gap: 8px;
   background: rgba(36, 36, 36, .86);
   border: 1px solid var(--border);
@@ -1792,9 +1792,9 @@ body[data-view="home"] .legend { display: none; }
     radial-gradient(ellipse 70% 70% at 60% 50%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%),
     var(--bg);
   border-left: 1px solid var(--border);
-  padding: 18px;
+  padding: 10px;
 }
-.home-feature-art img { width: 100%; height: auto; display: block; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0, 0, 0, .45); }
+.home-feature-art svg { width: 100%; max-width: 330px; height: auto; display: block; }
 @media (max-width: 760px) {
   .home-feature { grid-template-columns: 1fr; }
   .home-feature-art { border-left: 0; border-top: 1px solid var(--border); }

@@ -43,7 +43,16 @@ export function createHome(hostEl, composers, opts = {}) {
         "Click a bar to open that composer&rsquo;s life, works and connections",
         "Use the era chips at the top to focus on a single period",
       ],
-      art: `<img src="shots/timeline.jpg" alt="Screenshot of the Timeline view: bars for each Romantic-era composer across the decades" loading="lazy" decoding="async" />`,
+      art: `<svg viewBox="0 0 320 230" aria-hidden="true">
+        <g stroke="#f0ede8" stroke-opacity=".08"><path d="M40 30v170M110 30v170M180 30v170M250 30v170"/></g>
+        <g>
+          <rect x="22" y="40" width="64" height="12" rx="6" fill="${era("Medieval")}"/>
+          <rect x="58" y="66" width="108" height="12" rx="6" fill="${era("Renaissance")}"/>
+          <rect x="112" y="92" width="112" height="12" rx="6" fill="${era("Baroque")}"/>
+          <rect x="160" y="118" width="86" height="12" rx="6" fill="${era("Classical")}"/>
+          <rect x="188" y="144" width="104" height="12" rx="6" fill="${era("Romantic")}"/>
+          <rect x="226" y="170" width="74" height="12" rx="6" fill="${era("Modern")}"/>
+        </g></svg>`,
     },
     {
       kicker: "World map", accent: era("Modern"), href: "#/map", cta: "Open the map",
@@ -54,7 +63,18 @@ export function createHome(hostEl, composers, opts = {}) {
         "Click a dot to follow one composer&rsquo;s whole journey, place by place",
         "Switch Born, Lived and Died on or off to change what you see",
       ],
-      art: `<img src="shots/map.jpg" alt="Screenshot of the World map view: dots for composers' birthplaces and homes in 1850 to 1900" loading="lazy" decoding="async" />`,
+      art: `<svg viewBox="0 0 320 230" aria-hidden="true">
+        <circle cx="160" cy="115" r="86" fill="#222" stroke="#f0ede8" stroke-opacity=".08"/>
+        <g stroke="#f0ede8" stroke-opacity=".07" fill="none"><ellipse cx="160" cy="115" rx="86" ry="34"/><ellipse cx="160" cy="115" rx="40" ry="86"/></g>
+        <g fill-opacity=".85">
+          <circle cx="150" cy="86" r="4" fill="${era("Baroque")}"/><circle cx="168" cy="92" r="5" fill="${era("Classical")}"/>
+          <circle cx="182" cy="82" r="3.5" fill="${era("Romantic")}"/><circle cx="120" cy="98" r="3.5" fill="${era("Renaissance")}"/>
+          <circle cx="232" cy="138" r="4.5" fill="${era("Modern")}"/><circle cx="104" cy="140" r="4" fill="${era("Contemporary")}"/>
+          <circle cx="196" cy="150" r="3.5" fill="${era("Romantic")}"/>
+        </g>
+        <g fill="none" stroke-width="1.4"><circle cx="160" cy="98" r="12" stroke="${era("Baroque")}" stroke-opacity=".7"/><circle cx="92" cy="122" r="11" stroke="${era("Modern")}" stroke-opacity=".7"/></g>
+        <g fill="#f0ede8" font-size="9" text-anchor="middle" font-family="sans-serif"><text x="160" y="101">7</text><text x="92" y="125">4</text></g>
+      </svg>`,
     },
     {
       kicker: "Composers", accent: era("Renaissance"), href: "#/composers", cta: "Browse composers",
@@ -65,7 +85,14 @@ export function createHome(hostEl, composers, opts = {}) {
         "Sort by birth year, name or death year",
         "Jump between periods with the chips at the top",
       ],
-      art: `<img src="shots/composers.jpg" alt="Screenshot of the Composers view: a grid of portraits grouped by period" loading="lazy" decoding="async" />`,
+      art: `<svg viewBox="0 0 320 230" aria-hidden="true">
+        ${[0,1,2,3].map(r => [0,1,2,3,4].map(c => {
+          const eras = ["Medieval","Renaissance","Baroque","Classical","Romantic","Modern","Contemporary"];
+          const e = eras[Math.min(6, Math.floor((r * 5 + c) / 3))];
+          const x = 52 + c * 54, y = 40 + r * 50;
+          return `<circle cx="${x}" cy="${y}" r="17" fill="${era(e)}" fill-opacity=".2" stroke="${era(e)}" stroke-opacity=".8" stroke-width="1.6"/>`;
+        }).join("")).join("")}
+      </svg>`,
     },
     {
       kicker: "Connections", accent: era("Romantic"), href: "#/links", cta: "Explore the connections",
@@ -81,7 +108,30 @@ export function createHome(hostEl, composers, opts = {}) {
         <a href="#/links?f=brahms">Brahms&rsquo;s circle</a>
         <a href="#/links?f=ravel">Ravel&rsquo;s circle</a>
       </div>`,
-      art: `<img src="shots/links.jpg" alt="Screenshot of the Connections view: Johannes Brahms and the composers linked to him" loading="lazy" decoding="async" />`,
+      art: `<svg viewBox="0 0 320 230" aria-hidden="true">
+        <g fill="none" stroke-width="1.4" stroke-linecap="round">
+          <path d="M70 34 C70 80 120 80 120 118" stroke="#9B8FE8" opacity=".7"/>
+          <path d="M70 34 C70 90 40 96 40 150" stroke="#9B8FE8" opacity=".35"/>
+          <path d="M160 30 C160 78 120 84 120 118" stroke="#E8A020" opacity=".7"/>
+          <path d="M160 30 C160 90 200 90 200 122" stroke="#E8A020" opacity=".35"/>
+          <path d="M240 38 C240 84 200 86 200 122" stroke="#E86040" opacity=".6"/>
+          <path d="M120 118 C120 150 90 156 90 196" stroke="#E0608A" opacity=".8"/>
+          <path d="M120 118 C120 154 150 158 150 196" stroke="#E0608A" opacity=".8"/>
+          <path d="M200 122 C200 156 240 160 240 196" stroke="#50A0E8" opacity=".6"/>
+          <path d="M120 118 C120 150 200 96 200 122" stroke="#E0608A" opacity=".25"/>
+          <path d="M40 150 C40 176 90 170 90 196" stroke="#9B8FE8" opacity=".3"/>
+        </g>
+        <g stroke-width="2">
+          <circle cx="70" cy="34" r="11" fill="#2a2740" stroke="#9B8FE8"/>
+          <circle cx="160" cy="30" r="11" fill="#3a2e18" stroke="#E8A020"/>
+          <circle cx="240" cy="38" r="11" fill="#3b2420" stroke="#E86040"/>
+          <circle cx="120" cy="118" r="13" fill="#3b2230" stroke="#E0608A"/>
+          <circle cx="200" cy="122" r="11" fill="#1f3040" stroke="#50A0E8"/>
+          <circle cx="40" cy="150" r="9" fill="#2a2740" stroke="#9B8FE8"/>
+          <circle cx="90" cy="196" r="11" fill="#243818" stroke="#70C030"/>
+          <circle cx="150" cy="196" r="11" fill="#1f3040" stroke="#50A0E8"/>
+          <circle cx="240" cy="196" r="11" fill="#243818" stroke="#70C030"/>
+        </g></svg>`,
     },
   ];
 
