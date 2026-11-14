@@ -507,7 +507,10 @@ async function main() {
     if (currentView === "map" && worldMap) { worldMap.focus(id); addInlineJourney(); }
     openPanel();
     syncCardMap();
-    panelInner.scrollTop = 0;
+    // Every newly opened composer starts at the top (the scroller is #detail-target in full-page view).
+    const toTop = () => { panelInner.scrollTop = 0; detailTarget.scrollTop = 0; panelEl.scrollTop = 0; };
+    toTop();
+    requestAnimationFrame(toTop);
   }
 
   renderEmpty(detailTarget);

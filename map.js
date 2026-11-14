@@ -253,7 +253,7 @@ export function createMap(mapHostEl) {
   function showComposer(composer) {
     currentComposer = composer;
     clear();
-    journey.setColor(eraColor(composer && composer.era));
+    journey.setColor("#ffffff"); // the card's route is white; the dots carry green / blue / red
     journey.setStops(jmBuildStops(composer));
     if (!composer || !composer.locations || composer.locations.length === 0) return;
 
@@ -285,11 +285,10 @@ export function createMap(mapHostEl) {
       grp.addLayer(marker);
     });
 
-    // Route in the composer's era colour (same as the world map); the dots keep the
-    // green / blue / red of birth / lived / death.
+    // White route; the dots keep the green / blue / red of birth / lived / death.
     const route = jmBuildStops(composer).map(s => [s.lat, s.lng]);
     if (route.length >= 2) {
-      routeLayer.addLayer(L.polyline(route, { color: eraColor(composer.era), weight: 2, opacity: 0.8, lineJoin: "round" }));
+      routeLayer.addLayer(L.polyline(route, { color: "#ffffff", weight: 2, opacity: 0.75, lineJoin: "round" }));
     }
 
     if (points.length > 0) {

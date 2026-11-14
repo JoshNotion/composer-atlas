@@ -3408,7 +3408,7 @@ function createMap(mapHostEl) {
   function showComposer(composer) {
     currentComposer = composer;
     clear();
-    journey.setColor(eraColor(composer && composer.era));
+    journey.setColor("#ffffff"); // the card's route is white; the dots carry green / blue / red
     journey.setStops(jmBuildStops(composer));
     if (!composer || !composer.locations || composer.locations.length === 0) return;
 
@@ -3440,11 +3440,10 @@ function createMap(mapHostEl) {
       grp.addLayer(marker);
     });
 
-    // Route in the composer's era colour (same as the world map); the dots keep the
-    // green / blue / red of birth / lived / death.
+    // White route; the dots keep the green / blue / red of birth / lived / death.
     const route = jmBuildStops(composer).map(s => [s.lat, s.lng]);
     if (route.length >= 2) {
-      routeLayer.addLayer(L.polyline(route, { color: eraColor(composer.era), weight: 2, opacity: 0.8, lineJoin: "round" }));
+      routeLayer.addLayer(L.polyline(route, { color: "#ffffff", weight: 2, opacity: 0.75, lineJoin: "round" }));
     }
 
     if (points.length > 0) {
@@ -3672,14 +3671,13 @@ function createWorldMap(hostEl, composers, opts = {}) {
 
   // ---- rendering ----------------------------------------------------------------
 
-  // Pins are coloured by kind of place (green birth, blue lived, red death), like the
-  // composer card's map; the lines drawn between places carry the era colour instead.
-  function pinType(types) { return types.has("birth") ? "birth" : types.has("death") ? "death" : "lived"; }
-  function dominantType(people) {
+  // Overview pins follow the era colour (the most common era among the composers at that
+  // place). Only the focused journey uses green / blue / red for birth / lived / death.
+  function dominantEraColor(people) {
     const counts = {};
-    people.forEach(e => { const t = pinType(e.types); counts[t] = (counts[t] || 0) + 1; });
-    const order = ["birth", "lived", "death"];
-    return order.slice().sort((a, b) => (counts[b] || 0) - (counts[a] || 0) || order.indexOf(a) - order.indexOf(b))[0];
+    people.forEach(e => { const era = e.composer.era; counts[era] = (counts[era] || 0) + 1; });
+    const top = Object.keys(counts).sort((a, b) => counts[b] - counts[a])[0];
+    return eraColor(top);
   }
 
   function popupFor(place) {
@@ -3784,7 +3782,7 @@ function createWorldMap(hostEl, composers, opts = {}) {
     // as the timeline's, drawn translucent so the map stays calm.
     places.forEach(place => {
       const n = place.people.size;
-      const color = TYPE_COLOR[dominantType([...place.people.values()])];
+      const color = dominantEraColor([...place.people.values()]);
       const size = n === 1 ? 9 : Math.round(Math.min(34, 15 + Math.sqrt(n) * 3.4));
       const html = n === 1
         ? `<div class="wm-pin wm-pin-one" style="width:${size}px;height:${size}px;--pin:${color}"></div>`
@@ -6458,7 +6456,10 @@ async function main() {
     if (currentView === "map" && worldMap) { worldMap.focus(id); addInlineJourney(); }
     openPanel();
     syncCardMap();
-    panelInner.scrollTop = 0;
+    // Every newly opened composer starts at the top (the scroller is #detail-target in full-page view).
+    const toTop = () => { panelInner.scrollTop = 0; detailTarget.scrollTop = 0; panelEl.scrollTop = 0; };
+    toTop();
+    requestAnimationFrame(toTop);
   }
 
   renderEmpty(detailTarget);

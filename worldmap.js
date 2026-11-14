@@ -197,14 +197,13 @@ export function createWorldMap(hostEl, composers, opts = {}) {
 
   // ---- rendering ----------------------------------------------------------------
 
-  // Pins are coloured by kind of place (green birth, blue lived, red death), like the
-  // composer card's map; the lines drawn between places carry the era colour instead.
-  function pinType(types) { return types.has("birth") ? "birth" : types.has("death") ? "death" : "lived"; }
-  function dominantType(people) {
+  // Overview pins follow the era colour (the most common era among the composers at that
+  // place). Only the focused journey uses green / blue / red for birth / lived / death.
+  function dominantEraColor(people) {
     const counts = {};
-    people.forEach(e => { const t = pinType(e.types); counts[t] = (counts[t] || 0) + 1; });
-    const order = ["birth", "lived", "death"];
-    return order.slice().sort((a, b) => (counts[b] || 0) - (counts[a] || 0) || order.indexOf(a) - order.indexOf(b))[0];
+    people.forEach(e => { const era = e.composer.era; counts[era] = (counts[era] || 0) + 1; });
+    const top = Object.keys(counts).sort((a, b) => counts[b] - counts[a])[0];
+    return eraColor(top);
   }
 
   function popupFor(place) {
@@ -309,7 +308,7 @@ export function createWorldMap(hostEl, composers, opts = {}) {
     // as the timeline's, drawn translucent so the map stays calm.
     places.forEach(place => {
       const n = place.people.size;
-      const color = TYPE_COLOR[dominantType([...place.people.values()])];
+      const color = dominantEraColor([...place.people.values()]);
       const size = n === 1 ? 9 : Math.round(Math.min(34, 15 + Math.sqrt(n) * 3.4));
       const html = n === 1
         ? `<div class="wm-pin wm-pin-one" style="width:${size}px;height:${size}px;--pin:${color}"></div>`
