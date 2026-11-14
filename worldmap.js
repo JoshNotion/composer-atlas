@@ -272,10 +272,11 @@ export function createWorldMap(hostEl, composers, opts = {}) {
       lineLayer.addLayer(L.polyline(stops.map(s => [s.lat, s.lng]), { color, weight: 2, opacity: 0.8, lineJoin: "round" }));
     }
     stops.forEach((st, i) => {
-      const size = 20;
+      // Same dot as the composer card's map: solid fill, dark outline, same size per kind of place.
+      const size = st.type === "lived" ? 13 : 15;
       const icon = L.divIcon({
         className: "wm-pin-wrap",
-        html: `<div class="wm-pin wm-pin-step" style="width:${size}px;height:${size}px;--pin:${TYPE_COLOR[st.type] || color}">${stops.length > 1 ? i + 1 : ""}</div>`,
+        html: `<div class="wm-pin wm-pin-step" style="width:${size}px;height:${size}px;--pin:${TYPE_COLOR[st.type] || color}"></div>`,
         iconSize: [size, size],
         iconAnchor: [size / 2, size / 2],
       });

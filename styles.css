@@ -1578,11 +1578,10 @@ body[data-view="home"] .legend { display: none; }
 .wm-focus-dot { width: 8px; height: 8px; border-radius: 50%; }
 .wm-focus-x { color: var(--text-dim); background: rgba(255, 255, 255, .06); border-radius: 999px; padding: 2px 9px; }
 .wm-pin-step {
-  background: color-mix(in srgb, var(--pin) 30%, #1a1a1a);
-  border: 1.5px solid var(--pin);
-  color: var(--text);
-  font-size: 10.5px;
-  font-weight: 600;
+  background: var(--pin);
+  border: 1.5px solid #0c0c0c;
+  opacity: .95;
+  box-sizing: border-box;
 }
 
 /* ================= Connections: a vertical, time-ordered web ================= */
