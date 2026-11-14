@@ -2610,8 +2610,8 @@ body[data-view="map"] .panel:not(.expanded) .map-section { display: none; }
 .work-preview.loading { color: var(--text-dim); cursor: progress; }
 .work-preview.none { color: var(--text-faint); border-color: var(--border); cursor: default; }
 .preview-cap { flex: 1 0 100%; margin-top: 4px; font-size: 11.5px; color: var(--text-faint); line-height: 1.4; }
-.preview-next { font: inherit; font-size: 11.5px; color: var(--text-dim); background: none; border: 0; padding: 0; margin-left: 6px; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
-.preview-next:hover { color: var(--text); }
+.preview-move, .preview-next { font: inherit; font-size: 11.5px; color: var(--text-dim); background: none; border: 0; padding: 0; margin-left: 6px; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.preview-move:hover, .preview-next:hover { color: var(--text); }
 
 /* One portrait style everywhere: warm black-and-white, faces framed near the top */
 :root { --portrait-filter: grayscale(1) sepia(.2) contrast(1.06) brightness(.97); }
@@ -5365,6 +5365,7 @@ function renderDetail(targetEl, composer, allComposersById, callbacks = {}) {
   // 30-second previews: one click handler for every Preview button in this card.
   stopPreview();
   targetEl.onclick = (e) => {
+    if (e.target.closest(".preview-move")) { nextMovement(); return; }
     if (e.target.closest(".preview-next")) { nextVersion(); return; }
     const btn = e.target.closest(".work-preview");
     if (btn) togglePreview(btn, composer);
@@ -5856,7 +5857,7 @@ async function findPreview(composer, workTitle) {
       const who = pvNorm(r.artistName);
       if (seen.has(who) || found.length >= 5) return;
       seen.add(who);
-      found.push({ url: r.previewUrl, label: `${r.trackName} — ${r.artistName}`, link: r.trackViewUrl || "" });
+      found.push({ url: r.previewUrl, label: `${r.trackName} — ${r.artistName}`, link: r.trackViewUrl || "", cid: r.collectionId, tid: r.trackId, tname: r.trackName || "", artist: r.artistName || "" });
     });
   } catch (e) { /* offline, blocked or timed out: treated as "no preview" */ }
   previewCache.set(key, found);
@@ -5871,13 +5872,17 @@ function pvSet(btn, state, text) {
   if (state !== "playing") btn.style.removeProperty("--pv");
 }
 
-function pvCaption(btn, text, canCycle, link) {
+function pvCaption(btn, text, opts) {
   const row = btn.closest(".work, .catalogue-work");
   if (!row) return;
+  const o = opts || {};
   let cap = row.querySelector(".preview-cap");
   if (!text) { if (cap) cap.remove(); return; }
   if (!cap) { cap = document.createElement("div"); cap.className = "preview-cap"; row.appendChild(cap); }
-  cap.innerHTML = `<span class="preview-cap-text"></span>${/^https:\/\/(music|itunes)\.apple\.com\//.test(link || "") ? ` <a class="preview-apple" href="${escapeAttr(link)}" target="_blank" rel="noopener">Apple Music</a>` : ""}${canCycle ? ' <button type="button" class="preview-next">Another version</button>' : ""}`;
+  const apple = /^https:\/\/(music|itunes)\.apple\.com\//.test(o.link || "") ? ` <a class="preview-apple" href="${escapeAttr(o.link)}" target="_blank" rel="noopener">Apple Music</a>` : "";
+  cap.innerHTML = `<span class="preview-cap-text"></span>${apple}` +
+    `${o.canMove ? ' <button type="button" class="preview-move">Next movement</button>' : ""}` +
+    `${o.canCycle ? ' <button type="button" class="preview-next">Another recording</button>' : ""}`;
   cap.querySelector(".preview-cap-text").textContent = text;
 }
 function stopPreview() {
@@ -5886,28 +5891,86 @@ function stopPreview() {
   previewBtnEl = null;
 }
 
-let previewCur = null; // { btn, cands, idx }
+let previewCur = null; // { btn, cands, idx, moves, mIdx, tries }
 
-async function playCandidate(btn, cands, idx) {
-  const hit = cands[idx];
-  previewAudio.src = hit.url;
+// The other movements / excerpts of the same recording: every track of the album that belongs to
+// the same work (same title before the colon, e.g. "Piano Concerto No. 2, Op. 18: II. Adagio").
+const moveCache = new Map();
+async function pvMovements(cand, wantTokens) {
+  const key = String(cand.cid);
+  if (moveCache.has(key)) return moveCache.get(key);
+  let list = [];
+  try {
+    const res = await fetch("https://itunes.apple.com/lookup?entity=song&limit=200&id=" + encodeURIComponent(cand.cid));
+    const data = await res.json();
+    const tracks = (data.results || []).filter(t => t.wrapperType === "track" && t.previewUrl);
+    const prefix = (n) => { const m = String(n).match(/^(.*):\s/); return m ? pvNorm(m[1]).trim() : ""; };
+    const mine = prefix(cand.tname);
+    let same = mine ? tracks.filter(t => prefix(t.trackName) === mine) : [];
+    if (same.length < 2) {
+      same = tracks.filter(t => {
+        const body = pvNorm(t.trackName);
+        return wantTokens.length && wantTokens.filter(w => body.includes(w)).length / wantTokens.length >= 0.5;
+      });
+    }
+    same.sort((a, b) => (a.discNumber || 1) - (b.discNumber || 1) || (a.trackNumber || 0) - (b.trackNumber || 0));
+    list = same.slice(0, 40).map(t => ({ url: t.previewUrl, label: `${t.trackName} — ${t.artistName}`, link: t.trackViewUrl || "", tid: t.trackId }));
+  } catch (e) { list = []; }
+  moveCache.set(key, list);
+  return list;
+}
+
+function pvShowCaption(cur) {
+  if (previewBtnEl !== cur.btn) return;
+  const moves = cur.moves && cur.moves.length > 1 ? cur.moves : null;
+  const clip = moves ? moves[cur.mIdx] : cur.cands[cur.idx];
+  const where = [];
+  if (moves) where.push(`part ${cur.mIdx + 1}/${moves.length}`);
+  if (cur.cands.length > 1) where.push(`recording ${cur.idx + 1}/${cur.cands.length}`);
+  pvCaption(cur.btn, `30-second preview${where.length ? " (" + where.join(", ") + ")" : ""}: ${clip.label}`,
+    { link: clip.link, canMove: !!moves, canCycle: cur.cands.length > 1 });
+}
+
+async function playClip(cur, clip) {
+  previewAudio.src = clip.url;
   try {
     await previewAudio.play();
-    if (previewBtnEl === btn) {
-      pvSet(btn, "playing", "Pause");
-      pvCaption(btn, `30-second preview${cands.length > 1 ? ` (${idx + 1}/${cands.length})` : ""}: ${hit.label}`, cands.length > 1, hit.link);
+    if (previewBtnEl === cur.btn) {
+      pvSet(cur.btn, "playing", "Pause");
+      pvShowCaption(cur);
     }
   } catch (e) {
-    if (previewBtnEl === btn) { previewBtnEl = null; pvSet(btn, "none"); }
+    if (previewBtnEl === cur.btn) { previewBtnEl = null; pvSet(cur.btn, "none"); }
   }
 }
 
-// "Another version" in the caption: next recording of the same work.
+// Play recording #idx (starting at its own track), then discover its other movements.
+async function playCandidate(btn, cands, idx) {
+  const cur = previewCur;
+  cur.idx = idx; cur.moves = null; cur.mIdx = 0;
+  const hit = cands[idx];
+  await playClip(cur, hit);
+  const moves = await pvMovements(hit, cur.wantTokens || []);
+  if (previewCur !== cur || cur.idx !== idx) return;
+  const at = moves.findIndex(m => m.tid === hit.tid);
+  if (moves.length > 1 && at >= 0) { cur.moves = moves; cur.mIdx = at; pvShowCaption(cur); }
+}
+
+// "Another recording": the same work by other performers.
 function nextVersion() {
   if (!previewCur || previewBtnEl !== previewCur.btn) return;
-  previewCur.idx = (previewCur.idx + 1) % previewCur.cands.length;
+  const idx = (previewCur.idx + 1) % previewCur.cands.length;
   pvSet(previewCur.btn, "loading", "Loading…");
-  playCandidate(previewCur.btn, previewCur.cands, previewCur.idx);
+  playCandidate(previewCur.btn, previewCur.cands, idx);
+}
+
+// "Next movement": the next part of the same recording (opening, middle, finale...).
+function nextMovement() {
+  const cur = previewCur;
+  if (!cur || previewBtnEl !== cur.btn || !cur.moves || cur.moves.length < 2) return;
+  cur.mIdx = (cur.mIdx + 1) % cur.moves.length;
+  pvSet(cur.btn, "loading", "Loading…");
+  playClip(cur, cur.moves[cur.mIdx]);
 }
 
 async function togglePreview(btn, composer) {
@@ -5943,7 +6006,7 @@ async function togglePreview(btn, composer) {
       pvSet(b, "none");
     });
   }
-  previewCur = { btn, cands, idx: 0, tries: 0 };
+  previewCur = { btn, cands, idx: 0, tries: 0, moves: null, mIdx: 0, wantTokens: pvTokens(btn.getAttribute("data-title")) };
   playCandidate(btn, cands, 0);
 }
 

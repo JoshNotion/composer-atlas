@@ -1937,8 +1937,8 @@ body[data-view="map"] .panel:not(.expanded) .map-section { display: none; }
 .work-preview.loading { color: var(--text-dim); cursor: progress; }
 .work-preview.none { color: var(--text-faint); border-color: var(--border); cursor: default; }
 .preview-cap { flex: 1 0 100%; margin-top: 4px; font-size: 11.5px; color: var(--text-faint); line-height: 1.4; }
-.preview-next { font: inherit; font-size: 11.5px; color: var(--text-dim); background: none; border: 0; padding: 0; margin-left: 6px; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
-.preview-next:hover { color: var(--text); }
+.preview-move, .preview-next { font: inherit; font-size: 11.5px; color: var(--text-dim); background: none; border: 0; padding: 0; margin-left: 6px; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.preview-move:hover, .preview-next:hover { color: var(--text); }
 
 /* One portrait style everywhere: warm black-and-white, faces framed near the top */
 :root { --portrait-filter: grayscale(1) sepia(.2) contrast(1.06) brightness(.97); }
