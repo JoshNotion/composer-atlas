@@ -30593,5 +30593,364 @@
       "WDR (West German Broadcasting) has commissioned and recorded much of his radio-play, choral, and orchestral output",
       "His work sits at the intersection of contemporary concert music, electronic composition, and theatre/film scoring — a hybrid path shaped by his dual degrees in classical piano and audio engineering"
     ]
+  },
+  {
+    "id": "eastman",
+    "name": "Julius Eastman",
+    "born": 1940,
+    "died": 1990,
+    "era": "Contemporary",
+    "portrait": "",
+    "wiki": "Julius Eastman",
+    "birthPlace": {
+      "city": "New York",
+      "country": "USA",
+      "lat": 40.7128,
+      "lng": -74.006
+    },
+    "locations": [
+      {
+        "city": "New York",
+        "type": "birth",
+        "years": "1940",
+        "lat": 40.7128,
+        "lng": -74.006
+      },
+      {
+        "city": "Ithaca",
+        "type": "lived",
+        "years": "1954–1959",
+        "lat": 42.444,
+        "lng": -76.5019
+      },
+      {
+        "city": "Philadelphia (Curtis Institute)",
+        "type": "lived",
+        "years": "1959–1963",
+        "lat": 39.9526,
+        "lng": -75.1652
+      },
+      {
+        "city": "Buffalo (SUNY Buffalo)",
+        "type": "lived",
+        "years": "1968–1975",
+        "lat": 42.8864,
+        "lng": -78.8784
+      },
+      {
+        "city": "New York",
+        "type": "lived",
+        "years": "1975–1989",
+        "lat": 40.7128,
+        "lng": -74.006
+      },
+      {
+        "city": "Buffalo",
+        "type": "death",
+        "years": "1990",
+        "lat": 42.8864,
+        "lng": -78.8784
+      }
+    ],
+    "relationships": [
+      {
+        "id": "max-davies",
+        "note": "Eastman sang the title role in Maxwell Davies's Eight Songs for a Mad King, a part that became one of his best-known performances."
+      },
+      {
+        "id": "boulez",
+        "note": "Worked with Boulez on a 1976 Lincoln Center performance of Eight Songs for a Mad King."
+      },
+      {
+        "id": "cage",
+        "note": "His 1975 performance of Cage's Song Books at SUNY Buffalo caused a controversy that ended his time there."
+      }
+    ],
+    "lifeEvents": [
+      {
+        "year": 1940,
+        "event": "Born in New York City and raised in Ithaca, where he began piano at fourteen"
+      },
+      {
+        "year": 1963,
+        "event": "Graduates in composition from the Curtis Institute of Music in Philadelphia"
+      },
+      {
+        "year": 1966,
+        "event": "Makes his debut as a pianist at Town Hall, New York"
+      },
+      {
+        "year": 1968,
+        "event": "Joins the Creative Associates at SUNY Buffalo at Lukas Foss's urging; co-founds the S.E.M. Ensemble with Petr Kotik"
+      },
+      {
+        "year": 1975,
+        "event": "Leaves Buffalo after the controversy over his performance of Cage's Song Books and settles in New York City"
+      },
+      {
+        "year": 1980,
+        "event": "Performs his four-piano works at Northwestern University, a concert later released as Unjust Malaise"
+      },
+      {
+        "year": 1990,
+        "event": "Dies in Buffalo at 49; his death goes largely unnoticed beyond a Village Voice obituary the following January"
+      },
+      {
+        "year": 2018,
+        "event": "G. Schirmer agrees to publish his music, working with his estate, after decades in which many scores were lost"
+      }
+    ],
+    "keyWorks": [
+      {
+        "title": "Stay On It",
+        "year": "1973",
+        "context": "Early postminimalist work that builds on popular-music progressions"
+      },
+      {
+        "title": "Gay Guerrilla",
+        "year": "c.1979",
+        "context": "One of three works for four pianos, with Evil Nigger and Crazy Nigger, that best represent his \"organic music\""
+      },
+      {
+        "title": "The Holy Presence of Joan d'Arc",
+        "year": "1981",
+        "context": "Piece for ten cellos performed at The Kitchen in New York"
+      },
+      {
+        "title": "Symphony No. II",
+        "year": "1983",
+        "context": "His only work for large orchestra, premiered in New York in 2018"
+      }
+    ],
+    "worldContext": [
+      "A Black, openly gay composer-performer working between the uptown and downtown New York scenes",
+      "His scores were impounded after an early-1980s eviction, so much of his music survives only in recordings and recollections",
+      "Rediscovered from the 2000s on, with a biography, new recordings and concert-hall performances by major orchestras"
+    ]
+  },
+  {
+    "id": "branca",
+    "name": "Glenn Branca",
+    "born": 1948,
+    "died": 2018,
+    "era": "Contemporary",
+    "portrait": "",
+    "wiki": "Glenn Branca",
+    "birthPlace": {
+      "city": "Harrisburg",
+      "country": "USA",
+      "lat": 40.2732,
+      "lng": -76.8867
+    },
+    "locations": [
+      {
+        "city": "Harrisburg",
+        "type": "birth",
+        "years": "1948",
+        "lat": 40.2732,
+        "lng": -76.8867
+      },
+      {
+        "city": "London",
+        "type": "lived",
+        "years": "1973",
+        "lat": 51.5074,
+        "lng": -0.1278
+      },
+      {
+        "city": "Boston",
+        "type": "lived",
+        "years": "1974–1976",
+        "lat": 42.3601,
+        "lng": -71.0589
+      },
+      {
+        "city": "New York",
+        "type": "lived",
+        "years": "1976–2018",
+        "lat": 40.7128,
+        "lng": -74.006
+      },
+      {
+        "city": "New York",
+        "type": "death",
+        "years": "2018",
+        "lat": 40.7128,
+        "lng": -74.006
+      }
+    ],
+    "relationships": [
+      {
+        "id": "reich",
+        "note": "His massed, pulsing guitar structures descend from the repetition of American minimalism, but replace its consonance with the harmonic series and extreme volume."
+      },
+      {
+        "id": "glass",
+        "note": "Fellow New York composer who came to concert music from the downtown scene; Branca is grouped with the post-minimalist generation that followed Glass and Reich."
+      }
+    ],
+    "lifeEvents": [
+      {
+        "year": 1948,
+        "event": "Born in Harrisburg, Pennsylvania"
+      },
+      {
+        "year": 1975,
+        "event": "Founds the experimental theatre group Bastard Theatre in Boston"
+      },
+      {
+        "year": 1976,
+        "event": "Moves to New York City"
+      },
+      {
+        "year": 1978,
+        "event": "Takes part in the No Wave festival at Artists Space"
+      },
+      {
+        "year": 1982,
+        "event": "Founds Neutral Records, which releases early recordings by Sonic Youth, whose members Thurston Moore and Lee Ranaldo had played in his ensemble"
+      },
+      {
+        "year": 1983,
+        "event": "Symphony No. 3 (Gloria) marks his first systematic use of the harmonic series"
+      },
+      {
+        "year": 2001,
+        "event": "Conducts his 100-guitar Symphony No. 13 at the base of the World Trade Center, less than three months before 9/11"
+      },
+      {
+        "year": 2018,
+        "event": "Dies in New York City of throat cancer at 69"
+      }
+    ],
+    "keyWorks": [
+      {
+        "title": "The Ascension",
+        "year": "1981",
+        "context": "Album-length work for electric guitars that put his massed-guitar sound on record"
+      },
+      {
+        "title": "Symphony No. 1 (Tonal Plexus)",
+        "year": "1983",
+        "context": "First of his numbered symphonies for amplified guitar ensemble"
+      },
+      {
+        "title": "Symphony No. 6 (Devil Choirs at the Gates of Heaven)",
+        "year": "1989",
+        "context": "Harmonic-series symphony from the middle of his career"
+      },
+      {
+        "title": "Symphony No. 13 (Hallucination City)",
+        "year": "2001",
+        "context": "Written for 100 guitars and premiered at the World Trade Center"
+      }
+    ],
+    "worldContext": [
+      "A central figure in New York's No Wave scene, which blurred the line between rock band and concert hall",
+      "Built custom instruments, including harmonics guitars and mallet guitars, to realise his harmonic-series music",
+      "Often grouped with Rhys Chatham in the totalist school of post-minimalism"
+    ]
+  },
+  {
+    "id": "david-lang",
+    "name": "David Lang",
+    "born": 1957,
+    "died": null,
+    "era": "Contemporary",
+    "portrait": "",
+    "wiki": "David Lang (composer)",
+    "birthPlace": {
+      "city": "Los Angeles",
+      "country": "USA",
+      "lat": 34.0522,
+      "lng": -118.2437
+    },
+    "locations": [
+      {
+        "city": "Los Angeles",
+        "type": "birth",
+        "years": "1957",
+        "lat": 34.0522,
+        "lng": -118.2437
+      },
+      {
+        "city": "New York",
+        "type": "lived",
+        "years": "1987–present",
+        "lat": 40.7128,
+        "lng": -74.006
+      }
+    ],
+    "relationships": [
+      {
+        "id": "henze",
+        "note": "Henze was among Lang's teachers."
+      },
+      {
+        "id": "bach",
+        "note": "The Little Match Girl Passion, Lang's Pulitzer-winning work, takes Bach's St. Matthew Passion as its model."
+      },
+      {
+        "id": "reich",
+        "note": "Bang on a Can, which Lang co-founded, carries on the downtown New York minimalist lineage that Reich helped establish."
+      }
+    ],
+    "lifeEvents": [
+      {
+        "year": 1957,
+        "event": "Born in Los Angeles and plays trombone in his youth; studies at Stanford and the University of Iowa"
+      },
+      {
+        "year": 1987,
+        "event": "Co-founds Bang on a Can with Julia Wolfe and Michael Gordon"
+      },
+      {
+        "year": 1989,
+        "event": "Earns a Doctorate of Musical Arts from Yale"
+      },
+      {
+        "year": 1999,
+        "event": "Premieres the opera The Difficulty of Crossing a Field, with Mac Wellman"
+      },
+      {
+        "year": 2007,
+        "event": "Premieres the little match girl passion at Zankel Hall, New York"
+      },
+      {
+        "year": 2008,
+        "event": "Wins the Pulitzer Prize for Music for the little match girl passion and joins the Yale School of Music faculty"
+      },
+      {
+        "year": 2016,
+        "event": "Receives an Academy Award nomination for the song \"Simple Song #3\" from Paolo Sorrentino's film Youth"
+      }
+    ],
+    "keyWorks": [
+      {
+        "title": "The Difficulty of Crossing a Field",
+        "year": "1999",
+        "context": "Opera with Mac Wellman, based on an Ambrose Bierce story"
+      },
+      {
+        "title": "the little match girl passion",
+        "year": "2007",
+        "context": "Passion for four voices and percussion after Hans Christian Andersen and Bach; won the 2008 Pulitzer Prize for Music"
+      },
+      {
+        "title": "Death Speaks",
+        "year": "2012",
+        "context": "Song cycle premiered at Carnegie Hall"
+      },
+      {
+        "title": "The Loser",
+        "year": "2016",
+        "context": "Opera based on Thomas Bernhard's novel, which opened BAM's Next Wave Festival"
+      }
+    ],
+    "worldContext": [
+      "Co-founder of Bang on a Can, one of the main institutions of new music in the United States",
+      "Has also written film scores, including Youth, Wildlife and The Woodmans",
+      "Still active: his oratorio The Wealth of Nations premiered in New York in March 2026"
+    ]
   }
 ]

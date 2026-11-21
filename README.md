@@ -1,6 +1,6 @@
 # Composer Atlas
 
-A personal classical-music exploration tool: **309 composers spanning ~950 years** of music history (Petrus Abaelardus, 1079 → present). A home page leads to an interactive D3.js timeline, a world map of where composers lived (filterable by 50-year bracket, era and birth/lived/death), and a searchable composers grid. Each composer opens in a detail panel with a Leaflet map of their journey.
+A personal classical-music exploration tool: **312 composers spanning ~950 years** of music history (Petrus Abaelardus, 1079 → present). A home page leads to an interactive D3.js timeline, a world map of where composers lived (filterable by 50-year bracket, era and birth/lived/death), and a searchable composers grid. Each composer opens in a detail panel with a Leaflet map of their journey.
 
 ## Run it locally
 
@@ -47,7 +47,7 @@ This produces `composer-atlas.html` (~1.4 MB) with **everything inlined** — CS
 - `portraits.js` — initials fallback + lazy Wikipedia summary fetch (one cached request per article, shared by the portrait and the About text); higher-resolution swap for the lightbox.
 - `openopus.js` — Open Opus integration: resolves a composer to an Open Opus id and loads their full works catalogue (cached; see below).
 - `app.js` — glue: loads JSON, mirrors relationships, wires selection, zoom, lightbox, keyboard, tooltip, panel state machine, hash-based era filter.
-- `composers.json` — the data file (194 composers).
+- `composers.json` — the data file (312 composers).
 - `build.cjs` — single-file bundler for the Notion / offline HTML.
 - `start.cmd` — Windows launcher (opens browser, runs `npx serve`).
 
